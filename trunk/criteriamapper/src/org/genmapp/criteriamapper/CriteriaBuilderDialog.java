@@ -53,7 +53,7 @@ import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 
-import src.BooleanSettingsDialog.getOperationSelection;
+import org.genmapp.criteriamapper.BooleanSettingsDialog.getOperationSelection;
 
 
 
