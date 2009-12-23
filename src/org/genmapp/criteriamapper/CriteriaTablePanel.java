@@ -294,6 +294,7 @@ public class CriteriaTablePanel implements ActionListener, ListSelectionListener
 		criteriaControlPanel = new JPanel();
 		//criteriaControlPanel.add(newCriteria);
 		criteriaControlPanel.add(editCriteria);
+		//criteriaControlPanel.add(CriteriaMapperDialog.saveSet);
 		//criteriaControlPanel.add(duplicateCriteria);
 		criteriaControlPanel.add(deleteCriteria);
 		

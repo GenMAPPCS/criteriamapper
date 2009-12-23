@@ -59,16 +59,24 @@ public class AttributeManager {
 		networkAttributes.setListAttribute(network.getIdentifier(), "__criteria", criteriaSetNames);
 	}
 	
-	public String[] getNamesAttribute(CyNetwork network){
-		if(networkAttributes.hasAttribute(network.getIdentifier(), "__criteria")){
-			String[] a = {""};
-			ArrayList<String> temp = (ArrayList<String>)networkAttributes.getListAttribute(network.getIdentifier(), "__criteria");
-			
-			return temp.toArray(a);
-		}else{
-			
-			return new String[] {""};
+	public Object[] getNamesAttribute(CyNetwork network){
+		List temp = networkAttributes.getListAttribute(network.getIdentifier(), "__criteria");
+
+		if(temp==null){
+			temp = new ArrayList();
+			temp.add("New...");
 		}
+				
+		return temp.toArray();
+		
+//		if(networkAttributes.hasAttribute(network.getIdentifier(), "__criteria")){
+//	//		String[] a ;
+//			
+//			return temp; //.toArray<String>(); //(a);
+//		}else{
+//			
+//			return new String[] {""};
+//		}
 	}
 	
 	
