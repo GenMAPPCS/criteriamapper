@@ -1,37 +1,32 @@
 package org.genmapp.criteriamapper;
 
 
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-import javax.swing.JTable;
-import javax.swing.border.Border;
-import javax.swing.border.EtchedBorder;
-import javax.swing.border.TitledBorder;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.ImageIcon;
-
-import javax.imageio.*;
-
-
-import cytoscape.Cytoscape;
-import cytoscape.data.CyAttributes;
-
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
-import java.util.*;
+import java.util.ArrayList;
+
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.border.Border;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+
+import cytoscape.Cytoscape;
+import cytoscape.data.CyAttributes;
+import cytoscape.view.CytoscapeDesktop;
 
 public class CriteriaMapperDialog extends JDialog implements ActionListener, FocusListener, ListSelectionListener,
 java.beans.PropertyChangeListener{
@@ -44,8 +39,8 @@ java.beans.PropertyChangeListener{
 	private CriteriaTablePanel criteriaTable;
 	private CriteriaCalculator calculate = new CriteriaCalculator(); //Not currently used
 	
-	private JButton newSet;
-	private JButton saveSet;
+//	private JButton newSet;
+	protected static JButton saveSet;
 	private JButton deleteSet;
 	private JButton renameSet;
 	private JButton duplicateSet;
@@ -73,7 +68,7 @@ java.beans.PropertyChangeListener{
 	}
 	
 	public void initialize()
-	{
+	{   		   
 	   mainPanel = new JPanel();
 	   
 	   mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
@@ -89,7 +84,9 @@ java.beans.PropertyChangeListener{
 	   mainPanel.add(tableMapperPanel);
 
 	   setContentPane(mainPanel);
-	   setLocation(900,Cytoscape.getDesktop().getHeight()-250);
+	   CytoscapeDesktop d = Cytoscape.getDesktop();
+	   setLocation(d.getX()+d.getWidth()/2-this.getWidth()/2, d.getY()+d.getHeight()/2-this.getHeight()/2);
+	
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -99,12 +96,34 @@ java.beans.PropertyChangeListener{
 		 
 	
 		if(command.equals("nameBoxChanged")){
+			String setName = (String)nameBox.getSelectedItem();
+			
 			if(nameBox.isEditable()){ 
-				JOptionPane.showMessageDialog(Cytoscape.getDesktop(), "Must save set name before continuing.");
+				nameBoxArray = attributeManager.getNamesAttribute(Cytoscape.getCurrentNetwork());
+				for (int i = 0; i< nameBoxArray.length; i++){
+					if (nameBoxArray[i].equals(setName)){
+						System.out.println("nameBoxChanged: "+setName);
+						criteriaTable.setName = setName;
+						criteriaTable.clearTable();	
+						loadSettings(setName); 
+						criteriaTable.setFlag = true;	
+						nameBox.setEditable(false);
+						return;
+					}
+				}
+			
+				attributeManager.addNamesAttribute(Cytoscape.getCurrentNetwork(), setName);
+				nameBox.addItem(setName);
+				nameBox.setEditable(false);
+				return;
+			}
+
+			if(setName.equalsIgnoreCase("New...")){
+				System.out.println("Hello");
+				nameBox.setEditable(true);
 				return;
 			}
 			
-			String setName = (String)nameBox.getSelectedItem();
 			System.out.println("nameBoxChanged: "+setName);
 			criteriaTable.setName = setName;
 			
@@ -172,8 +191,6 @@ java.beans.PropertyChangeListener{
 		String newName = nameValue; //(String)nameBox.getSelectedItem();
 		
 		String mapTo = (String)mapToBox.getSelectedItem();
-		
-		attributeManager.addNamesAttribute(Cytoscape.getCurrentNetwork(), newName);
        
 		String[] criteriaLabels = new String[criteriaTable.getDataLength()];
 		
@@ -187,6 +204,8 @@ java.beans.PropertyChangeListener{
 			//System.out.println(criteriaLabels.length+"AAA"+temp);
 		}
 		attributeManager.setValuesAttribute(newName, mapTo, criteriaLabels);
+		
+
 	}
 	
 	
@@ -231,7 +250,7 @@ java.beans.PropertyChangeListener{
 	
 	private JComboBox nameBox;
 	private JComboBox mapToBox;
-	private String[] nameBoxArray;
+	private Object[] nameBoxArray;
 	
 	public JPanel getCriteriaSetPanel(){
 		//JPanel setPanel = new JPanel(new BorderLayout(0, 2));
@@ -249,7 +268,7 @@ java.beans.PropertyChangeListener{
 		JLabel setLabel = new JLabel("Name"); 
 		//System.out.println(Cytoscape.getCurrentNetwork().getIdentifier());
 		nameBox = new JComboBox(nameBoxArray);
-		nameBox.setEditable(false);
+		nameBox.setEditable((nameBoxArray.length == 1)? true : false);
 		nameBox.setPreferredSize(new Dimension(240,20));
 		nameBox.setActionCommand("nameBoxChanged");
 		nameBox.addActionListener(this);
@@ -262,25 +281,25 @@ java.beans.PropertyChangeListener{
 		
 		JPanel sPanel = new JPanel(new BorderLayout(0,2));
 		JPanel setButtonsPanel = new JPanel();//new BorderLayout(0,2));
-		newSet = new JButton("New");
+		//newSet = new JButton("New");
 		saveSet = new JButton("Save");
 		deleteSet = new JButton("Delete");
 		renameSet = new JButton("Rename");
 		duplicateSet = new JButton("Duplicate");
 		
-		newSet.addActionListener(this);
+		//newSet.addActionListener(this);
 		saveSet.addActionListener(this);
 		deleteSet.addActionListener(this);
 		renameSet.addActionListener(this);
 		duplicateSet.addActionListener(this);
 		
-		newSet.setActionCommand("newSet");
+		//newSet.setActionCommand("newSet");
 		saveSet.setActionCommand("saveSet");
 		deleteSet.setActionCommand("deleteSet");
         renameSet.setActionCommand("renameSet");
         duplicateSet.setActionCommand("duplicateSet");   
         
-        setButtonsPanel.add(newSet); 
+  //      setButtonsPanel.add(newSet); 
   	    setButtonsPanel.add(saveSet);
 	    setButtonsPanel.add(deleteSet); 
         setButtonsPanel.add(renameSet);
