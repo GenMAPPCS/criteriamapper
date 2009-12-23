@@ -112,7 +112,7 @@ public class BooleanSettingsDialog extends JDialog implements ActionListener, Fo
 	private ArrayList<String> attributeList = new ArrayList<String>(); //List which holds all of the attributes
 	private String[] opArray = {"=", "<", ">", ">=", "<=", "AND", "OR", "NOT"}; 
 	private String[] attributesArray;
-	private String[] nameBoxArray; //Array holding the names of the Criteria Sets
+	private Object[] nameBoxArray; //Array holding the names of the Criteria Sets
 	
 	
 	public BooleanSettingsDialog() {
