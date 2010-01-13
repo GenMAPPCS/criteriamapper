@@ -39,8 +39,8 @@ java.beans.PropertyChangeListener{
 	private CriteriaTablePanel criteriaTable;
 	private CriteriaCalculator calculate = new CriteriaCalculator(); //Not currently used
 	
-//	private JButton newSet;
-	protected static JButton saveSet;
+	private JButton newSet;
+	private JButton saveSet;
 	private JButton deleteSet;
 	private JButton renameSet;
 	private JButton duplicateSet;
@@ -106,7 +106,7 @@ java.beans.PropertyChangeListener{
 						criteriaTable.setName = setName;
 						criteriaTable.clearTable();	
 						loadSettings(setName); 
-						criteriaTable.setFlag = true;	
+						//criteriaTable.setFlag = true;	
 						nameBox.setEditable(false);
 						return;
 					}
@@ -119,7 +119,6 @@ java.beans.PropertyChangeListener{
 			}
 
 			if(setName.equalsIgnoreCase("New...")){
-				System.out.println("Hello");
 				nameBox.setEditable(true);
 				return;
 			}
@@ -132,7 +131,7 @@ java.beans.PropertyChangeListener{
 				criteriaTable.clearTable();	
 				
 				loadSettings(setName); 
-				criteriaTable.setFlag = true;
+				//criteriaTable.setFlag = true;
 				//nameBox.setEditable(false);
 			}else{
 				criteriaTable.clearTable();
@@ -147,7 +146,7 @@ java.beans.PropertyChangeListener{
 			criteriaTable.clearTable();
 			
 			//criteriaTable.addEditableRow();
-			criteriaTable.setFlag = true;
+			//criteriaTable.setFlag = true;
 		}
 		if(command.equals("saveSet")){
 			String setName = (String)nameBox.getSelectedItem();
@@ -191,6 +190,8 @@ java.beans.PropertyChangeListener{
 		String newName = nameValue; //(String)nameBox.getSelectedItem();
 		
 		String mapTo = (String)mapToBox.getSelectedItem();
+		
+		attributeManager.addNamesAttribute(Cytoscape.getCurrentNetwork(), newName);
        
 		String[] criteriaLabels = new String[criteriaTable.getDataLength()];
 		
@@ -204,8 +205,6 @@ java.beans.PropertyChangeListener{
 			//System.out.println(criteriaLabels.length+"AAA"+temp);
 		}
 		attributeManager.setValuesAttribute(newName, mapTo, criteriaLabels);
-		
-
 	}
 	
 	
@@ -250,7 +249,7 @@ java.beans.PropertyChangeListener{
 	
 	private JComboBox nameBox;
 	private JComboBox mapToBox;
-	private Object[] nameBoxArray;
+	private String[] nameBoxArray;
 	
 	public JPanel getCriteriaSetPanel(){
 		//JPanel setPanel = new JPanel(new BorderLayout(0, 2));
