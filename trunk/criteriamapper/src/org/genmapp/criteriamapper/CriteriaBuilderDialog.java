@@ -57,11 +57,10 @@ import org.genmapp.criteriamapper.BooleanSettingsDialog.getOperationSelection;
 
 
 
-public class CriteriaBuilderDialog extends JDialog implements ActionListener, ListSelectionListener{
+public class CriteriaBuilderDialog extends JPanel implements ActionListener, ListSelectionListener{
 	
 	private JFrame mainFrame;
 	private JDialog mainDialog;
-	private JPanel mainPanel;
 	private JButton colorButton;
 	private JColorChooser colorChooser;
 	
@@ -73,6 +72,7 @@ public class CriteriaBuilderDialog extends JDialog implements ActionListener, Li
 	JComboBox mapToBox;
 	
 	CriteriaTablePanel panelPointer;
+	JPanel ctpPanel;
 	
 	Color currentColor = Color.WHITE; //keeps track of the color displayed by the color button
 	String label = ""; 
@@ -89,15 +89,13 @@ public class CriteriaBuilderDialog extends JDialog implements ActionListener, Li
 	public CriteriaBuilderDialog(CriteriaTablePanel panel){
 		
 		panelPointer = panel;
-		
+
 	}
 	
 	
-	public void initialize(int row){
+	public void initialize(){
 		
-		currentRow = row;
-		mainDialog = new JDialog();
-		mainPanel = new JPanel();
+//		mainDialog = new JDialog();
 		currentColor = Color.WHITE;
 		
 		/*JPanel labelPanel = new JPanel(new BorderLayout(0, 2));
@@ -108,31 +106,33 @@ public class CriteriaBuilderDialog extends JDialog implements ActionListener, Li
 		labelPanel.add(labelField, BorderLayout.LINE_END);
 		labelField.setHorizontalAlignment(JTextField.LEFT);
 		*/
+		//clear content before building
 		
-		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
+		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 		//mainPanel.setPreferredSize(new Dimension(Cytoscape.getDesktop().getWidth(), 450));
 		
 		//mainPanel.add(labelPanel);
 		//JPanel pan = getListPanel();
 		//pan.setSize(new Dimension(300,100));
 		//mainPanel.add(getListPanel());
-		mainPanel.add(getCriteriaChooserPanel());
-		mainPanel.add(getListPanel());
+		this.add(getCriteriaChooserPanel());
+		this.add(getListPanel());
 		
-		Image builderIcon = new ImageIcon(CriteriaBuilderDialog.class.getResource("img/stock_form-properties.png")).getImage();
+		//Image builderIcon = new ImageIcon(CriteriaBuilderDialog.class.getResource("img/upArrow.svg")).getImage();
         //if (builderIconURL != null) {
           //  builderIcon = new ImageIcon(builderIconURL).getImage();
         //}
-        mainFrame = new JFrame();
-        mainFrame.setIconImage(builderIcon);
+        //mainFrame = new JFrame();
+        //mainFrame.setIconImage(builderIcon);
         //mainDialog = new JDialog(mainFrame);
 		
+		ctpPanel = panelPointer.getTablePanel();
+		ctpPanel.add(this);
 		
-		
-		mainDialog.setContentPane(mainPanel);
-		mainDialog.setVisible(true);
-		mainDialog.setLocation(360,Cytoscape.getDesktop().getHeight()-250);
-		mainDialog.setSize(new Dimension(300,256));
+//		mainDialog.setContentPane(mainPanel);
+//		mainDialog.setVisible(true);
+//		mainDialog.setLocation(360,Cytoscape.getDesktop().getHeight()-250);
+//		mainDialog.setSize(new Dimension(300,256));
         
 		//mainDialog.setVisible(true);
 	}
@@ -165,12 +165,11 @@ public class CriteriaBuilderDialog extends JDialog implements ActionListener, Li
 			
 			
 		}
-    	if(command.equals("CBsave")){
+    	if(command.equals("CBdone")){
     		label = labelField.getText();
     		criteria = criteriaField.getText();
     		mapTo = (String)mapToBox.getSelectedItem();
-    		mainDialog.setVisible(false);
-    		
+    		//mainDialog.setVisible(false);
     	}
         
         //setVisible(true);
@@ -256,7 +255,7 @@ public class CriteriaBuilderDialog extends JDialog implements ActionListener, Li
 		
 		JButton addButton = new JButton("Add");
 		addButton.setActionCommand("CBadd");
-		addButton.addActionListener(this);
+		//addButton.addActionListener(this);
 		addButton.addActionListener(panelPointer);
 		
 		JButton clearButton = new JButton("Clear");
@@ -264,7 +263,7 @@ public class CriteriaBuilderDialog extends JDialog implements ActionListener, Li
 		clearButton.addActionListener(this);
 		
 		JButton doneButton = new JButton("Done");
-		doneButton.setActionCommand("CBsave");
+		doneButton.setActionCommand("CBdone");
 		doneButton.addActionListener(this);
 		doneButton.addActionListener(panelPointer);
 		
