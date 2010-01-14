@@ -148,10 +148,12 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 				criteriaTable.clearTable();
 				criteriaTable.addEditableRow();
 				tableMapperPanel.setVisible(true);
+				tableMapperPanel.setEnabled(true);
 				controlPanel.setVisible(true);
 				deleteSet.setEnabled(true);
 				duplicateSet.setEnabled(true);
 				pack();
+				setEnabled(true);
 				return;
 			}
 
