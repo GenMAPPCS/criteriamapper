@@ -135,43 +135,33 @@ public class CriteriaTablePanel implements ActionListener,
 
 				}
 
-				// if (e.getClickCount() == 2) {
-				//
-				// // checks for a new or current set and if the row being
-				// // clicked on has been made editable yet
-				// // if (setFlag && row >= editableRowCount) {
-				// // String labelstr = "Label " + row;
-				// // populateList("", labelstr, Color.WHITE);
-				// // }
-				// // // addEditableRow(); }
-				// // System.out.println(column);
-				// // if(column == 0 || column == 1){ }
-				// // if(column == 3){
-				// // }
-				// if (column == 2) {
-				// // TODO: pop up slim version of criteria builder
-				// }
-				// if (column == 4) {
-				//
-				// JColorChooser colorChooser = new JColorChooser();
-				// JButton button = new JButton();
-				// button.setActionCommand("edit");
-				// // button.addActionListener(this);
-				// button.setBorderPainted(true);
-				// JDialog dialog = JColorChooser.createDialog(button,
-				// "Pick a Color", true, // modal
-				// colorChooser, null, // OK button handler
-				// null); // no CANCEL button handler
-				// dialog.add(button);
-				// dialog.setLocation(2, Cytoscape.getDesktop()
-				// .getHeight() - 385);
-				// dialog.setVisible(true);
-				// Color currentColor = colorChooser.getColor();
-				// setCell(row, column, currentColor + "");
-				// colorEditor.currentColor = currentColor;
-				// // initializeTable();
-				// }
-				// }
+				if (e.getClickCount() == 2) {
+
+					if (column == 2) {
+						// TODO: pop up slim version of criteria builder
+					}
+
+					if (column == 4) {
+
+						JColorChooser colorChooser = new JColorChooser();
+						JButton button = new JButton();
+						button.setActionCommand("edit");
+						// button.addActionListener(this);
+						button.setBorderPainted(true);
+						JDialog dialog = JColorChooser.createDialog(button,
+								"Pick a Color", true, // modal
+								colorChooser, null, // OK button handler
+								null); // no CANCEL button handler
+						dialog.add(button);
+						dialog.setLocation(2, Cytoscape.getDesktop()
+								.getHeight() - 385);
+						dialog.setVisible(true);
+						Color currentColor = colorChooser.getColor();
+						setCell(row, column, currentColor + "");
+						colorEditor.currentColor = currentColor;
+						// initializeTable();
+					}
+				}
 			}
 		});
 
@@ -208,7 +198,7 @@ public class CriteriaTablePanel implements ActionListener,
 		table.getColumn("Value").setCellRenderer(new ColorRenderer(true));
 		// table.getColumn("").setCellRenderer(new ArrowRenderer(true));
 
-		table.setEditingColumn(1);
+		// table.setEditingColumn(1);
 
 		table.setDefaultEditor(Color.class, colorEditor);
 		table.getColumn("Value").setCellEditor(colorEditor);
@@ -287,15 +277,6 @@ public class CriteriaTablePanel implements ActionListener,
 
 		}
 
-		// if (command.equals("editCriteria")) {
-		//
-		// if(dataModel.isCellEditable(rowc, 1)){
-		// TODO: add new row
-		// }else{
-		// addEditableRow();
-		// }
-		// }
-
 		if (command.equals("CBdone")) {
 			// dataModel.setValueAt(cbDialog.labelField.getText(), row, 1);
 			dataModel.setValueAt(cbDialog.criteriaField.getText(), table
@@ -343,10 +324,10 @@ public class CriteriaTablePanel implements ActionListener,
 				JOptionPane.showMessageDialog(Cytoscape.getDesktop(),
 						"Please select a row first.");
 			} else {
-			// TODO: fix this!
-			JOptionPane.showMessageDialog(Cytoscape.getDesktop(),
-					"Sorry, I can only delete one row at a time :(");
-		}
+				// TODO: fix this!
+				JOptionPane.showMessageDialog(Cytoscape.getDesktop(),
+						"Sorry, I can only delete one row at a time :(");
+			}
 
 			// initializeTable();
 
@@ -790,17 +771,13 @@ public class CriteriaTablePanel implements ActionListener,
 			fireTableDataChanged();
 		}
 
-		// public boolean isCellEditable(int row, int col) {
-		// if (row < editableRowCount && row >= 0) {
-		// return true;
-		// } else {
-		// return false;
-		// }
-		// }
-
-		// public Class getColumnClass(int c) {
-		// return getValueAt(0, c).getClass();
-		// }
+		public boolean isCellEditable(int row, int col) {
+			if (row < rowCount && row >= 0) {
+				return true;
+			} else {
+				return false;
+			}
+		}
 
 		public String getColumnName(int i) {
 			return columnNames[i];
