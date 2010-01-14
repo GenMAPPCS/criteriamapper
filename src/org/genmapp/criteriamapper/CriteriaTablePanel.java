@@ -9,42 +9,42 @@ package org.genmapp.criteriamapper;
  * 
  */
 
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JColorChooser;
+import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.event.ListSelectionListener;
-import javax.swing.event.ListSelectionEvent;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
-import javax.swing.table.*;
-import javax.swing.ImageIcon;
-import javax.swing.UIManager;
-import javax.swing.SwingUtilities;
-
-import javax.swing.*;
-import javax.swing.event.*;
-import javax.swing.table.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.TableCellEditor;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 
 import cytoscape.Cytoscape;
-
-import java.util.*;
-import java.util.regex.*;
-import java.awt.*;
-import java.awt.event.*;
 
 public class CriteriaTablePanel implements ActionListener,
 		ListSelectionListener {
@@ -54,31 +54,32 @@ public class CriteriaTablePanel implements ActionListener,
 
 	// internal classes
 	private BooleanTableModel dataModel;
-//	private BooleanCalculator calculator;
+	// private BooleanCalculator calculator;
 	private ColorMapper mapper;
 	private ColorEditor colorEditor;
 	private CriteriaBuilderDialog cbDialog;
 
 	private JPanel tablePanel;
-	private JPanel criteriaControlPanel;
-//	private JPanel tableButtons;
+	// private JPanel criteriaControlPanel;
+	// private JPanel tableButtons;
 	private JTable table;
 
-//	private int listCount = 0;
-	private int globalRowCount = 0;
-	private int editableRowCount = 0;
+	// private int listCount = 0;
+	// private int globalRowCount = 0;
 
-//	private ArrayList<String> allCurrentLabels = new ArrayList<String>();
+	// private ArrayList<String> allCurrentLabels = new ArrayList<String>();
 
-	String mapTo = "Node Color";
-//	boolean setFlag = false;
+	// String mapTo = "Node Color";
+	// boolean setFlag = false;
 
-//	private String CBlabel;
-//	private String CBcriteria;
-//	private String CBvalue;
-//	private String CBmapTo;
+	// private String CBlabel;
+	// private String CBcriteria;
+	// private String CBvalue;
+	// private String CBmapTo;
 
-	String setName = "";
+	protected String setName = "New...";
+	protected String mapTo[] = { "Node Color", "Node Size", "Node Shape" };
+	public String mapToPick = mapTo[0];
 
 	private CriteriaCalculator calculate = new CriteriaCalculator();
 
@@ -88,7 +89,7 @@ public class CriteriaTablePanel implements ActionListener,
 		mapper = new ColorMapper();
 		attManager = new AttributeManager();
 		colorEditor = new ColorEditor();
-//		calculator = new BooleanCalculator();
+		// calculator = new BooleanCalculator();
 		cbDialog = new CriteriaBuilderDialog(this);
 		initializeTable();
 	}
@@ -121,8 +122,8 @@ public class CriteriaTablePanel implements ActionListener,
 				int column = target.getSelectedColumn();
 
 				// fill Builder fields from selected row cells
-				cbDialog.labelField.setText((String) getCell(row, 1));
-				cbDialog.criteriaField.setText((String) getCell(row, 2));
+				// cbDialog.labelField.setText((String) getCell(row, 1));
+				// cbDialog.criteriaField.setText((String) getCell(row, 2));
 
 				if (e.getClickCount() == 1) {
 					if (column == 0) {
@@ -134,43 +135,43 @@ public class CriteriaTablePanel implements ActionListener,
 
 				}
 
-				if (e.getClickCount() == 2) {
-
-					// checks for a new or current set and if the row being
-					// clicked on has been made editable yet
-					// if (setFlag && row >= editableRowCount) {
-					// String labelstr = "Label " + row;
-					// populateList("", labelstr, Color.WHITE);
-					// }
-					// // addEditableRow(); }
-					// System.out.println(column);
-	   		         if(column == 0 || column == 1){ }
-    		         if(column == 3){		        	
-    		         }
- 					if (column == 2) {
-						// TODO: pop up slim version of criteria builder
-					}
-					if (column == 4) {
-
-						JColorChooser colorChooser = new JColorChooser();
-						JButton button = new JButton();
-						button.setActionCommand("edit");
-						// button.addActionListener(this);
-						button.setBorderPainted(true);
-						JDialog dialog = JColorChooser.createDialog(button,
-								"Pick a Color", true, // modal
-								colorChooser, null, // OK button handler
-								null); // no CANCEL button handler
-						dialog.add(button);
-						dialog.setLocation(2, Cytoscape.getDesktop()
-								.getHeight() - 385);
-						dialog.setVisible(true);
-						Color currentColor = colorChooser.getColor();
-						setCell(row, column, currentColor + "");
-						colorEditor.currentColor = currentColor;
-						// initializeTable();
-					}
-				}
+				// if (e.getClickCount() == 2) {
+				//
+				// // checks for a new or current set and if the row being
+				// // clicked on has been made editable yet
+				// // if (setFlag && row >= editableRowCount) {
+				// // String labelstr = "Label " + row;
+				// // populateList("", labelstr, Color.WHITE);
+				// // }
+				// // // addEditableRow(); }
+				// // System.out.println(column);
+				// // if(column == 0 || column == 1){ }
+				// // if(column == 3){
+				// // }
+				// if (column == 2) {
+				// // TODO: pop up slim version of criteria builder
+				// }
+				// if (column == 4) {
+				//
+				// JColorChooser colorChooser = new JColorChooser();
+				// JButton button = new JButton();
+				// button.setActionCommand("edit");
+				// // button.addActionListener(this);
+				// button.setBorderPainted(true);
+				// JDialog dialog = JColorChooser.createDialog(button,
+				// "Pick a Color", true, // modal
+				// colorChooser, null, // OK button handler
+				// null); // no CANCEL button handler
+				// dialog.add(button);
+				// dialog.setLocation(2, Cytoscape.getDesktop()
+				// .getHeight() - 385);
+				// dialog.setVisible(true);
+				// Color currentColor = colorChooser.getColor();
+				// setCell(row, column, currentColor + "");
+				// colorEditor.currentColor = currentColor;
+				// // initializeTable();
+				// }
+				// }
 			}
 		});
 
@@ -180,7 +181,7 @@ public class CriteriaTablePanel implements ActionListener,
 		// table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
 		TableColumn showCol = table.getColumnModel().getColumn(0);
-		TableColumn buildCol = table.getColumnModel().getColumn(2);
+		// TableColumn buildCol = table.getColumnModel().getColumn(2);
 		TableColumn mapToCol = table.getColumnModel().getColumn(3);
 
 		showCol.setMaxWidth(40);
@@ -191,7 +192,6 @@ public class CriteriaTablePanel implements ActionListener,
 
 		// buildCol.setCellRenderer(new builderIconRenderer(true));
 
-		String mapTo[] = { "Node Color", "Node Size", "Node Shape" };
 		JComboBox mapToBox = new JComboBox(mapTo);
 		mapToCol.setCellEditor(new DefaultCellEditor(mapToBox));
 
@@ -199,9 +199,9 @@ public class CriteriaTablePanel implements ActionListener,
 
 		// Create the scroll pane and add the table to it.
 
-//		 ListSelectionModel listSelectionModel = table.getSelectionModel();
-//		 listSelectionModel.addListSelectionListener(this);
-//		 table.setSelectionModel(listSelectionModel);
+		// ListSelectionModel listSelectionModel = table.getSelectionModel();
+		// listSelectionModel.addListSelectionListener(this);
+		// table.setSelectionModel(listSelectionModel);
 
 		// Set up renderer and editor for the Favorite Color column.
 
@@ -214,7 +214,7 @@ public class CriteriaTablePanel implements ActionListener,
 		table.getColumn("Value").setCellEditor(colorEditor);
 
 		table.setEnabled(true);
-		
+
 		JScrollPane scrollPane = new JScrollPane(table);
 
 		// Add the scroll pane to this panel.
@@ -240,56 +240,38 @@ public class CriteriaTablePanel implements ActionListener,
 		downArrow.setActionCommand("moveDown");
 		downArrow.addActionListener(this);
 
+		JButton newRow = new JButton("New Row");
+		newRow.setActionCommand("newCriteria");
+		newRow.addActionListener(this);
+
+		JButton deleteRow = new JButton("Delete Row");
+		deleteRow.setActionCommand("deleteCriteria");
+		deleteRow.addActionListener(this);
+
 		JPanel arrowPanel = new JPanel();
 		arrowPanel.setLayout(new BoxLayout(arrowPanel, BoxLayout.Y_AXIS));
 
-		JPanel scrollPanel = new JPanel();
-		scrollPanel.setLayout(new BoxLayout(scrollPanel, BoxLayout.X_AXIS));
-
 		arrowPanel.add(upArrow);
 		arrowPanel.add(downArrow);
+		arrowPanel.add(newRow);
+		arrowPanel.add(deleteRow);
 		arrowPanel.setBorder(BorderFactory
 				.createEtchedBorder(EtchedBorder.LOWERED));
 
-		scrollPanel.add(scrollPane);
-		scrollPanel.add(arrowPanel);
+		JPanel horizontalPanel = new JPanel();
+		horizontalPanel.setLayout(new BoxLayout(horizontalPanel,
+				BoxLayout.X_AXIS));
+
+		horizontalPanel.add(scrollPane);
+		horizontalPanel.add(arrowPanel);
+
+		tablePanel.add(horizontalPanel);
+
 		// scrollPanel.setBorder(BorderFactory.createEtchedBorder(EtchedBorder.
 		// LOWERED));
 
-		tablePanel.add(scrollPanel);
-
-		JButton newCriteria = new JButton("New");
-		newCriteria.setActionCommand("newCriteria");
-		newCriteria.addActionListener(this);
-
-		// JButton editCriteria = new JButton("Edit");
-		// editCriteria.setActionCommand("editCriteria");
-		// editCriteria.addActionListener(this);
-
-		// JButton duplicateCriteria = new JButton("Duplicate");
-		// duplicateCriteria.setActionCommand("duplicateCriteria");
-		// duplicateCriteria.addActionListener(this);
-
-		JButton deleteCriteria = new JButton("Delete");
-		deleteCriteria.setActionCommand("deleteCriteria");
-		deleteCriteria.addActionListener(this);
-
-		criteriaControlPanel = new JPanel();
-		criteriaControlPanel.add(newCriteria);
-		// criteriaControlPanel.add(editCriteria);
-		// criteriaControlPanel.add(CriteriaMapperDialog.saveSet);
-		// criteriaControlPanel.add(duplicateCriteria);
-		criteriaControlPanel.add(deleteCriteria);
-
-		// tablePanel.add(tableButtons);
-		// scrollPane.setAlignmentY(TOP_ALIGNMENT);
-		// tableButtons.setAlignmentY(BOTTOM_ALIGNMENT);
-		tablePanel.add(criteriaControlPanel);
-
-		// start off with a new row
-		this.addEditableRow();
-
 		cbDialog.initialize();
+
 	}
 
 	/*
@@ -305,70 +287,68 @@ public class CriteriaTablePanel implements ActionListener,
 
 		}
 
-		if (command.equals("editCriteria")) {
-
-			// if(dataModel.isCellEditable(rowc, 1)){
-			// TODO: add new row
-			// }else{
-			// addEditableRow();
-			// }
-		}
+		// if (command.equals("editCriteria")) {
+		//
+		// if(dataModel.isCellEditable(rowc, 1)){
+		// TODO: add new row
+		// }else{
+		// addEditableRow();
+		// }
+		// }
 
 		if (command.equals("CBdone")) {
-			int row = cbDialog.currentRow;
-			dataModel.setValueAt(cbDialog.labelField.getText(), row, 1);
-			dataModel.setValueAt(cbDialog.criteriaField.getText(), row, 2);
-			dataModel.setValueAt(cbDialog.mapToBox.getSelectedItem(), row, 3);
-			dataModel.setValueAt(cbDialog.currentColor, row, 4);
+			// dataModel.setValueAt(cbDialog.labelField.getText(), row, 1);
+			dataModel.setValueAt(cbDialog.criteriaField.getText(), table
+					.getSelectedRow(), 2);
+			// dataModel.setValueAt(cbDialog.mapToBox.getSelectedItem(), row,
+			// 3);
+			// dataModel.setValueAt(cbDialog.currentColor, row, 4);
 			// applyCriteria();
 		}
 
-		if (command.equals("CBadd")) {
-			System.out.println("HEY");
-			populateList(cbDialog.criteriaField.getText(), cbDialog.labelField
-					.getText(), cbDialog.currentColor);
-			// populateList("Criteria", "label", Color.WHITE);
-
-		}
+		// if (command.equals("CBadd")) {
+		// System.out.println("HEY");
+		// populateList(cbDialog.criteriaField.getText(), cbDialog.labelField
+		// .getText(), cbDialog.currentColor);
+		// // populateList("Criteria", "label", Color.WHITE);
+		//
+		// }
 
 		if (command.equals("deleteCriteria")) {
 
-			int[] row = table.getSelectedRows();
+			int[] rows = table.getSelectedRows();
 			// data[row][0] = "";
 
-			if (row.length == 1) {
+			if (rows.length == 1) {
 				try {
-					attManager.removeColorAttribute(getCell(row[0], 1) + "");
+					attManager.removeColorAttribute(getCell(rows[0], 1) + "");
 				} catch (Exception failedDelete) {
 					System.out.println(failedDelete.getMessage());
 				}
-				dataModel.setValueAt("", row[0], 1);
-				dataModel.setValueAt("", row[0], 2);
-				dataModel.setValueAt("", row[0], 3);
-				dataModel.setValueAt(Color.white, row[0], 4);
-				if (dataModel.rowCount > 5) {
-					dataModel.rowCount--;
-					// dataModel.createNewDataObject(dataModel.rowCount, 3);
-				}
 
-				if (row[0] != 0) {
-					while (getCell(row[0] - 1, 0) == "") {
-						row[0]--;
-					}
-				}
-				//listCount = row[0];
+				dataModel.removeRow(rows[0]);
+				// dataModel.rowCount--;
+				// dataModel.fireTableRowsDeleted(row[0], row[0]);
+				// dataModel.createNewDataObject(dataModel.rowCount, 3);
 
+				// if (rows[0] != 0) {
+				// while (getCell(rows[0] - 1, 0) == "") {
+				// rows[0]--;
+				// }
+				// }
+				// listCount = row[0];
+
+			} else if (rows.length == 0) {
+				// TODO: fix this!
+				JOptionPane.showMessageDialog(Cytoscape.getDesktop(),
+						"Please select a row first.");
 			} else {
-				for (int i = 0; i < row.length; i++) {
-					setCell(row[i], 1, "");
-					setCell(row[i], 2, "");
-					setCell(row[i], 4, Color.white + "");
-				}
-			}
+			// TODO: fix this!
+			JOptionPane.showMessageDialog(Cytoscape.getDesktop(),
+					"Sorry, I can only delete one row at a time :(");
+		}
 
 			// initializeTable();
-
-			editableRowCount--;
 
 		}
 
@@ -468,10 +448,9 @@ public class CriteriaTablePanel implements ActionListener,
 							return;
 						}
 						Color c = stringToColor(colorString);
-						mapper
-								.createDiscreteMapping(getCell(i, 1)
-										+ "_discrete", (String) getCell(i, 1),
-										c, mapTo);
+						mapper.createDiscreteMapping(getCell(i, 1)
+								+ "_discrete", (String) getCell(i, 1), c,
+								mapToPick);
 					} else {
 						String[] labels = getLabelArray(temp);
 						Color[] colors = getColorArray(temp);
@@ -481,7 +460,8 @@ public class CriteriaTablePanel implements ActionListener,
 								.println("COMPOSITE LABEL: " + compositeLabel);
 						if (labels.length == 1) {
 							mapper.createDiscreteMapping(labels[0]
-									+ "_discrete", labels[0], colors[0], mapTo);
+									+ "_discrete", labels[0], colors[0],
+									mapToPick);
 							break;
 						}
 						if (labels.length == 2
@@ -499,7 +479,8 @@ public class CriteriaTablePanel implements ActionListener,
 							// +"WAY");
 						}
 						mapper.createCompositeMapping(compositeLabel
-								+ "_discrete", compositeLabel, colors, mapTo);
+								+ "_discrete", compositeLabel, colors,
+								mapToPick);
 					}
 
 				}
@@ -525,8 +506,13 @@ public class CriteriaTablePanel implements ActionListener,
 			String label = setName + "_" + getCell(i, 1);
 			String current = (String) getCell(i, 2);
 			String showBoolean = "" + getCell(i, 0);
-			if (current != null && !current.equals("") && !label.equals("")
-					) { //&& showBoolean.equals("true")
+			if (current != null && !current.equals("") && !label.equals("")) { // &&
+				// showBoolean
+				// .
+				// equals
+				// (
+				// "true"
+				// )
 
 				try {
 
@@ -545,7 +531,7 @@ public class CriteriaTablePanel implements ActionListener,
 						compositeLabel = compositeLabel + ":" + label;
 					}
 				}
-				//System.out.println("compositeLabel: "+compositeLabel);
+				// System.out.println("compositeLabel: "+compositeLabel);
 				calculate.evaluateLeftToRight(label);
 				labels.add(label);
 
@@ -554,7 +540,7 @@ public class CriteriaTablePanel implements ActionListener,
 
 			}
 		}
-		
+
 		String[] labelsA = new String[labels.size()];
 		for (int h = 0; h < labels.size(); h++) {
 			labelsA[h] = labels.get(h);
@@ -578,10 +564,10 @@ public class CriteriaTablePanel implements ActionListener,
 		}
 		if (labels.size() == 1) {
 			mapper.createDiscreteMapping(labelsA[0] + "_discrete", labelsA[0],
-					colorsA[0], mapTo);
+					colorsA[0], mapToPick);
 		} else {
 			mapper.createCompositeMapping(compositeLabel + "_discrete",
-					compositeLabel, colorsA, mapTo);
+					compositeLabel, colorsA, mapToPick);
 		}
 
 	}
@@ -616,7 +602,7 @@ public class CriteriaTablePanel implements ActionListener,
 	}
 
 	public void clearTable() {
-		editableRowCount = 0;
+		dataModel.rowCount = 1;
 
 		for (int i = 0; i < dataModel.rowCount; i++) {
 			for (int j = 0; j < dataModel.colCount; j++) {
@@ -645,20 +631,14 @@ public class CriteriaTablePanel implements ActionListener,
 	}
 
 	public void addEditableRow() {
-		editableRowCount++;
-		globalRowCount++;
-		dataModel.setRowCount(globalRowCount);
-		dataModel.createNewDataObject();
-		table.setModel(dataModel);
-
-		String labelstr = "Label " + globalRowCount;
-		String critstr = ""; // "Criteria "+editableRowCount;
+		dataModel.addRow();
+		// table.setModel(dataModel);
 
 		// setCell(editableRowCount-1, 1, labelstr);
 		// setCell(editableRowCount-1, 2, critstr);
 		// if(editableRowCount > 4){
 
-		populateList(critstr, labelstr, Color.white); // }
+		// populateList(critstr, labelstr, Color.white); // }
 	}
 
 	public void populateList(String criteria, String label, Color currentColor) {
@@ -674,16 +654,16 @@ public class CriteriaTablePanel implements ActionListener,
 		//
 		// }
 
-		System.out.println(" Global Row Count: " + globalRowCount
+		System.out.println(" Global Row Count: " + dataModel.rowCount
 				+ " Criteria: " + criteria + " Label: " + label);
 
 		// if (listCount < globalRowCount) {
 		// }
 
-		dataModel.setValueAt(label, globalRowCount - 1, 1);
-		dataModel.setValueAt(criteria, globalRowCount - 1, 2);
-		dataModel.setValueAt("Node Color", globalRowCount - 1, 3);
-		dataModel.setValueAt(currentColor, globalRowCount - 1, 4);
+		dataModel.setValueAt(label, dataModel.rowCount - 1, 1);
+		dataModel.setValueAt(criteria, dataModel.rowCount - 1, 2);
+		dataModel.setValueAt("Node Color", dataModel.rowCount - 1, 3);
+		dataModel.setValueAt(currentColor, dataModel.rowCount - 1, 4);
 
 		dataModel.fireTableDataChanged();
 
@@ -723,7 +703,7 @@ public class CriteriaTablePanel implements ActionListener,
 	}
 
 	public void moveRowDown(int rowNumber) {
-		if (rowNumber != globalRowCount) {
+		if (rowNumber != dataModel.rowCount) {
 
 			Object showTemp = dataModel.data[rowNumber][0];
 			Object labelTemp = dataModel.data[rowNumber][1];
@@ -754,29 +734,60 @@ public class CriteriaTablePanel implements ActionListener,
 	}
 
 	class BooleanTableModel extends AbstractTableModel {
-
-		// TableModel dataModel = new AbstractTableModel() {
+		// initialize variables
+		int labelCount = 1;
 		int rowCount = 1;
 		int colCount = 5;
-		// int editableRowCount = 0;
+		boolean empty = true;
 
 		String[] columnNames = { "Show", "Label", "Criteria", "Map To", "Value" };
 		Object[][] data = new Object[rowCount][colCount];
 
-		public void createNewDataObject() {
-			Object[][] temp = data;
-			// System.out.println("cndo rowCount: "+ rowCount);
-			this.data = new Object[rowCount][colCount];
+		public void addRow() {
+			if (!empty) { // preserve data
+				rowCount++;
+				labelCount++;
+				Object[][] temp = data;
+				data = new Object[rowCount][colCount];
 
-			for (int i = 0; i < rowCount; i++) {
-				for (int j = 0; j < colCount; j++) {
-					// System.out.println("temp ij: "+temp[i][j]);
-					if (i < temp.length) {
-						this.data[i][j] = temp[i][j];
+				for (int i = 0; i < rowCount; i++) {
+					for (int j = 0; j < colCount; j++) {
+						if (i < temp.length) {
+							data[i][j] = temp[i][j];
+						}
 					}
-					fireTableCellUpdated(i, j);
 				}
 			}
+			// add new row
+			data[rowCount - 1][0] = false;
+			data[rowCount - 1][1] = "Label " + labelCount;
+			data[rowCount - 1][2] = "";
+			data[rowCount - 1][3] = mapTo[0];
+			data[rowCount - 1][4] = Color.WHITE;
+			// System.out.println("Added row: "+rowCount);
+			empty = false;
+			fireTableDataChanged();
+		}
+
+		public void removeRow(int row) {
+			rowCount--;
+			if (rowCount == 0) {
+				labelCount = 0; // reset label only if all rows are removed
+			}
+			int newi = 0;
+			Object[][] temp = data;
+			data = new Object[rowCount][colCount];
+
+			for (int i = 0; i <= rowCount; i++) {
+				if (i == row) { // skip removed row
+					continue;
+				}
+				for (int j = 0; j < colCount; j++) {
+					data[newi][j] = temp[i][j];
+				}
+				newi++;
+			}
+			fireTableDataChanged();
 		}
 
 		// public boolean isCellEditable(int row, int col) {
@@ -793,14 +804,6 @@ public class CriteriaTablePanel implements ActionListener,
 
 		public String getColumnName(int i) {
 			return columnNames[i];
-		}
-
-		public void setColumnCount(int count) {
-			colCount = count;
-		}
-
-		public void setRowCount(int count) {
-			rowCount = count;
 		}
 
 		public int getColumnCount() {
@@ -834,47 +837,47 @@ public class CriteriaTablePanel implements ActionListener,
 	}
 }
 
-class builderIconRenderer extends JLabel implements TableCellRenderer {
-	Border unselectedBorder = null;
-	Border selectedBorder = null;
-	boolean isBordered = true;
-
-	public builderIconRenderer(boolean isBordered) {
-		this.isBordered = isBordered;
-		setOpaque(true);
-	}
-
-	public Component getTableCellRendererComponent(JTable table, Object color,
-			boolean isSelected, boolean hasFocus, int row, int column) {
-
-		java.net.URL builderIconURL = CriteriaTablePanel.class
-				.getResource("img/stock_form-properties.png");
-
-		ImageIcon builderIcon = new ImageIcon();
-		if (builderIconURL != null) {
-			builderIcon = new ImageIcon(builderIconURL);
-		}
-		this.setIcon(builderIcon);
-
-		if (isBordered) {
-			if (isSelected) {
-				if (selectedBorder == null) {
-					selectedBorder = BorderFactory.createMatteBorder(2, 5, 2,
-							5, table.getSelectionBackground());
-				}
-				setBorder(selectedBorder);
-			} else {
-				if (unselectedBorder == null) {
-					unselectedBorder = BorderFactory.createMatteBorder(2, 5, 2,
-							5, table.getBackground());
-				}
-				setBorder(unselectedBorder);
-			}
-		}
-
-		return this;
-	}
-}
+// class builderIconRenderer extends JLabel implements TableCellRenderer {
+// Border unselectedBorder = null;
+// Border selectedBorder = null;
+// boolean isBordered = true;
+//
+// public builderIconRenderer(boolean isBordered) {
+// this.isBordered = isBordered;
+// setOpaque(true);
+// }
+//
+// public Component getTableCellRendererComponent(JTable table, Object color,
+// boolean isSelected, boolean hasFocus, int row, int column) {
+//
+// // java.net.URL builderIconURL = CriteriaTablePanel.class
+// // .getResource("img/stock_form-properties.png");
+// //
+// // ImageIcon builderIcon = new ImageIcon();
+// // if (builderIconURL != null) {
+// // builderIcon = new ImageIcon(builderIconURL);
+// // }
+// // this.setIcon(builderIcon);
+//
+// if (isBordered) {
+// if (isSelected) {
+// if (selectedBorder == null) {
+// selectedBorder = BorderFactory.createMatteBorder(2, 5, 2,
+// 5, table.getSelectionBackground());
+// }
+// setBorder(selectedBorder);
+// } else {
+// if (unselectedBorder == null) {
+// unselectedBorder = BorderFactory.createMatteBorder(2, 5, 2,
+// 5, table.getBackground());
+// }
+// setBorder(unselectedBorder);
+// }
+// }
+//
+// return this;
+// }
+// }
 
 /*
  * ColorRenderer and ColorEditor are taken almost verbatim from the Java Trail's
