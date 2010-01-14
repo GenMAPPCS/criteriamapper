@@ -43,6 +43,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 	private JButton newSet;
 	private JButton saveSet;
+	private JButton closeAll;
 	private JButton deleteSet;
 	private JButton renameSet;
 	private JButton duplicateSet;
@@ -97,6 +98,8 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		setLocation(d.getX() + d.getWidth() / 2 - this.getWidth() / 2, d.getY()
 				+ d.getHeight() / 2 - this.getHeight() / 2);
 
+		this.pack();
+		this.setVisible(true);
 	}
 
 	public void actionPerformed(ActionEvent e) {
@@ -115,6 +118,8 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			if (setName.equalsIgnoreCase("New...")) {
 				tableMapperPanel.setVisible(false);
 				controlPanel.setVisible(false);
+				deleteSet.setEnabled(false);
+				duplicateSet.setEnabled(false);
 				nameBox.setEditable(true);
 				pack();
 				return;
@@ -141,8 +146,11 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 				nameBox.addItem(setName);
 				nameBox.setEditable(false);
 				criteriaTable.clearTable();
+				criteriaTable.addEditableRow();
 				tableMapperPanel.setVisible(true);
 				controlPanel.setVisible(true);
+				deleteSet.setEnabled(true);
+				duplicateSet.setEnabled(true);
 				pack();
 				return;
 			}
@@ -153,6 +161,10 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			loadSettings(setName);
 			tableMapperPanel.setVisible(true);
 			controlPanel.setVisible(true);
+			deleteSet.setEnabled(true);
+			duplicateSet.setEnabled(true);
+			pack();
+			setVisible(true);
 		}
 
 		// if(command.equals("newSet")){
@@ -191,11 +203,29 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			}
 		}
 
-		if (command.equals("renameSet")) {
-			nameBox.setEditable(true);
+		if (command.equals("closeAll")){
+			setName = (String) nameBox.getSelectedItem();
+			Object[] options = { "Cancel", "No", "Yes" };
+			int n = JOptionPane.showOptionDialog(Cytoscape.getDesktop(),
+					"Do you want to save this Set before closing?",
+					"", JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+			if (n == 0) { // YES
+				saveSettings(setName);
+				this.setVisible(false);
+				return;
+			} else if (n == 1) { // NO
+				this.setVisible(false);
+				return;
+			} else { // CANCEL
+				//do nothing...
+			}
 		}
-		pack();
-		setVisible(true);
+		
+		//TODO: replace with double click listener
+//		if (command.equals("renameSet")) {
+//			nameBox.setEditable(true);
+//		}
 	}
 
 	public void saveSettings(String nameValue) {
@@ -233,7 +263,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			mapTo = criteria[0];
 		}
 		System.out.println("MAP TO: " + mapTo);
-		criteriaTable.mapTo = mapTo;
+		criteriaTable.mapToPick = mapTo;
 
 		for (int i = 1; i < criteria.length; i++) {
 
@@ -302,24 +332,18 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 		JPanel sPanel = new JPanel(new BorderLayout(0, 2));
 		JPanel setButtonsPanel = new JPanel();// new BorderLayout(0,2));
-		// newSet = new JButton("New");
+
 		deleteSet = new JButton("Delete");
-		// renameSet = new JButton("Rename");
-		duplicateSet = new JButton("Duplicate");
-
-		// newSet.addActionListener(this);
 		deleteSet.addActionListener(this);
-		// renameSet.addActionListener(this);
-		duplicateSet.addActionListener(this);
-
-		// newSet.setActionCommand("newSet");
 		deleteSet.setActionCommand("deleteSet");
-		// renameSet.setActionCommand("renameSet");
+		deleteSet.setEnabled(false);
+		
+		duplicateSet = new JButton("Duplicate");
+		duplicateSet.addActionListener(this);
 		duplicateSet.setActionCommand("duplicateSet");
+		duplicateSet.setEnabled(false);
 
-		// setButtonsPanel.add(newSet);
 		setButtonsPanel.add(deleteSet);
-		// setButtonsPanel.add(renameSet);
 		setButtonsPanel.add(duplicateSet);
 
 		sPanel.add(setButtonsPanel, BorderLayout.CENTER);
@@ -356,6 +380,13 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		saveSet.addActionListener(this);
 		saveSet.setActionCommand("saveSet");
 		controlPanel.add(saveSet);
+		
+		closeAll = new JButton("Close");
+		closeAll.addActionListener(this);
+		closeAll.setActionCommand("closeAll");
+
+		controlPanel.add(saveSet);
+		controlPanel.add(closeAll);
 		
 		return controlPanel;
 	}
