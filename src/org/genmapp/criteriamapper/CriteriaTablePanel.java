@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.AbstractAction;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -34,11 +35,14 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
@@ -136,13 +140,19 @@ public class CriteriaTablePanel implements ActionListener,
 				}
 
 				if (e.getClickCount() == 2) {
+					System.out.println("Check 1:"
+							+ dataModel.isCellEditable(row, column));
 
 					if (column == 2) {
 						// TODO: pop up slim version of criteria builder
+						System.out.println("text: "
+								+ dataModel.getValueAt(row, column));
+						cbDialog.criteriaField.setText((String) dataModel
+								.getValueAt(row, column));
 					}
 
 					if (column == 4) {
-
+						System.out.println("Check 2");
 						JColorChooser colorChooser = new JColorChooser();
 						JButton button = new JButton();
 						button.setActionCommand("edit");
@@ -189,9 +199,14 @@ public class CriteriaTablePanel implements ActionListener,
 
 		// Create the scroll pane and add the table to it.
 
-		// ListSelectionModel listSelectionModel = table.getSelectionModel();
-		// listSelectionModel.addListSelectionListener(this);
-		// table.setSelectionModel(listSelectionModel);
+		ListSelectionModel listSelectionModel = table.getSelectionModel();
+		listSelectionModel.addListSelectionListener(this);
+		table.setSelectionModel(listSelectionModel);
+		SelectionListener listener = new SelectionListener();
+		table.getSelectionModel().addListSelectionListener(listener);
+		table.getColumnModel().getSelectionModel().addListSelectionListener(
+				listener);
+		table.getModel().addTableModelListener(new MyTableModelListener());
 
 		// Set up renderer and editor for the Favorite Color column.
 
@@ -261,6 +276,7 @@ public class CriteriaTablePanel implements ActionListener,
 		// LOWERED));
 
 		cbDialog.initialize();
+		cbDialog.criteriaField.setAction(new UpdateAnchorAction());
 
 	}
 
@@ -353,6 +369,77 @@ public class CriteriaTablePanel implements ActionListener,
 			}
 		}
 
+	}
+
+	public class UpdateAnchorAction extends AbstractAction {
+		int row = table.getSelectedRow();
+
+		UpdateAnchorAction() {
+			super("Set Anchor");
+		}
+
+		// Update the value in the anchor cell whenever the text field changes
+		public void actionPerformed(ActionEvent evt) {
+			JTextField textField = (JTextField) evt.getSource();
+			// Get anchor cell location
+			dataModel.setValueAt(textField.getText(), this.row, 2);
+		}
+	}
+
+	public class SelectionListener implements ListSelectionListener {
+		// Update the text field whenever the anchor cell changes
+		public void valueChanged(ListSelectionEvent e) {
+			int rowIndex = table.getSelectedRow();
+			int vColIndex = table.getSelectedColumn();
+			if (vColIndex == 2) {
+				System.out.println("r=" + rowIndex + " c=" + vColIndex);
+				// Get the value and set the text field
+				cbDialog.criteriaField.setText((String) table.getValueAt(
+						rowIndex, vColIndex));
+			}
+		}
+	}
+
+	public class MyTableModelListener implements TableModelListener {
+		// It is necessary to keep the table since it is not possible
+		// to determine the table from the event's source
+		MyTableModelListener() {
+		}
+
+		// Update the text field whenever the value in the anchor cell changes
+		public void tableChanged(TableModelEvent e) {
+			// Get anchor cell location
+			int rAnchor = table.getSelectedRow();
+			int vcAnchor = table.getSelectedColumn();
+			// This method is defined in
+			// Converting a Column Index Between the View and Model in a JTable
+			// Component
+			// int mcAnchor = vcAnchor; // toModel(table, vcAnchor);
+			// // Get affected rows and columns
+			// int firstRow = e.getFirstRow();
+			// int lastRow = e.getLastRow();
+			// int mColIndex = e.getColumn();
+			// if (firstRow != TableModelEvent.HEADER_ROW
+			// && rAnchor >= firstRow
+			// && rAnchor <= lastRow
+			// && (mColIndex == TableModelEvent.ALL_COLUMNS || mColIndex ==
+			// mcAnchor)) {
+			// Set the text field with the new value
+			if (vcAnchor == 2) {
+				cbDialog.criteriaField.setText((String) table.getValueAt(
+						rAnchor, vcAnchor));
+			}
+		}
+
+	}
+
+	// Converts a visible column index to a column index in the model.
+	// Returns -1 if the index does not exist.
+	public int toModel(JTable table, int vColIndex) {
+		if (vColIndex >= table.getColumnCount()) {
+			return -1;
+		}
+		return table.getColumnModel().getColumn(vColIndex).getModelIndex();
 	}
 
 	public Color[] getColorArray(int[] indices) {
@@ -792,6 +879,9 @@ public class CriteriaTablePanel implements ActionListener,
 		}
 
 		public Object getValueAt(int row, int col) {
+			if (row == -1 || col == -1) {
+				return "";
+			}
 			if (data[row][col] != null) {
 				return data[row][col];
 			} else {
@@ -803,8 +893,10 @@ public class CriteriaTablePanel implements ActionListener,
 		}
 
 		public void setValueAt(Object value, int row, int col) {
-			data[row][col] = value;
-			fireTableCellUpdated(row, col);
+			if (row >= 0 && col >= 0) {
+				data[row][col] = value;
+				fireTableCellUpdated(row, col);
+			}
 		}
 
 		public Class getColumnClass(int c) {
