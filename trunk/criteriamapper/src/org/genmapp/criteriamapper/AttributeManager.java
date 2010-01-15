@@ -7,21 +7,14 @@ package org.genmapp.criteriamapper;
  * This class contains all of the code for getting, setting, and removing attributes.  
  */
 
-import java.awt.Color;
+import giny.model.Node;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.Set;
 
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-
+import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
 import cytoscape.data.CyAttributes;
-import cytoscape.CyNetwork;
-
-import giny.model.*;
 
 public class AttributeManager {
 	private CyAttributes networkAttributes;

@@ -30,28 +30,24 @@ import cytoscape.view.CytoscapeDesktop;
 public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		FocusListener, ListSelectionListener, java.beans.PropertyChangeListener {
 
-	private BooleanCalculator calculator = null;
-	private BooleanScanner scan = null; // Not currently used
+//	private BooleanCalculator calculator = null;
+//	private BooleanScanner scan = null; // Not currently used
 	private AttributeManager attributeManager;
-	private ColorMapper colorMapper;
+//	private ColorMapper colorMapper;
 	private CriteriaTablePanel criteriaTable;
-	private CriteriaCalculator calculate = new CriteriaCalculator(); // Not
+//	private CriteriaCalculator calculate = new CriteriaCalculator(); // Not
 																		// currently
 																		// used
 
 	private String setName = null;
 
-	private JButton newSet;
 	private JButton saveSet;
 	private JButton closeAll;
 	private JButton deleteSet;
-	private JButton renameSet;
 	private JButton duplicateSet;
 	private JPanel mainPanel;
-	private JPanel namesPanel;
 	private JPanel tableMapperPanel;
 	private JPanel controlPanel;
-	private JPanel setButtonsPanel;
 
 	String mapTo = "Node Color";
 
@@ -63,11 +59,11 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 				.addPropertyChangeListener(this);
 
 		// currentAlgorithm = algorithm;
-		colorMapper = new ColorMapper();
+//		colorMapper = new ColorMapper();
 		attributeManager = new AttributeManager();
-		calculator = new BooleanCalculator();
+//		calculator = new BooleanCalculator();
 		criteriaTable = new CriteriaTablePanel();
-		scan = new BooleanScanner();
+//		scan = new BooleanScanner();
 		initialize();
 	}
 
@@ -95,8 +91,8 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 		setContentPane(mainPanel);
 		CytoscapeDesktop d = Cytoscape.getDesktop();
-		setLocation(d.getX() + d.getWidth() / 2 - this.getWidth() / 2, d.getY()
-				+ d.getHeight() / 2 - this.getHeight() / 2);
+		setLocation(d.getX() + d.getWidth() / 2 - 200, d.getY()
+				+ d.getHeight() / 2 - 200);
 
 		this.pack();
 		this.setVisible(true);
@@ -133,7 +129,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 				for (int i = 0; i < nameBoxArray.length; i++) {
 					if (nameBoxArray[i].equals(setName)) {
 						JOptionPane
-								.showMessageDialog(Cytoscape.getDesktop(),
+								.showMessageDialog(this,
 										"Set name already exists. Type a new name or select an existing Set.");
 						return;
 					}
@@ -192,27 +188,29 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			}
 			// prompt user to confirm deletion
 			setName = (String) nameBox.getSelectedItem();
-			Object[] options = { "Yes", "No" };
-			int n = JOptionPane.showOptionDialog(Cytoscape.getDesktop(),
+			Object[] options = { "No", "Yes" };
+			int n = JOptionPane.showOptionDialog(this,
 					"Are you sure that you want to delete the Criteria Set?",
 					"", JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
-			if (n == 0) { // YES
+			if (n == 1) { // YES
 				attributeManager.removeNamesAttribute(Cytoscape
 						.getCurrentNetwork(), setName);
 				nameBox.removeItem(setName);
 				criteriaTable.clearTable();
+			} else { // NO
+				//do nothing...		
 			}
 		}
 
 		if (command.equals("closeAll")){
 			setName = (String) nameBox.getSelectedItem();
 			Object[] options = { "Cancel", "No", "Yes" };
-			int n = JOptionPane.showOptionDialog(Cytoscape.getDesktop(),
+			int n = JOptionPane.showOptionDialog(this,
 					"Do you want to save this Set before closing?",
 					"", JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
-			if (n == 0) { // YES
+					JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+			if (n == 2) { // YES
 				saveSettings(setName);
 				this.setVisible(false);
 				return;

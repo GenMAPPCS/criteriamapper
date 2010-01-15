@@ -297,6 +297,7 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 //		criteriaPanel.add(criteriaLabel, labelLocation);
 		//criteriaPanel.add(criteriaField, fieldLocation);
 		criteriaField.setHorizontalAlignment(JTextField.LEFT);
+		
 		fieldPanel.add(criteriaField);
 		
 //		JPanel mapToValuePanel = new JPanel();
