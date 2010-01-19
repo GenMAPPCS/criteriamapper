@@ -77,8 +77,6 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		JPanel setPanel = getCriteriaSetPanel();
 
 		tableMapperPanel = criteriaTable.getTablePanel();
-		tableMapperPanel.setBorder(BorderFactory
-				.createEtchedBorder(EtchedBorder.LOWERED));
 
 		controlPanel = getControlPanel();
 		

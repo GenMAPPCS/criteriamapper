@@ -1,7 +1,6 @@
 package org.genmapp.criteriamapper;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -9,15 +8,11 @@ import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
-import javax.swing.JDialog;
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.border.Border;
@@ -25,6 +20,8 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
+import java.awt.Font;
 
 import cytoscape.Cytoscape;
 import cytoscape.data.CyAttributes;
@@ -233,14 +230,14 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 //		clearButton.setActionCommand("clear");
 //		clearButton.addActionListener(this);
 		
-		JButton doneButton = new JButton("Done");
-		doneButton.setActionCommand("CBdone");
+//		JButton doneButton = new JButton("Done");
+//		doneButton.setActionCommand("CBdone");
 //		doneButton.addActionListener(this);
-		doneButton.addActionListener(panelPointer);
+//		doneButton.addActionListener(panelPointer);
 		
 //		buttonBox.add(addButton);//, labelLocation);
 //		buttonBox.add(clearButton);//, fieldLocation);
-		buttonBox.add(doneButton);
+//		buttonBox.add(doneButton);
 		
 		//attListPanel.setPreferredSize(new Dimension(60,50));
 		listPanel.add(attListPanel);
@@ -267,11 +264,15 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 		fieldPanel.setLayout(box);
 		
 		Border refBorder = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
-		TitledBorder titleBorder = BorderFactory.createTitledBorder(refBorder, "Build Criteria");
+		TitledBorder titleBorder = BorderFactory.createTitledBorder(refBorder, "Expression Editor");
 		titleBorder.setTitlePosition(TitledBorder.LEFT);
 		titleBorder.setTitlePosition(TitledBorder.TOP);
 		fieldPanel.setBorder(titleBorder);
 		
+		JTextArea jt = new JTextArea("Use this field to construct expressions using Attributes and Operations below.");
+		jt.setFont(new Font("Arial", Font.PLAIN, 10));
+		jt.setBackground(this.getBackground());
+		fieldPanel.add(jt);
 		
 		
 //		String labelLocation = BorderLayout.LINE_START;
@@ -299,6 +300,7 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 		criteriaField.setHorizontalAlignment(JTextField.LEFT);
 		
 		fieldPanel.add(criteriaField);
+		//fieldPanel.setPreferredSize(new Dimension(Cytoscape.getDesktop().getWidth(), 70));
 		
 //		JPanel mapToValuePanel = new JPanel();
 //		BoxLayout mvXbox = new BoxLayout(mapToValuePanel, BoxLayout.X_AXIS);
@@ -419,6 +421,7 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 		}
 		attList.clearSelection();
 		criteriaField.requestFocus();
+		criteriaField.setCaretPosition(criteriaField.getText().length());
 		criteriaField.setHorizontalAlignment(JTextField.LEFT);
 
 	}
@@ -468,6 +471,7 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 			}
 			opList.clearSelection();
 			criteriaField.requestFocus();
+			criteriaField.setCaretPosition(criteriaField.getText().length());
 			criteriaField.setHorizontalAlignment(JTextField.LEFT);
 
 		}
