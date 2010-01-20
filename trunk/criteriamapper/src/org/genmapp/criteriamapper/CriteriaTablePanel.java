@@ -66,6 +66,11 @@ public class CriteriaTablePanel implements ActionListener,
 	private CriteriaEditor criteriaEditor;
 	private CriteriaBuilderDialog cbDialog;
 
+	public final int LABEL_COL = 0;
+	public final int EXP_COL = 1;
+	public final int MAPTO_COL = 2;
+	public final int VALUE_COL = 3;
+
 	private JPanel tablePanel;
 	// private JPanel criteriaControlPanel;
 	// private JPanel tableButtons;
@@ -129,13 +134,15 @@ public class CriteriaTablePanel implements ActionListener,
 
 				if (e.getClickCount() == 1) {
 					// update Expression Editor
-					String currentValue = (String) target.getValueAt(row, 2);
+					String currentValue = (String) target.getValueAt(row,
+							EXP_COL);
 					cbDialog.criteriaField.setText((String) currentValue);
-					if (column == 0) {
-						Object show = dataModel.getValueAt(row, column);
-						show = show + "";
-						applyCriteria();
-					} else if (column == 2) { // send focus to Expression Editor
+					// if (column == 0) {
+					// Object show = dataModel.getValueAt(row, column);
+					// show = show + "";
+					// applyCriteria();
+					// } else
+					if (column == EXP_COL) { // send focus to Expression Editor
 						cbDialog.criteriaField.requestFocusInWindow();
 						int pos = cbDialog.criteriaField.getText().length() - 1;
 						if (pos < 0)
@@ -145,7 +152,7 @@ public class CriteriaTablePanel implements ActionListener,
 				}
 
 				if (e.getClickCount() == 2) {
-					if (column == 4) {
+					if (column == VALUE_COL) {
 						JColorChooser colorChooser = new JColorChooser();
 						JButton button = new JButton();
 						button.setActionCommand("edit");
@@ -161,7 +168,8 @@ public class CriteriaTablePanel implements ActionListener,
 						Color currentColor = colorChooser.getColor();
 						setCell(row, column, currentColor + "");
 						colorEditor.currentColor = currentColor;
-					} else if (column == 2) { // send focus to Expression Editor
+					} else if (column == EXP_COL) { // send focus to Expression
+													// Editor
 						cbDialog.criteriaField.requestFocusInWindow();
 						int pos = cbDialog.criteriaField.getText().length() - 1;
 						if (pos < 0)
@@ -177,33 +185,32 @@ public class CriteriaTablePanel implements ActionListener,
 		// Disable auto resizing
 		// table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 
-		TableColumn showCol = table.getColumnModel().getColumn(0);
-		TableColumn labelCol = table.getColumnModel().getColumn(1);
-		TableColumn expCol = table.getColumnModel().getColumn(2);
-		TableColumn mapToCol = table.getColumnModel().getColumn(3);
-		TableColumn valueCol = table.getColumnModel().getColumn(4);
+		// TableColumn showCol = table.getColumnModel().getColumn(0);
+		TableColumn labelTC = table.getColumnModel().getColumn(LABEL_COL);
+		TableColumn expTC = table.getColumnModel().getColumn(EXP_COL);
+		TableColumn mapToTC = table.getColumnModel().getColumn(MAPTO_COL);
+		TableColumn valueTC = table.getColumnModel().getColumn(VALUE_COL);
 
-		showCol.setMaxWidth(40);
-		// buildCol.setMaxWidth(25);
+		expTC.setMinWidth(100);
 
-		JCheckBox showBox = new JCheckBox();
-		showCol.setCellEditor(new DefaultCellEditor(showBox));
-		showBox.setToolTipText("Click to show/hide criteria as visual style");
+		// JCheckBox showBox = new JCheckBox();
+		// showCol.setCellEditor(new DefaultCellEditor(showBox));
+		//showBox.setToolTipText("Click to show/hide criteria as visual style");
 
-		DefaultTableCellRenderer renderer = new DefaultTableCellRenderer();
-		renderer.setToolTipText("Double-click to edit");
-		labelCol.setCellRenderer(renderer);
+		DefaultTableCellRenderer labelRenderer = new DefaultTableCellRenderer();
+		labelRenderer.setToolTipText("Double-click to edit");
+		labelTC.setCellRenderer(labelRenderer);
 
-		expCol.setCellEditor(criteriaEditor);
-		DefaultTableCellRenderer renderer2 = new DefaultTableCellRenderer();
-		renderer2.setToolTipText("Click to activate Expression Editor below");
-		expCol.setCellRenderer(renderer2);
+		expTC.setCellEditor(criteriaEditor);
+		DefaultTableCellRenderer expRenderer = new DefaultTableCellRenderer();
+		expRenderer.setToolTipText("Click to activate Expression Editor below");
+		expTC.setCellRenderer(expRenderer);
 
 		JComboBox mapToBox = new JComboBox(mapTo);
-		mapToCol.setCellEditor(new DefaultCellEditor(mapToBox));
-		DefaultTableCellRenderer renderer3 = new DefaultTableCellRenderer();
-		renderer3.setToolTipText("Click for combo box");
-		mapToCol.setCellRenderer(renderer3);
+		mapToTC.setCellEditor(new DefaultCellEditor(mapToBox));
+		DefaultTableCellRenderer maptoRenderer = new DefaultTableCellRenderer();
+		maptoRenderer.setToolTipText("Click for combo box");
+		mapToTC.setCellRenderer(maptoRenderer);
 
 		table.setPreferredScrollableViewportSize(new Dimension(315, 80));
 
@@ -222,8 +229,8 @@ public class CriteriaTablePanel implements ActionListener,
 
 		// Set up renderer and editor for the Favorite Color column.
 		// table.setDefaultEditor(Color.class, colorEditor);
-		valueCol.setCellEditor(colorEditor);
-		valueCol.setCellRenderer(new ColorRenderer(true));
+		valueTC.setCellEditor(colorEditor);
+		valueTC.setCellRenderer(new ColorRenderer(true));
 
 		table.setEnabled(true);
 
@@ -307,18 +314,19 @@ public class CriteriaTablePanel implements ActionListener,
 
 			if (rows.length == 1) {
 				try {
+					// TODO: is this right?
 					attManager.removeColorAttribute(getCell(rows[0], 1) + "");
 				} catch (Exception failedDelete) {
 					System.out.println(failedDelete.getMessage());
 				}
-				//remove from table model
+				// remove from table model
 				dataModel.removeRow(rows[0]);
-				//reset row selection
+				// reset row selection
 				int selectableRow = table.getRowCount() - 1;
 				if (selectableRow >= 0) {
-					table.setRowSelectionInterval(selectableRow,
-							selectableRow);
-					String currentValue = (String) table.getValueAt(selectableRow, 2);
+					table.setRowSelectionInterval(selectableRow, selectableRow);
+					String currentValue = (String) table.getValueAt(
+							selectableRow, EXP_COL);
 					cbDialog.criteriaField.setText((String) currentValue);
 				}
 			} else if (rows.length == 0) {
@@ -366,13 +374,13 @@ public class CriteriaTablePanel implements ActionListener,
 		public void insertUpdate(DocumentEvent e) {
 			// TODO Auto-generated method stub
 			dataModel.setValueAt(cbDialog.criteriaField.getText(), table
-					.getSelectedRow(), 2);
+					.getSelectedRow(), EXP_COL);
 		}
 
 		public void removeUpdate(DocumentEvent e) {
 			// TODO Auto-generated method stub
 			dataModel.setValueAt(cbDialog.criteriaField.getText(), table
-					.getSelectedRow(), 2);
+					.getSelectedRow(), EXP_COL);
 		}
 
 	}
@@ -415,25 +423,25 @@ public class CriteriaTablePanel implements ActionListener,
 	// }
 	// }
 
-//	public class CriteriaCellListener implements TableModelListener {
-//
-//		CriteriaCellListener() {
-//			table.getModel().addTableModelListener(this);
-//		}
-//
-//		// Update the text field whenever the value in the anchor cell changes
-//		public void tableChanged(TableModelEvent e) {
-//			// Get anchor cell location
-//			int row = table.getSelectedRow();
-//			int col = table.getSelectedColumn();
-//			System.out.println("Change! " + e.getSource());
-//			if (col == 2) {
-//				cbDialog.criteriaField.setText((String) table.getValueAt(row,
-//						col));
-//			}
-//		}
-//
-//	}
+	// public class CriteriaCellListener implements TableModelListener {
+	//
+	// CriteriaCellListener() {
+	// table.getModel().addTableModelListener(this);
+	// }
+	//
+	// // Update the text field whenever the value in the anchor cell changes
+	// public void tableChanged(TableModelEvent e) {
+	// // Get anchor cell location
+	// int row = table.getSelectedRow();
+	// int col = table.getSelectedColumn();
+	// System.out.println("Change! " + e.getSource());
+	// if (col == 2) {
+	// cbDialog.criteriaField.setText((String) table.getValueAt(row,
+	// col));
+	// }
+	// }
+	//
+	// }
 
 	// Converts a visible column index to a column index in the model.
 	// Returns -1 if the index does not exist.
@@ -512,15 +520,15 @@ public class CriteriaTablePanel implements ActionListener,
 					System.out.println("LENGTHHH: " + temp.length);
 					if (temp.length == 1) {
 						System.out.println("Selected Index: " + i);
-						String colorString = getCell(i, 4) + "";
+						String colorString = getCell(i, VALUE_COL) + "";
 
-						if (getCell(i, 0).equals("")) {
-							return;
-						}
+						// if (getCell(i, 0).equals("")) {
+						// return;
+						// }
 						Color c = stringToColor(colorString);
-						mapper.createDiscreteMapping(getCell(i, 1)
-								+ "_discrete", (String) getCell(i, 1), c,
-								mapToPick);
+						mapper.createDiscreteMapping(getCell(i, LABEL_COL)
+								+ "_discrete", (String) getCell(i, LABEL_COL),
+								c, mapToPick);
 					} else {
 						String[] labels = getLabelArray(temp);
 						Color[] colors = getColorArray(temp);
@@ -573,19 +581,11 @@ public class CriteriaTablePanel implements ActionListener,
 			return;
 		}
 		for (int i = 0; i < getDataLength(); i++) {
-			String label = setName + "_" + getCell(i, 1);
-			String current = (String) getCell(i, 2);
-			String showBoolean = "" + getCell(i, 0);
-			if (current != null && !current.equals("") && !label.equals("")) { // &&
-				// showBoolean
-				// .
-				// equals
-				// (
-				// "true"
-				// )
-
+			String label = setName + "_" + getCell(i, LABEL_COL);
+			String current = (String) getCell(i, EXP_COL);
+			// String showBoolean = "" + getCell(i, 0);
+			if (current != null && !current.equals("") && !label.equals("")) {
 				try {
-
 					calculate.parse(current);
 				} catch (Exception p) {
 					System.out.println(p.getMessage());
@@ -605,7 +605,7 @@ public class CriteriaTablePanel implements ActionListener,
 				calculate.evaluateLeftToRight(label);
 				labels.add(label);
 
-				Color c = stringToColor(getCell(i, 4) + "");
+				Color c = stringToColor(getCell(i, VALUE_COL) + "");
 				colors.add(c);
 
 			}
@@ -661,7 +661,7 @@ public class CriteriaTablePanel implements ActionListener,
 	}
 
 	public void setCell(int row, int col, String value) {
-		if (col == 5) {
+		if (col == VALUE_COL) {
 			// java.awt.Color[r=0,g=0,b=255]
 			Color temp = stringToColor(value);
 			dataModel.setValueAt(temp, row, col);
@@ -672,20 +672,17 @@ public class CriteriaTablePanel implements ActionListener,
 	}
 
 	public void clearTable() {
+		applyCriteria();
 		dataModel.rowCount = 1;
-
 		for (int i = 0; i < dataModel.rowCount; i++) {
 			for (int j = 0; j < dataModel.colCount; j++) {
-				if (j == 0) {
-					dataModel.setValueAt(false, i, j);
+				if (j == VALUE_COL) {
+					dataModel.setValueAt(Color.WHITE, i, j);
 				} else {
-					if (j == 4) {
-						dataModel.setValueAt(Color.WHITE, i, j);
-					} else {
-						dataModel.setValueAt("", i, j);
-					}
+					dataModel.setValueAt("", i, j);
 				}
 			}
+
 		}
 	}
 
@@ -694,9 +691,9 @@ public class CriteriaTablePanel implements ActionListener,
 	}
 
 	public void deleteRow(int rowNumber) {
-		setCell(rowNumber, 1, "");
-		setCell(rowNumber, 2, "");
-		setCell(rowNumber, 3, "");
+		setCell(rowNumber, LABEL_COL, "");
+		setCell(rowNumber, EXP_COL, "");
+		setCell(rowNumber, MAPTO_COL, "");
 
 	}
 
@@ -704,7 +701,7 @@ public class CriteriaTablePanel implements ActionListener,
 		dataModel.addRow();
 		int selectableRow = table.getRowCount() - 1;
 		table.setRowSelectionInterval(selectableRow, selectableRow);
-		String currentValue = (String) table.getValueAt(selectableRow, 2);
+		String currentValue = (String) table.getValueAt(selectableRow, EXP_COL);
 		cbDialog.criteriaField.setText((String) currentValue);
 	}
 
@@ -713,16 +710,16 @@ public class CriteriaTablePanel implements ActionListener,
 		System.out.println(" Global Row Count: " + dataModel.rowCount
 				+ " Criteria: " + criteria + " Label: " + label);
 
-		dataModel.setValueAt(label, dataModel.rowCount - 1, 1);
-		dataModel.setValueAt(criteria, dataModel.rowCount - 1, 2);
-		dataModel.setValueAt("Node Color", dataModel.rowCount - 1, 3);
-		dataModel.setValueAt(currentColor, dataModel.rowCount - 1, 4);
+		dataModel.setValueAt(label, dataModel.rowCount - 1, LABEL_COL);
+		dataModel.setValueAt(criteria, dataModel.rowCount - 1, EXP_COL);
+		dataModel.setValueAt("Node Color", dataModel.rowCount - 1, MAPTO_COL);
+		dataModel.setValueAt(currentColor, dataModel.rowCount - 1, VALUE_COL);
 
 		dataModel.fireTableDataChanged();
 
 		int selectableRow = table.getRowCount() - 1;
 		table.setRowSelectionInterval(selectableRow, selectableRow);
-		String currentValue = (String) table.getValueAt(selectableRow, 2);
+		String currentValue = (String) table.getValueAt(selectableRow, EXP_COL);
 		cbDialog.criteriaField.setText((String) currentValue);
 		savedFlag = true;
 	}
@@ -730,11 +727,10 @@ public class CriteriaTablePanel implements ActionListener,
 	public void moveRowUp(int rowNumber) {
 		if (rowNumber != 0) {
 
-			Object showTemp = dataModel.data[rowNumber][0];
-			Object labelTemp = dataModel.data[rowNumber][1];
-			Object criteriaTemp = dataModel.data[rowNumber][2];
-			Object mapToTemp = dataModel.data[rowNumber][3];
-			Object colorTemp = dataModel.data[rowNumber][4];
+			Object temp0 = dataModel.data[rowNumber][0];
+			Object temp1 = dataModel.data[rowNumber][1];
+			Object temp2 = dataModel.data[rowNumber][2];
+			Object temp3 = dataModel.data[rowNumber][3];
 
 			dataModel
 					.setValueAt(dataModel.data[rowNumber - 1][0], rowNumber, 0);
@@ -744,14 +740,11 @@ public class CriteriaTablePanel implements ActionListener,
 					.setValueAt(dataModel.data[rowNumber - 1][2], rowNumber, 2);
 			dataModel
 					.setValueAt(dataModel.data[rowNumber - 1][3], rowNumber, 3);
-			dataModel
-					.setValueAt(dataModel.data[rowNumber - 1][4], rowNumber, 4);
 
-			dataModel.setValueAt(showTemp, rowNumber - 1, 0);
-			dataModel.setValueAt(labelTemp, rowNumber - 1, 1);
-			dataModel.setValueAt(criteriaTemp, rowNumber - 1, 2);
-			dataModel.setValueAt(mapToTemp, rowNumber - 1, 3);
-			dataModel.setValueAt(colorTemp, rowNumber - 1, 4);
+			dataModel.setValueAt(temp0, rowNumber - 1, 0);
+			dataModel.setValueAt(temp1, rowNumber - 1, 1);
+			dataModel.setValueAt(temp2, rowNumber - 1, 2);
+			dataModel.setValueAt(temp3, rowNumber - 1, 3);
 
 			applyCriteria();
 		}
@@ -760,11 +753,10 @@ public class CriteriaTablePanel implements ActionListener,
 	public void moveRowDown(int rowNumber) {
 		if (rowNumber != dataModel.rowCount) {
 
-			Object showTemp = dataModel.data[rowNumber][0];
-			Object labelTemp = dataModel.data[rowNumber][1];
-			Object criteriaTemp = dataModel.data[rowNumber][2];
-			Object mapToTemp = dataModel.data[rowNumber][3];
-			Object colorTemp = dataModel.data[rowNumber][4];
+			Object temp0 = dataModel.data[rowNumber][0];
+			Object temp1 = dataModel.data[rowNumber][1];
+			Object temp2 = dataModel.data[rowNumber][2];
+			Object temp3 = dataModel.data[rowNumber][3];
 
 			dataModel
 					.setValueAt(dataModel.data[rowNumber + 1][0], rowNumber, 0);
@@ -774,14 +766,11 @@ public class CriteriaTablePanel implements ActionListener,
 					.setValueAt(dataModel.data[rowNumber + 1][2], rowNumber, 2);
 			dataModel
 					.setValueAt(dataModel.data[rowNumber + 1][3], rowNumber, 3);
-			dataModel
-					.setValueAt(dataModel.data[rowNumber + 1][4], rowNumber, 4);
 
-			dataModel.setValueAt(showTemp, rowNumber + 1, 0);
-			dataModel.setValueAt(labelTemp, rowNumber + 1, 1);
-			dataModel.setValueAt(criteriaTemp, rowNumber + 1, 2);
-			dataModel.setValueAt(mapToTemp, rowNumber + 1, 3);
-			dataModel.setValueAt(colorTemp, rowNumber + 1, 4);
+			dataModel.setValueAt(temp0, rowNumber + 1, 0);
+			dataModel.setValueAt(temp1, rowNumber + 1, 1);
+			dataModel.setValueAt(temp2, rowNumber + 1, 2);
+			dataModel.setValueAt(temp3, rowNumber + 1, 3);
 
 			applyCriteria();
 			// initializeTable();
@@ -792,10 +781,10 @@ public class CriteriaTablePanel implements ActionListener,
 		// initialize variables
 		int labelCount = 1;
 		int rowCount = 1;
-		int colCount = 5;
+		int colCount = 4;
 		boolean empty = true;
 
-		String[] columnNames = { "Show", "Label", "Expression", "Map To",
+		String[] columnNames = { "Label", "Expression", "Map To",
 				"Value" };
 		Object[][] data = new Object[rowCount][colCount];
 
@@ -815,11 +804,10 @@ public class CriteriaTablePanel implements ActionListener,
 				}
 			}
 			// add new row
-			data[rowCount - 1][0] = false;
-			data[rowCount - 1][1] = "Label " + labelCount;
-			data[rowCount - 1][2] = "";
-			data[rowCount - 1][3] = mapTo[0];
-			data[rowCount - 1][4] = Color.WHITE;
+			data[rowCount - 1][LABEL_COL] = "Label " + labelCount;
+			data[rowCount - 1][EXP_COL] = "";
+			data[rowCount - 1][MAPTO_COL] = mapTo[0];
+			data[rowCount - 1][VALUE_COL] = Color.WHITE;
 			// System.out.println("Added row: "+rowCount);
 			empty = false;
 			savedFlag = false;
@@ -958,7 +946,7 @@ class ColorRenderer extends JLabel implements TableCellRenderer {
 
 	public Component getTableCellRendererComponent(JTable table, Object color,
 			boolean isSelected, boolean hasFocus, int row, int column) {
-		setToolTipText("Double-click to open color picker");
+		setToolTipText("Double-click to pick a color");
 		Color newColor = stringToColor(color + "");
 		setBackground(newColor);
 		if (isBordered) {
@@ -1112,5 +1100,4 @@ class CriteriaEditor extends AbstractCellEditor implements TableCellEditor,
 		criteria = (String) value;
 		return button;
 	}
-
 }

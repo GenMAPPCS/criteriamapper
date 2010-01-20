@@ -35,15 +35,15 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 //	private JButton colorButton;
 //	private JColorChooser colorChooser;
 	
-	JTextField criteriaField;
+	public JTextField criteriaField;
 //	JTextField labelField;
 //	private JDialog dialog;
 	private JList attList;
 	private JList opList;
 //	JComboBox mapToBox;
 	
-	CriteriaTablePanel panelPointer;
-	JPanel ctpPanel;
+	private CriteriaTablePanel ctPanel;
+	private JPanel tablePanel;
 	
 //	Color currentColor = Color.WHITE; //keeps track of the color displayed by the color button
 //	String label = ""; 
@@ -56,7 +56,7 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 	
 	public CriteriaBuilderDialog(CriteriaTablePanel panel){
 		
-		panelPointer = panel;
+		ctPanel = panel;
 
 	}
 	
@@ -94,8 +94,8 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
         //mainFrame.setIconImage(builderIcon);
         //mainDialog = new JDialog(mainFrame);
 		
-		ctpPanel = panelPointer.getTablePanel();
-		ctpPanel.add(this);
+		tablePanel = ctPanel.getTablePanel();
+		tablePanel.add(this);
 		
 //		mainDialog.setContentPane(mainPanel);
 //		mainDialog.setVisible(true);
