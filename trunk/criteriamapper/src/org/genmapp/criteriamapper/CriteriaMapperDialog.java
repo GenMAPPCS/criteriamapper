@@ -17,6 +17,7 @@ import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTable;
 import javax.swing.border.Border;
 import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
@@ -30,23 +31,25 @@ import cytoscape.view.CytoscapeDesktop;
 public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		FocusListener, ListSelectionListener, java.beans.PropertyChangeListener {
 
-//	private BooleanCalculator calculator = null;
-//	private BooleanScanner scan = null; // Not currently used
+	// private BooleanCalculator calculator = null;
+	// private BooleanScanner scan = null; // Not currently used
 	private AttributeManager attributeManager;
-//	private ColorMapper colorMapper;
+	// private ColorMapper colorMapper;
 	private CriteriaTablePanel criteriaTable;
-//	private CriteriaCalculator calculate = new CriteriaCalculator(); // Not
-																		// currently
-																		// used
+	// private CriteriaCalculator calculate = new CriteriaCalculator(); // Not
+	// currently
+	// used
 
 	private String setName = null;
 
+	private JButton applySet;
 	private JButton saveSet;
 	private JButton closeAll;
 	private JButton deleteSet;
 	private JButton duplicateSet;
 	private JPanel mainPanel;
 	private JPanel tableMapperPanel;
+	private JPanel setPanel;
 	private JPanel controlPanel;
 
 	String mapTo = "Node Color";
@@ -59,11 +62,11 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 				.addPropertyChangeListener(this);
 
 		// currentAlgorithm = algorithm;
-//		colorMapper = new ColorMapper();
+		// colorMapper = new ColorMapper();
 		attributeManager = new AttributeManager();
-//		calculator = new BooleanCalculator();
+		// calculator = new BooleanCalculator();
 		criteriaTable = new CriteriaTablePanel();
-//		scan = new BooleanScanner();
+		// scan = new BooleanScanner();
 		initialize();
 	}
 
@@ -74,12 +77,12 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		mainPanel.setMaximumSize(new Dimension(Cytoscape.getDesktop()
 				.getWidth(), 150));
 
-		JPanel setPanel = getCriteriaSetPanel();
+		setPanel = getCriteriaSetPanel();
 
 		tableMapperPanel = criteriaTable.getTablePanel();
 
 		controlPanel = getControlPanel();
-		
+
 		mainPanel.add(setPanel);
 		mainPanel.add(tableMapperPanel);
 		mainPanel.add(controlPanel);
@@ -89,8 +92,8 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 		setContentPane(mainPanel);
 		CytoscapeDesktop d = Cytoscape.getDesktop();
-		setLocation(d.getX() + d.getWidth() / 2 - 200, d.getY()
-				+ d.getHeight() / 2 - 200);
+		setLocation(d.getX() + d.getWidth() / 2 - 200, d.getY() + d.getHeight()
+				/ 2 - 200);
 
 		this.pack();
 		this.setVisible(true);
@@ -108,10 +111,22 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			// switch to newly selected set
 			setName = (String) nameBox.getSelectedItem();
 
-			// user selects "New..."
+			// check to see if new set name already exists
+			boolean setExists = false;
+			nameBoxArray = attributeManager.getNamesAttribute(Cytoscape
+					.getCurrentNetwork());
+			for (int i = 0; i < nameBoxArray.length; i++) {
+				if (nameBoxArray[i].equals(setName)) {
+					setExists = true;
+				}
+			}
+
+			// user has selected "New..."
 			if (setName.equalsIgnoreCase("New...")) {
 				tableMapperPanel.setVisible(false);
 				controlPanel.setVisible(false);
+				applySet.setEnabled(false);
+				saveSet.setEnabled(false);
 				deleteSet.setEnabled(false);
 				duplicateSet.setEnabled(false);
 				nameBox.setEditable(true);
@@ -119,67 +134,36 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 				return;
 			}
 
-			// User has typed a new set name
-			if (nameBox.isEditable()) {
-				// Check to see if new set name already exists
-				nameBoxArray = attributeManager.getNamesAttribute(Cytoscape
-						.getCurrentNetwork());
-				for (int i = 0; i < nameBoxArray.length; i++) {
-					if (nameBoxArray[i].equals(setName)) {
-						JOptionPane
-								.showMessageDialog(this,
-										"Set name already exists. Type a new name or select an existing Set.");
-						return;
-					}
-				}
+			if (setExists) {
+				// user has selected an existing set
+				criteriaTable.setName = setName;
+				criteriaTable.clearTable();
+				loadSettings(setName);
+			} else { // User has typed a new set name
 				// Add new set name and open table
 				attributeManager.addNamesAttribute(Cytoscape
 						.getCurrentNetwork(), setName);
 				saveSettings(setName);
 				criteriaTable.setName = setName;
 				nameBox.addItem(setName);
-				nameBox.setEditable(false);
 				criteriaTable.clearTable();
 				criteriaTable.addEditableRow();
-				tableMapperPanel.setVisible(true);
-				tableMapperPanel.setEnabled(true);
-				controlPanel.setVisible(true);
-				deleteSet.setEnabled(true);
-				duplicateSet.setEnabled(true);
-				pack();
-				setEnabled(true);
-				return;
 			}
-
-			// User has selected an existing set
-			criteriaTable.setName = setName;
-			criteriaTable.clearTable();
-			loadSettings(setName);
 			tableMapperPanel.setVisible(true);
 			controlPanel.setVisible(true);
+			applySet.setEnabled(true);
+			saveSet.setEnabled(true);
 			deleteSet.setEnabled(true);
 			duplicateSet.setEnabled(true);
+			nameBox.setEditable(false);
 			pack();
-			setVisible(true);
-		}
-
-		// if(command.equals("newSet")){
-		// nameBox.setSelectedIndex(0);
-		// nameBox.setEditable(true);
-		//			
-		// criteriaTable.clearTable();
-		//			
-		// //criteriaTable.addEditableRow();
-		// //criteriaTable.setFlag = true;
-		// }
-
-		// User is saving Set while editing an existing Set
-		if (command.equals("saveSet")) {
+		} else if (command.equals("applySet")) {
+			// TODO: apply criteria set
+		} else if (command.equals("saveSet")) {
+			// User is saving Set while editing an existing Set
 			setName = (String) nameBox.getSelectedItem();
 			saveSettings(setName);
-		}
-
-		if (command.equals("deleteSet")) {
+		} else if (command.equals("deleteSet")) {
 			// ignore if in edit mode
 			if (nameBox.isEditable()) {
 				return;
@@ -190,24 +174,26 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			int n = JOptionPane.showOptionDialog(this,
 					"Are you sure that you want to delete the Criteria Set?",
 					"", JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
+					JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
 			if (n == 1) { // YES
 				attributeManager.removeNamesAttribute(Cytoscape
 						.getCurrentNetwork(), setName);
 				nameBox.removeItem(setName);
 				criteriaTable.clearTable();
 			} else { // NO
-				//do nothing...		
+				// do nothing...
 			}
-		}
-
-		if (command.equals("closeAll")){
+		} else if (command.equals("closeAll")) {
+			if (criteriaTable.savedFlag){ //saved all changes
+				this.setVisible(false);
+				return;
+			}
 			setName = (String) nameBox.getSelectedItem();
 			Object[] options = { "Cancel", "No", "Yes" };
 			int n = JOptionPane.showOptionDialog(this,
-					"Do you want to save this Set before closing?",
-					"", JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.QUESTION_MESSAGE, null, options, options[2]);
+					"Do you want to save this Set before closing?", "",
+					JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.PLAIN_MESSAGE, null, options, options[2]);
 			if (n == 2) { // YES
 				saveSettings(setName);
 				this.setVisible(false);
@@ -216,20 +202,18 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 				this.setVisible(false);
 				return;
 			} else { // CANCEL
-				//do nothing...
+				// do nothing...
 			}
 		}
-		
-		//TODO: replace with double click listener
-//		if (command.equals("renameSet")) {
-//			nameBox.setEditable(true);
-//		}
 	}
 
-	public void saveSettings(String nameValue) {
+	public void saveSettings(String setName) {
 
+		if (setName.equals("New...")){
+			return; //skip saving "New..."
+		}
 		// System.out.println(nameBox.getSelectedItem());
-		String newName = nameValue; // (String)nameBox.getSelectedItem();
+		String newName = setName; // (String)nameBox.getSelectedItem();
 
 		String mapTo = (String) mapToBox.getSelectedItem();
 
@@ -242,7 +226,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			String temp = criteriaTable.getCell(k, 2) + ":"
 					+ criteriaTable.getCell(k, 1) + ":"
 					+ criteriaTable.getCell(k, 4);
-			System.out.println("SAVE SETTINGS: " + nameValue + "  " + temp);
+			System.out.println("SAVE SETTINGS: " + setName + "  " + temp);
 			if (!temp.equals(null)) {
 				criteriaLabels[k] = temp;
 			}
@@ -250,6 +234,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			// System.out.println(criteriaLabels.length+"AAA"+temp);
 		}
 		attributeManager.setValuesAttribute(newName, mapTo, criteriaLabels);
+		criteriaTable.savedFlag = true;
 	}
 
 	public void loadSettings(String setName) {
@@ -331,16 +316,28 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		JPanel sPanel = new JPanel(new BorderLayout(0, 2));
 		JPanel setButtonsPanel = new JPanel();// new BorderLayout(0,2));
 
+		applySet = new JButton("Apply");
+		applySet.addActionListener(this);
+		applySet.setActionCommand("applySet");
+		applySet.setEnabled(false);
+
+		saveSet = new JButton("Save");
+		saveSet.addActionListener(this);
+		saveSet.setActionCommand("saveSet");
+		saveSet.setEnabled(false);
+
 		deleteSet = new JButton("Delete");
 		deleteSet.addActionListener(this);
 		deleteSet.setActionCommand("deleteSet");
 		deleteSet.setEnabled(false);
-		
+
 		duplicateSet = new JButton("Duplicate");
 		duplicateSet.addActionListener(this);
 		duplicateSet.setActionCommand("duplicateSet");
 		duplicateSet.setEnabled(false);
 
+		setButtonsPanel.add(applySet);
+		setButtonsPanel.add(saveSet);
 		setButtonsPanel.add(deleteSet);
 		setButtonsPanel.add(duplicateSet);
 
@@ -370,22 +367,19 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 		return setPanel;
 	}
-	
+
 	public JPanel getControlPanel() {
-	
+
 		JPanel controlPanel = new JPanel();
-		saveSet = new JButton("Save");
-		saveSet.addActionListener(this);
-		saveSet.setActionCommand("saveSet");
-		controlPanel.add(saveSet);
-		
+		controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.X_AXIS));
+
 		closeAll = new JButton("Close");
 		closeAll.addActionListener(this);
 		closeAll.setActionCommand("closeAll");
 
-		controlPanel.add(saveSet);
+		// controlPanel.add(Box.createHorizontalGlue());
 		controlPanel.add(closeAll);
-		
+
 		return controlPanel;
 	}
 

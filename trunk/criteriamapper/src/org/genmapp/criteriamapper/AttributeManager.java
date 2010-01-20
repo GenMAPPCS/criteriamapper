@@ -26,7 +26,7 @@ public class AttributeManager {
 		networkAttributes = Cytoscape.getNetworkAttributes();
 		nodeAttributes = Cytoscape.getNodeAttributes();
 		//criteriaSetNames.add("");
-		criteriaSetNames.add("New...");
+		//criteriaSetNames.add("New...");
 		getAllAttributes();
 	}
 
@@ -56,8 +56,12 @@ public class AttributeManager {
 		if(networkAttributes.hasAttribute(network.getIdentifier(), "__criteria")){
 			String[] a = {""};
 			ArrayList<String> temp = (ArrayList<String>)networkAttributes.getListAttribute(network.getIdentifier(), "__criteria");
-			
-			return temp.toArray(a);
+			ArrayList<String> full = new ArrayList<String>();
+			full.add("New...");
+			for (String s : temp){
+				full.add(s);
+			}			
+			return full.toArray(a);		
 		}else{
 			
 			return new String[] {"New..."};
