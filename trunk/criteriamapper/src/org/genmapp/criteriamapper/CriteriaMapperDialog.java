@@ -173,22 +173,22 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			}
 			// prompt user to confirm deletion
 			setName = (String) nameBox.getSelectedItem();
-			 Object[] options = { "No", "Yes" };
-			 int n = JOptionPane.showOptionDialog(this,
-			 "Are you sure that you want to delete "+setName+"?",
-			 "", JOptionPane.YES_NO_CANCEL_OPTION,
-			 JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
-			 if (n == 1) { // YES
-			attributeManager.removeNamesAttribute(
-					Cytoscape.getCurrentNetwork(), setName);
-			deletedFlag = true; // to avoid autosave via nameBoxChanged
-			nameBox.removeItem(setName);
-			ctPanel.clearTable();
-			 } else { // NO
-			 // do nothing...
-			 }
+			Object[] options = { "No", "Yes" };
+			int n = JOptionPane.showOptionDialog(this,
+					"Are you sure that you want to delete " + setName + "?",
+					"", JOptionPane.YES_NO_CANCEL_OPTION,
+					JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
+			if (n == 1) { // YES
+				attributeManager.removeNamesAttribute(Cytoscape
+						.getCurrentNetwork(), setName);
+				deletedFlag = true; // to avoid autosave via nameBoxChanged
+				nameBox.removeItem(setName);
+				ctPanel.clearTable();
+			} else { // NO
+				// do nothing...
+			}
 		} else if (command.equals("closeAll")) {
-			if (ctPanel.savedFlag) { // saved all changes
+			if (ctPanel.savedFlag) { // changes already saved
 				this.setVisible(false);
 				return;
 			}
@@ -213,8 +213,8 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 	public void saveSettings(String sn) {
 
-		if (sn.equals("New...")) {
-			return; // skip saving "New..."
+		if (sn.equals("New...") || ctPanel.savedFlag) {
+			return; // skip saving "New..." or already saved
 		}
 		// System.out.println(nameBox.getSelectedItem());
 
