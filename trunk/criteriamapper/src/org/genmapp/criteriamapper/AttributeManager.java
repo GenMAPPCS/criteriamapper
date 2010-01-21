@@ -19,228 +19,256 @@ import cytoscape.data.CyAttributes;
 public class AttributeManager {
 	private CyAttributes networkAttributes;
 	private CyAttributes nodeAttributes;
-	//private SortedSet<String> criteriaSetNames = null;
+	// private SortedSet<String> criteriaSetNames = null;
 	private ArrayList<String> criteriaSetNames = new ArrayList<String>();
-	
-	public AttributeManager(){
+
+	public AttributeManager() {
 		networkAttributes = Cytoscape.getNetworkAttributes();
 		nodeAttributes = Cytoscape.getNodeAttributes();
-		//criteriaSetNames.add("");
-		//criteriaSetNames.add("New...");
+		// criteriaSetNames.add("");
+		// criteriaSetNames.add("New...");
 		getAllAttributes();
 	}
 
 	/*
-	 * The names attribute refers to a list of 'Criteria Set names'.  A 'Criteria Set Name'
-	 * is a name which identifies a session that can be saved when creating criteria using 
-	 * the criteria builder.
+	 * The names attribute refers to a list of 'Criteria Set names'. A 'Criteria
+	 * Set Name' is a name which identifies a session that can be saved when
+	 * creating criteria using the criteria builder.
 	 */
-	public void addNamesAttribute(CyNetwork network, String setName){
+	public void addNamesAttribute(CyNetwork network, String setName) {
 		networkAttributes = Cytoscape.getNetworkAttributes();
-		//System.out.println("setname: "+setName);
-		if(networkAttributes.hasAttribute(network.getIdentifier(), "__criteria")){
-			criteriaSetNames = (ArrayList<String>)networkAttributes.getListAttribute(network.getIdentifier(), "__criteria");
-		}else{
+		// System.out.println("setname: "+setName);
+		if (networkAttributes.hasAttribute(network.getIdentifier(),
+				"__criteria")) {
+			criteriaSetNames = (ArrayList<String>) networkAttributes
+					.getListAttribute(network.getIdentifier(), "__criteria");
+		} else {
 			criteriaSetNames.add(setName);
 		}
-		
-	    if(!(criteriaSetNames.contains(setName))){ 
+
+		if (!(criteriaSetNames.contains(setName))) {
 			criteriaSetNames.add(setName);
 		}
-		
-		
-		networkAttributes.setListAttribute(network.getIdentifier(), "__criteria", criteriaSetNames);
+
+		networkAttributes.setListAttribute(network.getIdentifier(),
+				"__criteria", criteriaSetNames);
 	}
-	
-	public String[] getNamesAttribute(CyNetwork network){
-		if(networkAttributes.hasAttribute(network.getIdentifier(), "__criteria")){
-			String[] a = {""};
-			ArrayList<String> temp = (ArrayList<String>)networkAttributes.getListAttribute(network.getIdentifier(), "__criteria");
+
+	public String[] getNamesAttribute(CyNetwork network) {
+		if (networkAttributes.hasAttribute(network.getIdentifier(),
+				"__criteria")) {
+			String[] a = { "" };
+			ArrayList<String> temp = (ArrayList<String>) networkAttributes
+					.getListAttribute(network.getIdentifier(), "__criteria");
 			ArrayList<String> full = new ArrayList<String>();
 			full.add("New...");
-			for (String s : temp){
+			for (String s : temp) {
 				full.add(s);
-			}			
-			return full.toArray(a);		
-		}else{
-			
-			return new String[] {"New..."};
+			}
+			return full.toArray(a);
+		} else {
+
+			return new String[] { "New..." };
 		}
 	}
-	
-	
-	
-	public void removeNamesAttribute(CyNetwork network, String setName){
+
+	public void removeNamesAttribute(CyNetwork network, String setName) {
+		criteriaSetNames = (ArrayList<String>) networkAttributes
+				.getListAttribute(network.getIdentifier(), "__criteria");
 		criteriaSetNames.remove(setName);
-		List temp = (List)criteriaSetNames;
-		networkAttributes.setListAttribute(network.getIdentifier(), "__criteria", temp);
+		if (criteriaSetNames.size() == 0) { // removed last set
+			networkAttributes.deleteAttribute("__criteria");
+		} else {
+			List temp = (List) criteriaSetNames;
+			networkAttributes.setListAttribute(network.getIdentifier(),
+					"__criteria", temp);
+		}
+		networkAttributes.deleteAttribute(setName);
 	}
-	public void setNamesAttribute(CyNetwork network, String[] setNames){
-		//System.out.println("SET NAMES ATTRIBUTE!!!");
+
+	public void setNamesAttribute(CyNetwork network, String[] setNames) {
+		// System.out.println("SET NAMES ATTRIBUTE!!!");
 		networkAttributes = Cytoscape.getNetworkAttributes();
-		//if(!networkAttributes.hasAttribute(Cytoscape.getCurrentNetwork().toString(), "Criteria")){
+		// if(!networkAttributes.hasAttribute(Cytoscape.getCurrentNetwork().
+		// toString(), "Criteria")){
 		List<String> temp = null;
-		for(int i=0; i<setNames.length; i++){
+		for (int i = 0; i < setNames.length; i++) {
 			temp.add(setNames[i]);
 		}
-		networkAttributes.setListAttribute(network.getIdentifier(), "__criteria", temp);
-		//}
-		networkAttributes = Cytoscape.getNetworkAttributes();
+		networkAttributes.setListAttribute(network.getIdentifier(),
+				"__criteria", temp);
+		// }
+		// networkAttributes = Cytoscape.getNetworkAttributes();
 	}
-	
-	
+
 	/*
-	 * The values attribute refers to a list of colon separated Strings.  The values separated
-	 * by the colons are the criteria, label, and color respectively.  Any number of values, or colon
-	 * separated strings can be associated with a setName or 'Criteria Set Name' attribute.
+	 * The values attribute refers to a list of colon separated Strings. The
+	 * values separated by the colons are the criteria, label, and color
+	 * respectively. Any number of values, or colon separated strings can be
+	 * associated with a setName or 'Criteria Set Name' attribute.
 	 */
-	public void setValuesAttribute(String setName,String mapTo, String[] criteriaLabelColor){
+	public void setValuesAttribute(String setName, String mapTo,
+			String[] criteriaLabelColor) {
 		ArrayList<String> temp = new ArrayList<String>();
 		temp.add(mapTo);
-		for(int i=0; i<criteriaLabelColor.length; i++){
+		for (int i = 0; i < criteriaLabelColor.length; i++) {
 			temp.add(criteriaLabelColor[i]);
 		}
-		networkAttributes.setListAttribute(Cytoscape.getCurrentNetwork().getIdentifier(), setName, temp);
 		networkAttributes = Cytoscape.getNetworkAttributes();
+		networkAttributes.setListAttribute(Cytoscape.getCurrentNetwork()
+				.getIdentifier(), setName, temp);
+
 	}
-	
-	public void setColorAttribute(String label, String nodeID, Boolean outcome){
+
+	public void setColorAttribute(String label, String nodeID, Boolean outcome) {
 		nodeAttributes.setAttribute(nodeID, label, outcome);
 		nodeAttributes = Cytoscape.getNodeAttributes();
 	}
-	
-	//public int getCompositeAttribute(String nodeID, String compositeName){
-		//nodeAttributes.getIntegerAttribute(nodeID, compositeName);
-		
-	//}
-	
+
+	// public int getCompositeAttribute(String nodeID, String compositeName){
+	// nodeAttributes.getIntegerAttribute(nodeID, compositeName);
+
+	// }
+
 	/*
-	 * This is perhaps one of the most important and confusing pieces of the entire program.  This method
-	 * takes an array of user entered labels that each represent some user entered criteria.  It then progressively iterates
-	 * through the value at each node for each label.  If the value is already true then 
+	 * This is perhaps one of the most important and confusing pieces of the
+	 * entire program. This method takes an array of user entered labels that
+	 * each represent some user entered criteria. It then progressively iterates
+	 * through the value at each node for each label. If the value is already
+	 * true then
 	 */
 	public void setCompositeAttribute(String[] labels) throws Exception {
 		CyNetwork network = Cytoscape.getCurrentNetwork();
 		List<Node> nodesList = network.nodesList();
 		String compositeName = labels[0];
-		for(int k=1; k<labels.length; k++){
-			if(labels[k].equals("")){ continue; }
+		for (int k = 1; k < labels.length; k++) {
+			if (labels[k].equals("")) {
+				continue;
+			}
 			compositeName = compositeName + ":" + labels[k];
 		}
-		
-		for(int i=0; i<nodesList.size(); i++){
+
+		for (int i = 0; i < nodesList.size(); i++) {
 			Node node = nodesList.get(i);
 			String nodeID = node.getIdentifier();
-			
-			for(int j=0; j<labels.length; j++){
-				if(labels[j].equals("")){ continue; }
-				if(!(nodeAttributes.hasAttribute(nodeID, labels[j]))){
-					throw new Exception("ITERATION: "+j+"Node Attribute for node "+nodeID +" at " + labels[j] + " has not been calculated");
+
+			for (int j = 0; j < labels.length; j++) {
+				if (labels[j].equals("")) {
+					continue;
 				}
-				
-				if(nodeAttributes.getBooleanAttribute(nodeID, labels[j])){
-					
-					if(nodeAttributes.hasAttribute(nodeID, compositeName)){ 
-						System.out.println("set attribute "+compositeName+" at node: "+nodeID +" to "+j);
-						int b = nodeAttributes.getIntegerAttribute(nodeID, compositeName);
-						if( b == -1){
-							//System.out.println("set attribute "+compositeName+" at node: "+nodeID +" to "+j);
-							nodeAttributes.setAttribute(nodeID, compositeName, j);
+				if (!(nodeAttributes.hasAttribute(nodeID, labels[j]))) {
+					throw new Exception("ITERATION: " + j
+							+ "Node Attribute for node " + nodeID + " at "
+							+ labels[j] + " has not been calculated");
+				}
+
+				if (nodeAttributes.getBooleanAttribute(nodeID, labels[j])) {
+
+					if (nodeAttributes.hasAttribute(nodeID, compositeName)) {
+						System.out.println("set attribute " + compositeName
+								+ " at node: " + nodeID + " to " + j);
+						int b = nodeAttributes.getIntegerAttribute(nodeID,
+								compositeName);
+						if (b == -1) {
+							//System.out.println("set attribute "+compositeName+
+							// " at node: "+nodeID +" to "+j);
+							nodeAttributes.setAttribute(nodeID, compositeName,
+									j);
 						}
-					
-					}else{
-						//System.out.println("possibly overwrote");
+
+					} else {
+						// System.out.println("possibly overwrote");
 						nodeAttributes.setAttribute(nodeID, compositeName, j);
-					
+
 					}
-				}else{
-					if(!(nodeAttributes.hasAttribute(nodeID, compositeName))){
-					//System.out.println("set attribute "+compositeName+" at node: "+nodeID +" to -1");
-					nodeAttributes.setAttribute(nodeID, compositeName, -1);
+				} else {
+					if (!(nodeAttributes.hasAttribute(nodeID, compositeName))) {
+						// System.out.println("set attribute "+compositeName+
+						// " at node: "+nodeID +" to -1");
+						nodeAttributes.setAttribute(nodeID, compositeName, -1);
 					}
 				}
-				//System.out.println("compositeName: "+compositeName);
+				// System.out.println("compositeName: "+compositeName);
 				nodeAttributes = Cytoscape.getNodeAttributes();
 			}
-			
+
 		}
-		
+
 	}
-	
-	public boolean isCompositeAttribute(String compositeName){
+
+	public boolean isCompositeAttribute(String compositeName) {
 		getAllAttributes();
-		if(attributeList.contains(compositeName)){
+		if (attributeList.contains(compositeName)) {
 			return true;
-		}else{
+		} else {
 			return false;
 		}
 	}
-	
-	public void removeCompositeAttribute(String compositeName){
+
+	public void removeCompositeAttribute(String compositeName) {
 		nodeAttributes.deleteAttribute(compositeName);
 	}
-	
-	
-	public String[] getValuesAttribute(CyNetwork network, String setName){
+
+	public String[] getValuesAttribute(CyNetwork network, String setName) {
 		String[] a = {};
-		ArrayList<String> temp = (ArrayList<String>)networkAttributes.getListAttribute(network.getIdentifier(), setName);
-		if(temp != null){
+		ArrayList<String> temp = (ArrayList<String>) networkAttributes
+				.getListAttribute(network.getIdentifier(), setName);
+		if (temp != null) {
 			return temp.toArray(a);
-		}else{
+		} else {
 			return a;
 		}
 	}
-	
-	public boolean getColorAttribute(String nodeID, String label){
-		if(nodeAttributes.hasAttribute(nodeID, label)){
+
+	public boolean getColorAttribute(String nodeID, String label) {
+		if (nodeAttributes.hasAttribute(nodeID, label)) {
 			return nodeAttributes.getBooleanAttribute(nodeID, label);
 		}
 		return false;
 	}
-	
-	
-	public void removeColorAttribute(String label) throws Exception{
-		if(!nodeAttributes.deleteAttribute(label)){
+
+	public void removeColorAttribute(String label) throws Exception {
+		if (!nodeAttributes.deleteAttribute(label)) {
 			throw new Exception("Could not delete Attribute");
 		}
-		
+
 	}
-	
+
 	ArrayList<String> attributeList;
+
 	public String[] getAllAttributes() {
 		// Create the list by combining node and edge attributes into a single
 		// list
 		attributeList = new ArrayList<String>();
 		getAttributesList(attributeList, Cytoscape.getNodeAttributes(), "");
 		getAttributesList(attributeList, Cytoscape.getEdgeAttributes(), "");
-		
-		String[] str = (String[])attributeList.toArray(new String[attributeList.size()]);
+
+		String[] str = (String[]) attributeList
+				.toArray(new String[attributeList.size()]);
 		attributeList.clear();
 		return str;
 
 	}
 
-	
 	public void getAttributesList(ArrayList<String> attributeList,
 			CyAttributes attributes, String prefix) {
 		String[] names = attributes.getAttributeNames();
-		
+
 		for (int i = 0; i < names.length; i++) {
 			if (attributes.getType(names[i]) == CyAttributes.TYPE_FLOATING
-					 || attributes.getType(names[i]) == CyAttributes.TYPE_INTEGER || attributes.getType(names[i]) == CyAttributes.TYPE_BOOLEAN) {
-				
-					/*for(int j = 0; j < names[i].length(); j++){
-						String temp = names[i].charAt(j) + "";
-						if(temp.matches(" ")){
-							names[i] = names[i].substring(0,j) + "-" + names[i].substring(j+2, names[i].length());
-						}
-					}*/
-				
+					|| attributes.getType(names[i]) == CyAttributes.TYPE_INTEGER
+					|| attributes.getType(names[i]) == CyAttributes.TYPE_BOOLEAN) {
+
+				/*
+				 * for(int j = 0; j < names[i].length(); j++){ String temp =
+				 * names[i].charAt(j) + ""; if(temp.matches(" ")){ names[i] =
+				 * names[i].substring(0,j) + "-" + names[i].substring(j+2,
+				 * names[i].length()); } }
+				 */
+
 				attributeList.add(names[i]);
 			}
 		}
-		
+
 	}
 }
-
-

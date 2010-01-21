@@ -52,6 +52,8 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 	private JPanel setPanel;
 	private JPanel controlPanel;
 
+	private boolean deletedFlag = false;
+
 	String mapTo = "Node Color";
 
 	public CriteriaMapperDialog() {
@@ -105,7 +107,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 		if (command.equals("nameBoxChanged")) {
 			// save current set before switching
-			if (null != setName) {
+			if (null != setName && !deletedFlag) {
 				saveSettings(setName);
 			}
 			// switch to newly selected set
@@ -141,13 +143,13 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 				loadSettings(setName);
 			} else { // User has typed a new set name
 				// Add new set name and open table
-				attributeManager.addNamesAttribute(Cytoscape
-						.getCurrentNetwork(), setName);
-				saveSettings(setName);
-				ctPanel.setName = setName;
+				// attributeManager.addNamesAttribute(Cytoscape
+				// .getCurrentNetwork(), setName);
 				nameBox.addItem(setName);
+				ctPanel.setName = setName;
 				ctPanel.clearTable();
 				ctPanel.addEditableRow();
+				saveSettings(setName);
 			}
 			tablePanel.setVisible(true);
 			controlPanel.setVisible(true);
@@ -171,21 +173,22 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			}
 			// prompt user to confirm deletion
 			setName = (String) nameBox.getSelectedItem();
-			Object[] options = { "No", "Yes" };
-			int n = JOptionPane.showOptionDialog(this,
-					"Are you sure that you want to delete the Criteria Set?",
-					"", JOptionPane.YES_NO_CANCEL_OPTION,
-					JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
-			if (n == 1) { // YES
-				attributeManager.removeNamesAttribute(Cytoscape
-						.getCurrentNetwork(), setName);
-				nameBox.removeItem(setName);
-				ctPanel.clearTable();
-			} else { // NO
-				// do nothing...
-			}
+			 Object[] options = { "No", "Yes" };
+			 int n = JOptionPane.showOptionDialog(this,
+			 "Are you sure that you want to delete "+setName+"?",
+			 "", JOptionPane.YES_NO_CANCEL_OPTION,
+			 JOptionPane.PLAIN_MESSAGE, null, options, options[1]);
+			 if (n == 1) { // YES
+			attributeManager.removeNamesAttribute(
+					Cytoscape.getCurrentNetwork(), setName);
+			deletedFlag = true; // to avoid autosave via nameBoxChanged
+			nameBox.removeItem(setName);
+			ctPanel.clearTable();
+			 } else { // NO
+			 // do nothing...
+			 }
 		} else if (command.equals("closeAll")) {
-			if (ctPanel.savedFlag){ //saved all changes
+			if (ctPanel.savedFlag) { // saved all changes
 				this.setVisible(false);
 				return;
 			}
@@ -208,18 +211,16 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		}
 	}
 
-	public void saveSettings(String setName) {
+	public void saveSettings(String sn) {
 
-		if (setName.equals("New...")){
-			return; //skip saving "New..."
+		if (sn.equals("New...")) {
+			return; // skip saving "New..."
 		}
 		// System.out.println(nameBox.getSelectedItem());
-		String newName = setName; // (String)nameBox.getSelectedItem();
 
 		String mapTo = (String) mapToBox.getSelectedItem();
 
-		attributeManager.addNamesAttribute(Cytoscape.getCurrentNetwork(),
-				newName);
+		attributeManager.addNamesAttribute(Cytoscape.getCurrentNetwork(), sn);
 
 		String[] criteriaLabels = new String[ctPanel.getDataLength()];
 
@@ -227,14 +228,14 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			String temp = ctPanel.getCell(k, ctPanel.EXP_COL) + ":"
 					+ ctPanel.getCell(k, ctPanel.LABEL_COL) + ":"
 					+ ctPanel.getCell(k, ctPanel.VALUE_COL);
-			System.out.println("SAVE SETTINGS: " + setName + "  " + temp);
+			System.out.println("SAVE SETTINGS: " + sn + "  " + temp);
 			if (!temp.equals(null)) {
 				criteriaLabels[k] = temp;
 			}
 			// attributeManager.setColorAttribute(label, color, nodeID);
 			// System.out.println(criteriaLabels.length+"AAA"+temp);
 		}
-		attributeManager.setValuesAttribute(newName, mapTo, criteriaLabels);
+		attributeManager.setValuesAttribute(sn, mapTo, criteriaLabels);
 		ctPanel.savedFlag = true;
 	}
 
