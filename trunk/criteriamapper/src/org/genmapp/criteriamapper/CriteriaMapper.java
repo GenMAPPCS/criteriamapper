@@ -67,7 +67,7 @@ public class CriteriaMapper extends CytoscapePlugin {
 				// Create the dialog
 				CriteriaMapperDialog  settingsDialog = new CriteriaMapperDialog();
 				// Keep it on top and active
-				settingsDialog.setModal(true);
+				settingsDialog.setModal(false);
 				// Pop it up
 				settingsDialog.actionPerformed(e);
 			//} 
