@@ -82,10 +82,10 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		mainPanel = new JPanel();
 
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
-		mainPanel.setMaximumSize(new Dimension(Cytoscape.getDesktop()
-				.getWidth(), 150));
 
 		setPanel = getCriteriaSetPanel();
+		setPanel.setMaximumSize(new Dimension(Cytoscape.getDesktop()
+				.getWidth(), 150));
 
 		tablePanel = ctPanel.getTablePanel();
 
