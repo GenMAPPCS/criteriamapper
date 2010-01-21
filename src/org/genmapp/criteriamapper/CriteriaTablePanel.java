@@ -169,7 +169,7 @@ public class CriteriaTablePanel implements ActionListener,
 						setCell(row, column, currentColor + "");
 						colorEditor.currentColor = currentColor;
 					} else if (column == EXP_COL) { // send focus to Expression
-													// Editor
+						// Editor
 						cbDialog.criteriaField.requestFocusInWindow();
 						int pos = cbDialog.criteriaField.getText().length() - 1;
 						if (pos < 0)
@@ -188,10 +188,13 @@ public class CriteriaTablePanel implements ActionListener,
 		// TableColumn showCol = table.getColumnModel().getColumn(0);
 		TableColumn labelTC = table.getColumnModel().getColumn(LABEL_COL);
 		TableColumn expTC = table.getColumnModel().getColumn(EXP_COL);
-		TableColumn mapToTC = table.getColumnModel().getColumn(MAPTO_COL);
+		TableColumn maptoTC = table.getColumnModel().getColumn(MAPTO_COL);
 		TableColumn valueTC = table.getColumnModel().getColumn(VALUE_COL);
 
-		expTC.setMinWidth(100);
+		labelTC.setMinWidth(50);
+		expTC.setMinWidth(110);
+		maptoTC.setMinWidth(75);
+		valueTC.setMinWidth(50);
 
 		// JCheckBox showBox = new JCheckBox();
 		// showCol.setCellEditor(new DefaultCellEditor(showBox));
@@ -206,11 +209,11 @@ public class CriteriaTablePanel implements ActionListener,
 		expRenderer.setToolTipText("Click to activate Expression Editor below");
 		expTC.setCellRenderer(expRenderer);
 
-		JComboBox mapToBox = new JComboBox(mapTo);
-		mapToTC.setCellEditor(new DefaultCellEditor(mapToBox));
+		JComboBox maptoBox = new JComboBox(mapTo);
+		maptoTC.setCellEditor(new DefaultCellEditor(maptoBox));
 		DefaultTableCellRenderer maptoRenderer = new DefaultTableCellRenderer();
 		maptoRenderer.setToolTipText("Click for combo box");
-		mapToTC.setCellRenderer(maptoRenderer);
+		maptoTC.setCellRenderer(maptoRenderer);
 
 		table.setPreferredScrollableViewportSize(new Dimension(315, 80));
 
@@ -331,11 +334,11 @@ public class CriteriaTablePanel implements ActionListener,
 				}
 			} else if (rows.length == 0) {
 				// TODO: fix this!
-				JOptionPane.showMessageDialog(Cytoscape.getDesktop(),
-						"Please select a row first.");
+				JOptionPane.showMessageDialog(cbDialog,
+						"Please select a row first");
 			} else {
 				// TODO: fix this!
-				JOptionPane.showMessageDialog(Cytoscape.getDesktop(),
+				JOptionPane.showMessageDialog(cbDialog,
 						"Sorry, I can only delete one row at a time :(");
 			}
 
@@ -576,7 +579,7 @@ public class CriteriaTablePanel implements ActionListener,
 		String compositeLabel = "";
 		String[] nameLabels = new String[getDataLength()];
 		if (setName.equals("")) {
-			JOptionPane.showMessageDialog(Cytoscape.getDesktop(),
+			JOptionPane.showMessageDialog(cbDialog,
 					"Must have a set name.");
 			return;
 		}
@@ -603,7 +606,13 @@ public class CriteriaTablePanel implements ActionListener,
 				}
 				// System.out.println("compositeLabel: "+compositeLabel);
 				calculate.evaluateLeftToRight(label);
-				labels.add(label);
+				if (labels.contains(label)) {
+					JOptionPane.showMessageDialog(cbDialog,
+							"Must have unique labels");
+					return;
+				} else {
+					labels.add(label);
+				}
 
 				Color c = stringToColor(getCell(i, VALUE_COL) + "");
 				colors.add(c);
@@ -672,19 +681,19 @@ public class CriteriaTablePanel implements ActionListener,
 	}
 
 	public void clearTable() {
-//		applyCriteria();
+		// applyCriteria();
 		dataModel.labelCount = 0;
 		dataModel.rowCount = 0;
-//		for (int i = 0; i < dataModel.rowCount; i++) {
-//			for (int j = 0; j < dataModel.colCount; j++) {
-//				if (j == VALUE_COL) {
-//					dataModel.setValueAt(Color.WHITE, i, j);
-//				} else {
-//					dataModel.setValueAt("", i, j);
-//				}
-//			}
-//
-//		}
+		// for (int i = 0; i < dataModel.rowCount; i++) {
+		// for (int j = 0; j < dataModel.colCount; j++) {
+		// if (j == VALUE_COL) {
+		// dataModel.setValueAt(Color.WHITE, i, j);
+		// } else {
+		// dataModel.setValueAt("", i, j);
+		// }
+		// }
+		//
+		// }
 	}
 
 	public int getDataLength() {
@@ -708,14 +717,14 @@ public class CriteriaTablePanel implements ActionListener,
 
 	public void populateList(String criteria, String label, Color currentColor) {
 		dataModel.addRow();
-		System.out.println("  Row Count: " + dataModel.rowCount
-				+ " Criteria: " + criteria + " Label: " + label);
+		System.out.println("  Row Count: " + dataModel.rowCount + " Criteria: "
+				+ criteria + " Label: " + label);
 
 		dataModel.setValueAt(label, dataModel.rowCount - 1, LABEL_COL);
 		dataModel.setValueAt(criteria, dataModel.rowCount - 1, EXP_COL);
 		dataModel.setValueAt("Node Color", dataModel.rowCount - 1, MAPTO_COL);
 		dataModel.setValueAt(currentColor, dataModel.rowCount - 1, VALUE_COL);
-		
+
 		dataModel.fireTableDataChanged();
 
 		int selectableRow = table.getRowCount() - 1;
@@ -783,34 +792,33 @@ public class CriteriaTablePanel implements ActionListener,
 		int labelCount = 1;
 		int rowCount = 1;
 		int colCount = 4;
-		//boolean empty = true;
+		// boolean empty = true;
 
-		String[] columnNames = { "Label", "Expression", "Map To",
-				"Value" };
+		String[] columnNames = { "Label", "Expression", "Map To", "Value" };
 		Object[][] data = new Object[rowCount][colCount];
 
 		public void addRow() {
-			//if (!empty) { // preserve data
-				rowCount++;
-				labelCount++;
-				Object[][] temp = data;
-				data = new Object[rowCount][colCount];
+			// if (!empty) { // preserve data
+			rowCount++;
+			labelCount++;
+			Object[][] temp = data;
+			data = new Object[rowCount][colCount];
 
-				for (int i = 0; i < rowCount; i++) {
-					for (int j = 0; j < colCount; j++) {
-						if (i < temp.length) {
-							data[i][j] = temp[i][j];
-						}
+			for (int i = 0; i < rowCount; i++) {
+				for (int j = 0; j < colCount; j++) {
+					if (i < temp.length) {
+						data[i][j] = temp[i][j];
 					}
 				}
-			//}
+			}
+			// }
 			// add new row
 			data[rowCount - 1][LABEL_COL] = "Label " + labelCount;
 			data[rowCount - 1][EXP_COL] = "";
 			data[rowCount - 1][MAPTO_COL] = mapTo[0];
 			data[rowCount - 1][VALUE_COL] = Color.WHITE;
 			// System.out.println("Added row: "+rowCount);
-			//empty = false;
+			// empty = false;
 			savedFlag = false;
 			fireTableDataChanged();
 
