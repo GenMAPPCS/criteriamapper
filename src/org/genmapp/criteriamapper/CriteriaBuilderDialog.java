@@ -165,10 +165,10 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 		
 		
 		JPanel attPanel = new JPanel(new BorderLayout(0,2));
-		JLabel attLabel = new JLabel("    Attributes");
+		JLabel attLabel = new JLabel("      Attributes");
 		attPanel.add(attLabel, BorderLayout.LINE_START);
 		JPanel opPanel = new JPanel(new BorderLayout(0,2));
-		JLabel opLabel = new JLabel("Operations       ");
+		JLabel opLabel = new JLabel("Operations           ");
 		
 		//opPanel.add(spaceLabel, BorderLayout.LINE_START);
 		opPanel.add(opLabel, BorderLayout.LINE_END);
@@ -201,8 +201,11 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
     	//attListPanel.add(attList, BorderLayout.LINE_START);
 		
     	JScrollPane attpane = new JScrollPane();
+    	attpane.setToolTipText("Click on attribute names to copy them into the expression above");
 		attpane.setViewportView(attList);
+		attpane.setMinimumSize(new Dimension(125,100));
 		attpane.setPreferredSize(new Dimension(125,100));
+		attpane.setMaximumSize(new Dimension(125,Cytoscape.getDesktop().getHeight()));
 		attListPanel.add(attpane, BorderLayout.LINE_START);
 		
     	
@@ -214,8 +217,11 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
     	opList.setSelectionModel(listSelectionModel);
     	
     	JScrollPane oppane = new JScrollPane();
+    	oppane.setToolTipText("Click on operations to copy them into the expression above");
 		oppane.setViewportView(opList);
+		oppane.setMinimumSize(new Dimension(125,100));
 		oppane.setPreferredSize(new Dimension(125,100));
+		oppane.setMaximumSize(new Dimension(125,Cytoscape.getDesktop().getHeight()));
 		opListPanel.add(oppane, BorderLayout.LINE_START);
 		
     	//opListPanel.add(opList, BorderLayout.LINE_START);
@@ -247,7 +253,7 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 		bigPanel.add(labelPanel);
 		bigPanel.add(listPanel);
 		bigPanel.add(buttonBox);
-		bigPanel.setMaximumSize(new Dimension(300,100));
+		bigPanel.setMaximumSize(new Dimension(300,Cytoscape.getDesktop().getHeight()));
 		
 		return bigPanel;
 	}
@@ -300,7 +306,7 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 		criteriaField.setHorizontalAlignment(JTextField.LEFT);
 		
 		fieldPanel.add(criteriaField);
-		//fieldPanel.setPreferredSize(new Dimension(Cytoscape.getDesktop().getWidth(), 70));
+		fieldPanel.setMaximumSize(new Dimension(Cytoscape.getDesktop().getWidth(), 80));
 		
 //		JPanel mapToValuePanel = new JPanel();
 //		BoxLayout mvXbox = new BoxLayout(mapToValuePanel, BoxLayout.X_AXIS);
