@@ -672,18 +672,19 @@ public class CriteriaTablePanel implements ActionListener,
 	}
 
 	public void clearTable() {
-		applyCriteria();
-		dataModel.rowCount = 1;
-		for (int i = 0; i < dataModel.rowCount; i++) {
-			for (int j = 0; j < dataModel.colCount; j++) {
-				if (j == VALUE_COL) {
-					dataModel.setValueAt(Color.WHITE, i, j);
-				} else {
-					dataModel.setValueAt("", i, j);
-				}
-			}
-
-		}
+//		applyCriteria();
+		dataModel.labelCount = 0;
+		dataModel.rowCount = 0;
+//		for (int i = 0; i < dataModel.rowCount; i++) {
+//			for (int j = 0; j < dataModel.colCount; j++) {
+//				if (j == VALUE_COL) {
+//					dataModel.setValueAt(Color.WHITE, i, j);
+//				} else {
+//					dataModel.setValueAt("", i, j);
+//				}
+//			}
+//
+//		}
 	}
 
 	public int getDataLength() {
@@ -706,15 +707,15 @@ public class CriteriaTablePanel implements ActionListener,
 	}
 
 	public void populateList(String criteria, String label, Color currentColor) {
-
-		System.out.println(" Global Row Count: " + dataModel.rowCount
+		dataModel.addRow();
+		System.out.println("  Row Count: " + dataModel.rowCount
 				+ " Criteria: " + criteria + " Label: " + label);
 
 		dataModel.setValueAt(label, dataModel.rowCount - 1, LABEL_COL);
 		dataModel.setValueAt(criteria, dataModel.rowCount - 1, EXP_COL);
 		dataModel.setValueAt("Node Color", dataModel.rowCount - 1, MAPTO_COL);
 		dataModel.setValueAt(currentColor, dataModel.rowCount - 1, VALUE_COL);
-
+		
 		dataModel.fireTableDataChanged();
 
 		int selectableRow = table.getRowCount() - 1;
@@ -782,14 +783,14 @@ public class CriteriaTablePanel implements ActionListener,
 		int labelCount = 1;
 		int rowCount = 1;
 		int colCount = 4;
-		boolean empty = true;
+		//boolean empty = true;
 
 		String[] columnNames = { "Label", "Expression", "Map To",
 				"Value" };
 		Object[][] data = new Object[rowCount][colCount];
 
 		public void addRow() {
-			if (!empty) { // preserve data
+			//if (!empty) { // preserve data
 				rowCount++;
 				labelCount++;
 				Object[][] temp = data;
@@ -802,14 +803,14 @@ public class CriteriaTablePanel implements ActionListener,
 						}
 					}
 				}
-			}
+			//}
 			// add new row
 			data[rowCount - 1][LABEL_COL] = "Label " + labelCount;
 			data[rowCount - 1][EXP_COL] = "";
 			data[rowCount - 1][MAPTO_COL] = mapTo[0];
 			data[rowCount - 1][VALUE_COL] = Color.WHITE;
 			// System.out.println("Added row: "+rowCount);
-			empty = false;
+			//empty = false;
 			savedFlag = false;
 			fireTableDataChanged();
 

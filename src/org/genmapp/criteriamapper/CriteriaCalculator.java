@@ -280,6 +280,10 @@ public class CriteriaCalculator {
 			Stack<Boolean> finalValue = new Stack<Boolean>();
 			
 			int size = tokenList.size();
+			if(size < 2){ //incomplete expression
+				finalValue.push(false);
+				return;
+			}
 			for(int i=0; i<size; i++){
 
 				String logicalString = "";				
