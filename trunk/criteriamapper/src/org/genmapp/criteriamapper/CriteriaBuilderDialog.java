@@ -2,6 +2,7 @@ package org.genmapp.criteriamapper;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
@@ -20,8 +21,6 @@ import javax.swing.border.EtchedBorder;
 import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-
-import java.awt.Font;
 
 import cytoscape.Cytoscape;
 import cytoscape.data.CyAttributes;

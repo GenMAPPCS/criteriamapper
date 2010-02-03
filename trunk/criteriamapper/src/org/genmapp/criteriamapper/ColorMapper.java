@@ -9,34 +9,30 @@ package org.genmapp.criteriamapper;
  * user hits 'apply' and by CriteriaTablePanel any time a selection in the table is made.  
  * 
  */
-import giny.model.*;
+import giny.model.Node;
 import giny.view.NodeView;
-
-
-import cytoscape.visual.mappings.*;
-import cytoscape.visual.calculators.*;
-import cytoscape.visual.properties.*;
-import cytoscape.visual.ui.*;
-import cytoscape.visual.*;
-
-
-import cytoscape.Cytoscape;
-import cytoscape.CyNetwork;
-import cytoscape.view.CyNetworkView;
-import cytoscape.data.CyAttributes;
-import cytoscape.visual.CalculatorCatalog;
-import cytoscape.visual.EdgeAppearanceCalculator;
-import cytoscape.visual.NodeAppearanceCalculator;
-import cytoscape.visual.VisualMappingManager;
-import cytoscape.visual.VisualStyle; 
-import cytoscape.CyNode;
-
-import cytoscape.visual.mappings.ObjectMapping; 
 
 import java.awt.Color;
 import java.awt.Paint;
 import java.util.List;
 import java.util.Set;
+
+import cytoscape.CyNetwork;
+import cytoscape.Cytoscape;
+import cytoscape.data.CyAttributes;
+import cytoscape.view.CyNetworkView;
+import cytoscape.visual.CalculatorCatalog;
+import cytoscape.visual.EdgeAppearanceCalculator;
+import cytoscape.visual.NodeAppearanceCalculator;
+import cytoscape.visual.VisualMappingManager;
+import cytoscape.visual.VisualPropertyType;
+import cytoscape.visual.VisualStyle;
+import cytoscape.visual.calculators.BasicCalculator;
+import cytoscape.visual.calculators.Calculator;
+import cytoscape.visual.mappings.ContinuousMapping;
+import cytoscape.visual.mappings.DiscreteMapping;
+import cytoscape.visual.mappings.LinearNumberToColorInterpolator;
+import cytoscape.visual.mappings.ObjectMapping;
 
 public class ColorMapper {
 	CyNetwork network;

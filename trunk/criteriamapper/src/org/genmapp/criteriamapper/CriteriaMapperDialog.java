@@ -6,8 +6,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 
@@ -207,6 +205,10 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 	public void actionPerformed(ActionEvent e) {
 
+		if (null == e){ //e.g., when called by CyCommands
+			return;
+		}
+		
 		String command = e.getActionCommand();
 
 		if (command.equals("nameBoxChanged")) {
