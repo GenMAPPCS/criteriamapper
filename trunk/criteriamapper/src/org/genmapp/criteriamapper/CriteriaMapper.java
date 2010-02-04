@@ -44,8 +44,9 @@ public class CriteriaMapper extends CytoscapePlugin {
 			// You must reserve your namespace first
 			CyCommandNamespace ns = CyCommandManager
 					.reserveNamespace("criteria mapper");
-			// Now register this handler as handling "open"
+			// Now register handlers
 			CyCommandHandler oh = new OpenCommandHandler(ns);
+			CyCommandHandler lsh = new ListSetsCommandHandler(ns);
 		} catch (RuntimeException e) {
 			// Handle already registered exceptions
 			System.out.println(e);
@@ -71,6 +72,30 @@ public class CriteriaMapper extends CytoscapePlugin {
 			settingsDialog.setModal(false);
 			// Pop it up
 			settingsDialog.actionPerformed(null);
+			return new CyCommandResult();
+		}
+
+		public CyCommandResult execute(String arg0, Collection<Tunable> arg1)
+				throws CyCommandException {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+	}
+	
+	class ListSetsCommandHandler extends AbstractCommandHandler {
+		protected ListSetsCommandHandler(CyCommandNamespace ns) {
+			super(ns);
+			addArgument("list sets");
+		}
+
+		public String getHandlerName() {
+			return "list sets";
+		}
+
+		public CyCommandResult execute(String command, Map<String, Object> args)
+				throws CyCommandException {
+			// return list
 			return new CyCommandResult();
 		}
 
