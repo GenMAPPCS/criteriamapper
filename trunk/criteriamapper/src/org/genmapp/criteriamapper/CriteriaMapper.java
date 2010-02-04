@@ -45,7 +45,7 @@ public class CriteriaMapper extends CytoscapePlugin {
 			CyCommandNamespace ns = CyCommandManager
 					.reserveNamespace("criteria mapper");
 			// Now register this handler as handling "open"
-			CyCommandHandler oh = new OpenHandler(ns);
+			CyCommandHandler oh = new OpenCommandHandler(ns);
 		} catch (RuntimeException e) {
 			// Handle already registered exceptions
 			System.out.println(e);
@@ -53,8 +53,8 @@ public class CriteriaMapper extends CytoscapePlugin {
 		
 	}
 
-	class OpenHandler extends AbstractCommandHandler {
-		protected OpenHandler(CyCommandNamespace ns) {
+	class OpenCommandHandler extends AbstractCommandHandler {
+		protected OpenCommandHandler(CyCommandNamespace ns) {
 			super(ns);
 			addArgument("open");
 		}
@@ -65,7 +65,12 @@ public class CriteriaMapper extends CytoscapePlugin {
 
 		public CyCommandResult execute(String command, Map<String, Object> args)
 				throws CyCommandException {
-			item.getActionListeners()[0].actionPerformed(null);
+			// Create the dialog
+			CriteriaMapperDialog  settingsDialog = new CriteriaMapperDialog();
+			// Keep it on top and active?
+			settingsDialog.setModal(false);
+			// Pop it up
+			settingsDialog.actionPerformed(null);
 			return new CyCommandResult();
 		}
 
@@ -89,7 +94,7 @@ public class CriteriaMapper extends CytoscapePlugin {
 			//if (alg != null) {
 				// Create the dialog
 				CriteriaMapperDialog  settingsDialog = new CriteriaMapperDialog();
-				// Keep it on top and active
+				// Keep it on top and active?
 				settingsDialog.setModal(false);
 				// Pop it up
 				settingsDialog.actionPerformed(e);
