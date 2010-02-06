@@ -26,19 +26,18 @@ import cytoscape.command.CyCommandResult;
 import cytoscape.layout.Tunable;
 import cytoscape.plugin.CytoscapePlugin;
 
-
-
 public class CriteriaMapper extends CytoscapePlugin {
-	
+
 	private JMenuItem item = new JMenuItem("Criteria Mapper");
-	
+	public CriteriaMapperDialog settingsDialog;
+
 	public CriteriaMapper() {
-		
-		
-		item.addActionListener(new CriteriaMapperCommandListener());		
-		JMenu pluginMenu = Cytoscape.getDesktop().getCyMenus().getMenuBar().getMenu("Plugins");	
+
+		item.addActionListener(new CriteriaMapperCommandListener());
+		JMenu pluginMenu = Cytoscape.getDesktop().getCyMenus().getMenuBar()
+				.getMenu("Plugins");
 		pluginMenu.add(item);
-		
+
 		// register cycommands
 		try {
 			// You must reserve your namespace first
@@ -51,7 +50,7 @@ public class CriteriaMapper extends CytoscapePlugin {
 			// Handle already registered exceptions
 			System.out.println(e);
 		}
-		
+
 	}
 
 	class OpenCommandHandler extends AbstractCommandHandler {
@@ -67,12 +66,20 @@ public class CriteriaMapper extends CytoscapePlugin {
 		public CyCommandResult execute(String command, Map<String, Object> args)
 				throws CyCommandException {
 			// Create the dialog
-			CriteriaMapperDialog  settingsDialog = new CriteriaMapperDialog();
+			if (null == settingsDialog) {
+				settingsDialog = new CriteriaMapperDialog();
+			} else if (!settingsDialog.isVisible()) {
+				settingsDialog = new CriteriaMapperDialog();
+			} else {
+				settingsDialog.setVisible(true);
+			}
 			// Keep it on top and active?
-			settingsDialog.setModal(false);
+			settingsDialog.setAlwaysOnTop(true);
+			// settingsDialog.setModal(false);
 			// Pop it up
 			settingsDialog.actionPerformed(null);
 			return new CyCommandResult();
+
 		}
 
 		public CyCommandResult execute(String arg0, Collection<Tunable> arg1)
@@ -82,7 +89,7 @@ public class CriteriaMapper extends CytoscapePlugin {
 		}
 
 	}
-	
+
 	class ListSetsCommandHandler extends AbstractCommandHandler {
 		protected ListSetsCommandHandler(CyCommandNamespace ns) {
 			super(ns);
@@ -106,28 +113,31 @@ public class CriteriaMapper extends CytoscapePlugin {
 		}
 
 	}
-	
-	
+
 	class CriteriaMapperCommandListener implements ActionListener {
-		//BooleanAlgorithm alg = null;
+		// BooleanAlgorithm alg = null;
 
 		public CriteriaMapperCommandListener() {
-			//this.alg = algorithm;
+			// this.alg = algorithm;
 		}
 
 		public void actionPerformed(ActionEvent e) {
-			//if (alg != null) {
-				// Create the dialog
-				CriteriaMapperDialog  settingsDialog = new CriteriaMapperDialog();
-				// Keep it on top and active?
-				settingsDialog.setModal(false);
-				// Pop it up
-				settingsDialog.actionPerformed(e);
-			//} 
+			// if (alg != null) {
+			// Create the dialog
+			if (null == settingsDialog) {
+				System.out.println("Menu: null!");
+				settingsDialog = new CriteriaMapperDialog();
+			} else if (!settingsDialog.isVisible()) {
+				settingsDialog = new CriteriaMapperDialog();
+			} else {
+				settingsDialog.setVisible(true);
+			}
+			// Keep it on top and active?
+			// settingsDialog.setModal(false);
+			settingsDialog.setAlwaysOnTop(true);
+			// Pop it up
+			settingsDialog.actionPerformed(e);
+			// }
 		}
 	}
 }
-
-	
-
-
