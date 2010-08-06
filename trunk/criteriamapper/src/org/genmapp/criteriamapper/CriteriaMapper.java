@@ -1,3 +1,18 @@
+/*
+ Copyright 2010 Alexander Pico
+ Licensed under the Apache License, Version 2.0 (the "License"); 
+ you may not use this file except in compliance with the License. 
+ You may obtain a copy of the License at 
+ 	
+ 	http://www.apache.org/licenses/LICENSE-2.0 
+ 	
+ Unless required by applicable law or agreed to in writing, software 
+ distributed under the License is distributed on an "AS IS" BASIS, 
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. 
+ See the License for the specific language governing permissions and 
+ limitations under the License. 
+ */
+
 package org.genmapp.criteriamapper;
 
 /* 
@@ -10,27 +25,27 @@ package org.genmapp.criteriamapper;
  */
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Collection;
-import java.util.Map;
+import java.util.HashMap;
 
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 
 import cytoscape.Cytoscape;
-import cytoscape.command.AbstractCommandHandler;
 import cytoscape.command.CyCommandException;
 import cytoscape.command.CyCommandHandler;
 import cytoscape.command.CyCommandManager;
 import cytoscape.command.CyCommandNamespace;
-import cytoscape.command.CyCommandResult;
-import cytoscape.layout.Tunable;
+import cytoscape.logger.CyLogger;
 import cytoscape.plugin.CytoscapePlugin;
 
 public class CriteriaMapper extends CytoscapePlugin {
 
 	private JMenuItem item = new JMenuItem("Criteria Mapper");
 	public CriteriaMapperDialog settingsDialog;
+	protected CyCommandHandler cch;
 
+	private CyLogger logger = CyLogger.getLogger(CriteriaMapper.class);
+	
 	public CriteriaMapper() {
 
 		item.addActionListener(new CriteriaMapperCommandListener());
@@ -44,8 +59,7 @@ public class CriteriaMapper extends CytoscapePlugin {
 			CyCommandNamespace ns = CyCommandManager
 					.reserveNamespace("criteria mapper");
 			// Now register handlers
-			CyCommandHandler oh = new OpenCommandHandler(ns);
-			CyCommandHandler lsh = new ListSetsCommandHandler(ns);
+			cch = new CriteriaCommandHandler(ns);
 		} catch (RuntimeException e) {
 			// Handle already registered exceptions
 			System.out.println(e);
@@ -53,66 +67,7 @@ public class CriteriaMapper extends CytoscapePlugin {
 
 	}
 
-	class OpenCommandHandler extends AbstractCommandHandler {
-		protected OpenCommandHandler(CyCommandNamespace ns) {
-			super(ns);
-			addArgument("open");
-		}
 
-		public String getHandlerName() {
-			return "open";
-		}
-
-		public CyCommandResult execute(String command, Map<String, Object> args)
-				throws CyCommandException {
-			// Create the dialog
-			if (null == settingsDialog) {
-				settingsDialog = new CriteriaMapperDialog();
-			} else if (!settingsDialog.isVisible()) {
-				settingsDialog = new CriteriaMapperDialog();
-			} else {
-				settingsDialog.setVisible(true);
-			}
-			// Keep it on top and active?
-			settingsDialog.setAlwaysOnTop(true);
-			// settingsDialog.setModal(false);
-			// Pop it up
-			settingsDialog.actionPerformed(null);
-			return new CyCommandResult();
-
-		}
-
-		public CyCommandResult execute(String arg0, Collection<Tunable> arg1)
-				throws CyCommandException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-	}
-
-	class ListSetsCommandHandler extends AbstractCommandHandler {
-		protected ListSetsCommandHandler(CyCommandNamespace ns) {
-			super(ns);
-			addArgument("list sets");
-		}
-
-		public String getHandlerName() {
-			return "list sets";
-		}
-
-		public CyCommandResult execute(String command, Map<String, Object> args)
-				throws CyCommandException {
-			// return list
-			return new CyCommandResult();
-		}
-
-		public CyCommandResult execute(String arg0, Collection<Tunable> arg1)
-				throws CyCommandException {
-			// TODO Auto-generated method stub
-			return null;
-		}
-
-	}
 
 	class CriteriaMapperCommandListener implements ActionListener {
 		// BooleanAlgorithm alg = null;
@@ -124,20 +79,11 @@ public class CriteriaMapper extends CytoscapePlugin {
 		public void actionPerformed(ActionEvent e) {
 			// if (alg != null) {
 			// Create the dialog
-			if (null == settingsDialog) {
-				System.out.println("Menu: null!");
-				settingsDialog = new CriteriaMapperDialog();
-			} else if (!settingsDialog.isVisible()) {
-				settingsDialog = new CriteriaMapperDialog();
-			} else {
-				settingsDialog.setVisible(true);
+			try {
+				cch.execute(CriteriaCommandHandler.OPEN, new HashMap());
+			} catch (CyCommandException e1) {
+				logger.warning(e1.getMessage());
 			}
-			// Keep it on top and active?
-			// settingsDialog.setModal(false);
-			settingsDialog.setAlwaysOnTop(true);
-			// Pop it up
-			settingsDialog.actionPerformed(e);
-			// }
 		}
 	}
 }
