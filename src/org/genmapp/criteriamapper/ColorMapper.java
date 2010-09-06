@@ -170,29 +170,10 @@ public class ColorMapper {
 			}
 
 			for (Map.Entry<String, List<Color>> entry : nodeMap.entrySet()) {
-				String colorstring = "";
-				for (Color c : entry.getValue()) {
-					String red = Integer.toHexString(c.getRed());
-					String green = Integer.toHexString(c.getGreen());
-					String blue = Integer.toHexString(c.getBlue());
-
-					if (red.length() == 1)
-						red = "0" + red;
-					if (green.length() == 1)
-						green = "0" + green;
-					if (blue.length() == 1)
-						blue = "0" + blue;
-
-					String hexColor = "#" + red + green + blue;
-
-					colorstring += hexColor + ",";
-				}
-				colorstring = colorstring
-						.substring(0, colorstring.length() - 1);
 				args.put("node", entry.getKey());
 				args.put("labellist", "null");
 				args.put("valuelist", "0");
-				args.put("colorlist", colorstring);
+				args.put("colorlist", entry.getValue());
 //				System.out.println("nodecharts stripe node=\"" + entry.getKey()
 //				 +"\" labellist=\"null\" valuelist=\"0\" colorlist=\"" +
 //				 colorstring + "\"");
