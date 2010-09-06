@@ -232,44 +232,44 @@ public class CriteriaCalculator {
 
 	
 	public void printTokens(){
-		System.out.println("##TOKENS##");
+//		System.out.println("##TOKENS##");
 		for(int i=0; i<tokenList.size(); i++){
 			Token token = tokenList.get(i);
 			//System.out.println("TOKS: "+i+" "+token.getType());
 			switch (token.type)
 			{
 			case Token.AND:
-				System.out.println("AND");
+//				System.out.println("AND");
 				break;
 			case Token.OR:
-				System.out.println("OR");
+//				System.out.println("OR");
 				break;
 			case Token.NOT:
-				System.out.println("NOT");
+//				System.out.println("NOT");
 				break;
 			case Token.GT:
-				System.out.println(">");
+//				System.out.println(">");
 				break;
 			case Token.LT:
-				System.out.println("<");
+//				System.out.println("<");
 				break;
 			case Token.GTEQ:
-				System.out.println(">=");
+//				System.out.println(">=");
 				break;
 			case Token.LTEQ:
-				System.out.println("<=");
+//				System.out.println("<=");
 				break;
 			case Token.NUMATTRIBUTE:
-				System.out.println("NumATT: "+token.attributeName);
+//				System.out.println("NumATT: "+token.attributeName);
 				break;
 			case Token.STRATTRIBUTE:
-				System.out.println("StrATT: "+token.attributeName);
+//				System.out.println("StrATT: "+token.attributeName);
 				break;
 			case Token.BOOLATTRIBUTE:
-				System.out.println("BoolATT: "+token.attributeName);
+//				System.out.println("BoolATT: "+token.attributeName);
 				break;	
 			case Token.NUMBER:
-				System.out.println(token.numberValue);
+//				System.out.println(token.numberValue);
 				break;
 				//throw new Exception("Can't evaluate this expression as boolean");
 		}

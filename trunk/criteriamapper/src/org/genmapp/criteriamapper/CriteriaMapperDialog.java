@@ -69,7 +69,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 	private boolean deletedFlag = false;
 	private boolean dupFlag = false;
 
-	String mapTo = "Node Color";
+	String mapTo;
 
 	public CriteriaMapperDialog() {
 		Cytoscape.getSwingPropertyChangeSupport().addPropertyChangeListener(
@@ -201,18 +201,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		titleBorder.setTitlePosition(TitledBorder.TOP);
 		setPanel.setBorder(titleBorder);
 
-		JPanel mapPanel = new JPanel(new BorderLayout(0, 2));
-		JLabel mapLabel = new JLabel("Map To");
-		mapToBox = new JComboBox(new String[] { "Node Color",
-				"Node Border Color", "None" });
-		mapToBox.setActionCommand("mapToBoxChanged");
-		mapToBox.addActionListener(this);
-
-		mapPanel.add(mapLabel, labelLocation);
-		mapPanel.add(mapToBox, fieldLocation);
-
 		setPanel.add(nPanel);
-		// setPanel.add(mapPanel);
 		setPanel.add(sPanel);
 
 		return setPanel;
@@ -397,7 +386,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		if (criteria.length > 0) {
 			mapTo = criteria[0];
 		}
-		System.out.println("MAP TO: " + mapTo);
+		//System.out.println("MAP TO: " + mapTo);
 		ctPanel.mapToPick = mapTo;
 
 		for (int i = 1; i < criteria.length; i++) {

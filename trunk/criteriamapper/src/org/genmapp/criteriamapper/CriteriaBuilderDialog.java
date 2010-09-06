@@ -44,26 +44,11 @@ import cytoscape.data.CyAttributes;
 
 public class CriteriaBuilderDialog extends JPanel implements ActionListener, ListSelectionListener{
 	
-//	private JFrame mainFrame;
-//	private JDialog mainDialog;
-//	private JButton colorButton;
-//	private JColorChooser colorChooser;
-	
 	public JTextField criteriaField;
-//	JTextField labelField;
-//	private JDialog dialog;
 	private JList attList;
 	private JList opList;
-//	JComboBox mapToBox;
-	
 	private CriteriaTablePanel ctPanel;
 	private JPanel tablePanel;
-	
-//	Color currentColor = Color.WHITE; //keeps track of the color displayed by the color button
-//	String label = ""; 
-//	String criteria = "";
-//	String mapTo = "";
-//	private ArrayList<String> allCurrentLabels = new ArrayList<String>();
 	private ArrayList<String> attributeList = new ArrayList<String>(); //List which holds all of the attributes
 	private String[] opArray = {"=", "<", ">", ">=", "<=", "AND", "OR", "NOT"}; 
 	private String[] attributesArray;
@@ -76,86 +61,17 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 	
 	
 	public void initialize(){
-		
-//		mainDialog = new JDialog();
-//		currentColor = Color.WHITE;
-		
-		/*JPanel labelPanel = new JPanel(new BorderLayout(0, 2));
-		JLabel label = new JLabel("Label"); 
-		labelField = new JTextField();
-		labelField.setPreferredSize(new Dimension(200, 20));
-		labelPanel.add(label, BorderLayout.LINE_START);
-		labelPanel.add(labelField, BorderLayout.LINE_END);
-		labelField.setHorizontalAlignment(JTextField.LEFT);
-		*/
-		//clear content before building
-		
 		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
-		//mainPanel.setPreferredSize(new Dimension(Cytoscape.getDesktop().getWidth(), 450));
-		
-		//mainPanel.add(labelPanel);
-		//JPanel pan = getListPanel();
-		//pan.setSize(new Dimension(300,100));
-		//mainPanel.add(getListPanel());
+
 		this.add(getCriteriaChooserPanel());
 		this.add(getListPanel());
 		
-		//Image builderIcon = new ImageIcon(CriteriaBuilderDialog.class.getResource("img/upArrow.svg")).getImage();
-        //if (builderIconURL != null) {
-          //  builderIcon = new ImageIcon(builderIconURL).getImage();
-        //}
-        //mainFrame = new JFrame();
-        //mainFrame.setIconImage(builderIcon);
-        //mainDialog = new JDialog(mainFrame);
-		
 		tablePanel = ctPanel.getTablePanel();
 		tablePanel.add(this);
-		
-//		mainDialog.setContentPane(mainPanel);
-//		mainDialog.setVisible(true);
-//		mainDialog.setLocation(360,Cytoscape.getDesktop().getHeight()-250);
-//		mainDialog.setSize(new Dimension(300,256));
-        
-		//mainDialog.setVisible(true);
 	}
 	
 	public void actionPerformed(ActionEvent e){
-    	
     	String command = e.getActionCommand();
-    	
-//    	if(command.equals("chooseColor")){
-//			colorChooser = new JColorChooser();
-//			 JButton button = new JButton();
-//		     button.setActionCommand("edit");
-//		     button.addActionListener(this);
-//		     button.setBorderPainted(true);
-//			dialog = JColorChooser.createDialog(button,
-//                    "Pick a Color",
-//                    true,  //modal
-//                    colorChooser,
-//                    this,  //OK button handler
-//                    null); //no CANCEL button handler
-//			dialog.add(button);
-//			dialog.setLocation(2,Cytoscape.getDesktop().getHeight()-385);
-//			dialog.setVisible(true);
-//			currentColor = colorChooser.getColor();
-//			colorButton.setBackground(currentColor);
-//		    System.out.println(currentColor);
-//    	}
-//		
-//    	if(command.equals("mapToListChanged")){
-//			
-//			
-//		}
-//    	if(command.equals("CBdone")){
-//    		//label = labelField.getText();
-//    		//criteria = criteriaField.getText();
-//    		//mapTo = (String)mapToBox.getSelectedItem();
-//    		//mainDialog.setVisible(false);
-//    	}
-        
-        //setVisible(true);
-    	
 	}
 	
 	private JPanel getListPanel(){
@@ -184,7 +100,6 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 		JPanel opPanel = new JPanel(new BorderLayout(0,2));
 		JLabel opLabel = new JLabel("Operations           ");
 		
-		//opPanel.add(spaceLabel, BorderLayout.LINE_START);
 		opPanel.add(opLabel, BorderLayout.LINE_END);
 		
 		labelPanel.add(attPanel);
@@ -211,8 +126,6 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
         listSelectModel.addListSelectionListener(this);
         
     	attList.setSelectionModel(listSelectModel);
-    	//attList.setMaximumSize(new Dimension(60,50));
-    	//attListPanel.add(attList, BorderLayout.LINE_START);
 		
     	JScrollPane attpane = new JScrollPane();
     	attpane.setToolTipText("Click on attribute names to copy them into the expression above");
@@ -238,28 +151,8 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 		oppane.setMaximumSize(new Dimension(125,Cytoscape.getDesktop().getHeight()));
 		opListPanel.add(oppane, BorderLayout.LINE_START);
 		
-    	//opListPanel.add(opList, BorderLayout.LINE_START);
-		JPanel buttonBox = new JPanel();//new BorderLayout(0,2));
-		
-//		JButton addButton = new JButton("Add");
-//		addButton.setActionCommand("CBadd");
-//		//addButton.addActionListener(this);
-//		addButton.addActionListener(panelPointer);
-		
-//		JButton clearButton = new JButton("Clear");
-//		clearButton.setActionCommand("clear");
-//		clearButton.addActionListener(this);
-		
-//		JButton doneButton = new JButton("Done");
-//		doneButton.setActionCommand("CBdone");
-//		doneButton.addActionListener(this);
-//		doneButton.addActionListener(panelPointer);
-		
-//		buttonBox.add(addButton);//, labelLocation);
-//		buttonBox.add(clearButton);//, fieldLocation);
-//		buttonBox.add(doneButton);
-		
-		//attListPanel.setPreferredSize(new Dimension(60,50));
+		JPanel buttonBox = new JPanel();
+
 		listPanel.add(attListPanel);
 		listPanel.add(opListPanel);
 		
@@ -293,110 +186,16 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 		jt.setFont(new Font("Arial", Font.PLAIN, 10));
 		jt.setBackground(this.getBackground());
 		fieldPanel.add(jt);
-		
-		
-//		String labelLocation = BorderLayout.LINE_START;
-//		String fieldLocation = BorderLayout.LINE_END;
-		
-		
-//		JPanel labelPanel = new JPanel(new BorderLayout(0, 2));
-//		JLabel label = new JLabel("Label"); 
-//		labelField = new JTextField();
-//		labelField.setPreferredSize(new Dimension(215, 20));
-//		labelPanel.add(label, labelLocation);
-//		labelPanel.add(labelField, fieldLocation);
-//		labelField.setHorizontalAlignment(JTextField.LEFT);
-		
-		
-//		JPanel criteriaPanel = new JPanel(new BorderLayout(0, 2));
-//		JLabel criteriaLabel = new JLabel("Criteria");
+
 		criteriaField = new JTextField();
 		
-		//criteriaField.setPreferredSize(new Dimension(215, 20));
-		//criteriaField.setAutoscrolls(true);
-		//criteriaField.setMaximumSize(new Dimension(1000, 20));
-//		criteriaPanel.add(criteriaLabel, labelLocation);
-		//criteriaPanel.add(criteriaField, fieldLocation);
 		criteriaField.setHorizontalAlignment(JTextField.LEFT);
 		
 		fieldPanel.add(criteriaField);
 		fieldPanel.setMaximumSize(new Dimension(Cytoscape.getDesktop().getWidth(), 80));
-		
-//		JPanel mapToValuePanel = new JPanel();
-//		BoxLayout mvXbox = new BoxLayout(mapToValuePanel, BoxLayout.X_AXIS);
-//		mapToValuePanel.setLayout(mvXbox);
-//		
-//		JPanel mapToPanel = new JPanel(new BorderLayout(0,2));
-//		JLabel mtLabel = new JLabel("Map To");
-//		mapToPanel.add(mtLabel, labelLocation);
-//		
-//		String[] mappableAttributes = {"Node Color", "Node Size", "Node Shape"};
-//		mapToBox = new JComboBox(mappableAttributes);
-//		
-//		mapToBox.setEditable(false);
-//		mapToBox.setPreferredSize(new Dimension(100,20));
-//		mapToBox.setActionCommand("mapToListChanged");
-//		mapToBox.addActionListener(this);
-//		
-//		mapToPanel.add(mapToBox, fieldLocation);		
-//		
-//		mapToValuePanel.add(mapToPanel);
-		
-		
-		
-		/*
-		//Make JPanel for colorPanel and button box panel
-		JPanel colorAndButtonPanel = new JPanel();
-		BoxLayout Xbox = new BoxLayout(colorAndButtonPanel, BoxLayout.X_AXIS);
-		colorAndButtonPanel.setLayout(Xbox);
-		*/
-		
-		//Make colorPanel for Color Label and color chooser button
-//		JPanel colorPanel = new JPanel(new BorderLayout(0, 2));
-//		//colorPanel.setPreferredSize(new Dimension(180,10));
-//		JLabel colorLabel = new JLabel(" Value");
-//		colorButton = new JButton("");
-//		colorButton.setBackground(currentColor);
-//		colorButton.setPreferredSize(new Dimension(60, 10));
-//		colorButton.setActionCommand("chooseColor");
-//		colorButton.addActionListener(this);
-//		colorButton.setBorder(null);
-//        colorButton.setBorderPainted(false);
-//        colorButton.setBackground(currentColor);
-//        
-//		colorPanel.add(colorLabel, labelLocation);
-//		colorPanel.add(colorButton, fieldLocation);
-//		mapToValuePanel.add(colorPanel);
-		
-		//Make button box JPanel for Add and Clear Buttons
-//		JPanel buttonBox = new JPanel();//new BorderLayout(0,2));
-//		JButton addButton = new JButton("Save");
-//		addButton.setActionCommand("save");
-//		addButton.addActionListener(this);
-//		JButton clearButton = new JButton("Clear");
-//		clearButton.setActionCommand("clear");
-//		clearButton.addActionListener(this);
-//		
-//		buttonBox.add(addButton);//, labelLocation);
-//		buttonBox.add(clearButton);//, fieldLocation);
-		
-		
-		
-		
-//		fieldPanel.add(labelPanel);
-//		fieldPanel.add(criteriaPanel);
-//		fieldPanel.add(mapToValuePanel);
-		//fieldPanel.add(buttonBox);
-		//fieldPanel.add(colorAndButtonPanel);
-		
-		
+	
 		return fieldPanel;
 	}
-	
-	/*
-	 * Creates the attribute list and operation list.
-	 */
-	
 	
 	String criteriaBuild = "";
 	int last = -1;
