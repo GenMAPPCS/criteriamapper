@@ -33,7 +33,7 @@ import cytoscape.data.CyAttributes;
 
 public class AttributeManager {
 	private CyAttributes networkAttributes;
-	private CyAttributes nodeAttributes;
+	private static CyAttributes nodeAttributes;
 	// private SortedSet<String> criteriaSetNames = null;
 	private ArrayList<String> criteriaSetNames = new ArrayList<String>();
 
@@ -235,7 +235,7 @@ public class AttributeManager {
 		}
 	}
 
-	public boolean getColorAttribute(String nodeID, String label) {
+	public static boolean getColorAttribute(String nodeID, String label) {
 		if (nodeAttributes.hasAttribute(nodeID, label)) {
 			return nodeAttributes.getBooleanAttribute(nodeID, label);
 		}
