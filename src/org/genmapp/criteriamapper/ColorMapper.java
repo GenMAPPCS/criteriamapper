@@ -29,6 +29,7 @@ import giny.view.NodeView;
 
 import java.awt.Color;
 import java.awt.Paint;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -56,87 +57,93 @@ public class ColorMapper {
 	String attributeLabel;
 	Color color;
 	List<Node> nodes = null;
-	//VisualMappingManager manager;
-	//CalculatorCatalog catalog;
-	//VisualStyle vs;
-	
-	public ColorMapper(){
+	// VisualMappingManager manager;
+	// CalculatorCatalog catalog;
+	// VisualStyle vs;
+
+	public ColorMapper() {
 
 	}
-	
+
 	/*
-	 * This method creates the CompositeMapping, or mapping of multiple colors at once in the graph.
-	 * It takes as arguments a compositeLabel or colon separated String and an array of Colors.  Each of the
-	 * values in the comma separated list is the name of an attribute that holds the values of the outcome of an individually
-	 * evaluated criteria.  Each of the comma separated values is then a label name in the order it appears
-	 * in the table in the actual GUI.  The Colors are in an array parallel to this and are subsequently mapped.
+	 * This method creates the CompositeMapping, or mapping of multiple colors
+	 * at once in the graph. It takes as arguments a compositeLabel or colon
+	 * separated String and an array of Colors. Each of the values in the comma
+	 * separated list is the name of an attribute that holds the values of the
+	 * outcome of an individually evaluated criteria. Each of the comma
+	 * separated values is then a label name in the order it appears in the
+	 * table in the actual GUI. The Colors are in an array parallel to this and
+	 * are subsequently mapped.
 	 */
-	public VisualStyle createCompositeMapping(String vsName, String compositeLabel, Color[] colors, String mapTo){
+	public VisualStyle createCompositeMapping(String vsName,
+			String compositeLabel, Color[] colors, String[] mapTo) {
 		boolean newStyle = false;
 		boolean update = true;
-		
-		if(!compositeLabel.contains(":")){
-			return createDiscreteMapping(compositeLabel+"discrete", compositeLabel, colors[0], mapTo);
+
+		if (!compositeLabel.contains(":")) {
+			return createDiscreteMapping(compositeLabel + "discrete",
+					compositeLabel, colors[0], mapTo[0]);
 		}
-		
+
 		CyAttributes nodeAttributes = Cytoscape.getNodeAttributes();
-		
+
 		network = Cytoscape.getCurrentNetwork();
 		networkView = Cytoscape.getCurrentNetworkView();
-		
+
 		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
 		CalculatorCatalog catalog = manager.getCalculatorCatalog();
-		
+
 		VisualStyle vs = Cytoscape.getCurrentNetworkView().getVisualStyle();
-		//VisualStyle visualStyle = null;
-		
-		//System.out.println("make Composite mapping");
-		
-		
+		// VisualStyle visualStyle = null;
+
+		// System.out.println("make Composite mapping");
+
 		Set<String> styles = catalog.getVisualStyleNames();
-		if (!(vs == null) && styles.contains(vs.getName())){
+		if (!(vs == null) && styles.contains(vs.getName())) {
 			vs = catalog.getVisualStyle(vs.getName());
 		} else {
-			//System.out.println("apply new style");
+			// System.out.println("apply new style");
 			vs = new VisualStyle(vs, vsName);
 			newStyle = true;
 		}
-	
-		
-		DiscreteMapping disMapping = new DiscreteMapping(new Color(0), compositeLabel, ObjectMapping.NODE_MAPPING);
-		
+
+		DiscreteMapping disMapping = new DiscreteMapping(new Color(0),
+				compositeLabel, ObjectMapping.NODE_MAPPING);
 		disMapping.putMapValue(new Integer(-1), Color.WHITE);
-		
-		for(int i=0; i<colors.length; i++){
-			disMapping.putMapValue(new Integer(i), colors[i]);
-			//System.out.println("COLORRED: "+colors[i]);
-		}
-		
-		
-		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
-   		
-		Calculator nodeColorCalculator = null;
-        
-		if(mapTo.equals("Node Border Color")){
-			nodeColorCalculator = new BasicCalculator("Single Node Border Color Calc",
-	                disMapping,
-	                VisualPropertyType.NODE_BORDER_COLOR);
-			
-		}else{
-			if(mapTo.equals("None")){
-				nodeColorCalculator = null;
-			}else{
-			nodeColorCalculator = new BasicCalculator("Single Node Color Calc",
-                disMapping,
-                VisualPropertyType.NODE_FILL_COLOR);
+
+		List<Color> stripeColorList = new ArrayList<Color>();
+		boolean doCalc = false;
+
+		// collect colors intended for Node Color into disMapping;
+		// collect those intended for Node Stripe into array.
+		for (int i = 0; i < colors.length; i++) {
+			if (mapTo[i].equals("Node Color")) {
+				disMapping.putMapValue(new Integer(i), colors[i]);
+				doCalc = true;
+
+			} else if (mapTo[i].equals("Node Stripe")) {
+				stripeColorList.add(colors[i]);
 			}
 		}
-		
-		if(nodeColorCalculator != null){
+
+		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
+
+		Calculator nodeColorCalculator = null;
+
+		if (stripeColorList.size() > 0) {
+			// TODO: call nodeCharts
+		}
+
+		if (doCalc) {
+			nodeColorCalculator = new BasicCalculator("Single Node Color Calc",
+					disMapping, VisualPropertyType.NODE_FILL_COLOR);
+		} 
+
+		if (nodeColorCalculator != null) {
 			nodeAppCalc.setCalculator(nodeColorCalculator);
 		}
 		vs.setNodeAppearanceCalculator(nodeAppCalc);
-		
+
 		// Create the visual style
 		if (newStyle) {
 			catalog.addVisualStyle(vs);
@@ -146,93 +153,77 @@ public class ColorMapper {
 			}
 		} else if (update) {
 			Cytoscape.getCurrentNetworkView().applyVizmapper(vs);
-		} 
-		
-		
-		networkView.redrawGraph(true,true);
+		}
+
+		networkView.redrawGraph(true, true);
 
 		return vs;
 	}
-	
-	
-	public void clearNetwork(){
+
+	public void clearNetwork() {
 		CyNetwork currentNetwork = Cytoscape.getCurrentNetwork();
 		CyNetworkView networkView = Cytoscape.getCurrentNetworkView();
 		List<Node> nodeList = currentNetwork.nodesList();
-		for(Node node: nodeList)
-        {
-			
+		for (Node node : nodeList) {
+
 			NodeView nodeView = networkView.getNodeView(node);
 			Paint p = Color.WHITE;
 			nodeView.setUnselectedPaint(p);
-	    	   
-        }
+
+		}
 		networkView.updateView();
 	}
-	
-	
-	
+
 	/*
-	 * This method creates a single discreteMapping taking the label of an evaluated criteria and the color
-	 * it should be mapped to.
+	 * This method creates a single discreteMapping taking the label of an
+	 * evaluated criteria and the color it should be mapped to.
 	 */
-	public VisualStyle createDiscreteMapping(String vsName, String label, Color currentColor, String mapTo){
-		
+	public VisualStyle createDiscreteMapping(String vsName, String label,
+			Color currentColor, String mapTo) {
+
 		boolean newStyle = false;
 		boolean update = true;
-		
+
 		network = Cytoscape.getCurrentNetwork();
 		networkView = Cytoscape.getCurrentNetworkView();
-		
+
 		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
 		CalculatorCatalog catalog = manager.getCalculatorCatalog();
-		
+
 		VisualStyle vs = Cytoscape.getCurrentNetworkView().getVisualStyle();
-		
+
 		Set<String> styles = catalog.getVisualStyleNames();
-		if (!(vs == null) && styles.contains(vs.getName())){
+		if (!(vs == null) && styles.contains(vs.getName())) {
 			vs = catalog.getVisualStyle(vs.getName());
-			//System.out.println("apply style");
+			// System.out.println("apply style");
 		} else {
-			//System.out.println("apply new style");
+			// System.out.println("apply new style");
 			vs = new VisualStyle(vs, vsName);
 			newStyle = true;
 		}
-		
-		
-		DiscreteMapping disMapping = new DiscreteMapping(new Color(0), label, ObjectMapping.NODE_MAPPING);
-		
-		
+
+		DiscreteMapping disMapping = new DiscreteMapping(new Color(0), label,
+				ObjectMapping.NODE_MAPPING);
+
 		disMapping.putMapValue(Boolean.TRUE, currentColor);
 		disMapping.putMapValue(Boolean.FALSE, Color.WHITE);
-		
+
 		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
-   		//EdgeAppearanceCalculator edgeAppCalc = vs.getEdgeAppearanceCalculator();
-   		//GlobalAppearanceCalculator globalAppCalc = vs.getGlobalAppearanceCalculator();
-		
+
 		Calculator nodeColorCalculator = null;
-		
-		if(mapTo.equals("Node Border Color")){
-			nodeColorCalculator = new BasicCalculator("Single Node Border Color Calc",
-	                disMapping,
-	                VisualPropertyType.NODE_BORDER_COLOR);
-			
-		}else{
-			if(mapTo.equals("None")){
-				nodeColorCalculator = null;
-			}else{
+
+		if (mapTo.equals("None")) {
+			nodeColorCalculator = null;
+		} else { // do this for either Node Color or Node Stripe
 			nodeColorCalculator = new BasicCalculator("Single Node Color Calc",
-                disMapping,
-                VisualPropertyType.NODE_FILL_COLOR);
-			}
+					disMapping, VisualPropertyType.NODE_FILL_COLOR);
 		}
-		
+
 		nodeAppCalc.setCalculator(nodeColorCalculator);
-		
+
 		vs.setNodeAppearanceCalculator(nodeAppCalc);
 		// Create the visual style
-			  			
-		
+
 		if (newStyle) {
 			catalog.addVisualStyle(vs);
 			if (update) {
@@ -241,79 +232,68 @@ public class ColorMapper {
 			}
 		} else if (update) {
 			Cytoscape.getCurrentNetworkView().applyVizmapper(vs);
-		} 
-		
-		
-		networkView.redrawGraph(true,true);
+		}
+
+		networkView.redrawGraph(true, true);
 
 		return vs;
 	}
-	
+
 	/*
-	 * This method creates a single discreteMapping of the border color taking the label of an evaluated criteria and the color
-	 * it should be mapped to.
+	 * This method creates a single discreteMapping of the border color taking
+	 * the label of an evaluated criteria and the color it should be mapped to.
 	 */
-	public VisualStyle createDiscreteBorderMapping(String vsName, String label, Color currentColor){
-		
-		
+	public VisualStyle createDiscreteBorderMapping(String vsName, String label,
+			Color currentColor) {
+
 		boolean newStyle = false;
 		boolean update = true;
-		
+
 		network = Cytoscape.getCurrentNetwork();
 		networkView = Cytoscape.getCurrentNetworkView();
-		
+
 		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
 		CalculatorCatalog catalog = manager.getCalculatorCatalog();
-		
+
 		VisualStyle vs = Cytoscape.getCurrentNetworkView().getVisualStyle();
-		//VisualStyle visualStyle = null;
-		
-		
-		
-		
+		// VisualStyle visualStyle = null;
+
 		Set<String> styles = catalog.getVisualStyleNames();
-		if (!(vs == null) && styles.contains(vs.getName())){
+		if (!(vs == null) && styles.contains(vs.getName())) {
 			vs = catalog.getVisualStyle(vs.getName());
 		} else {
 			System.out.println("apply new style");
 			vs = new VisualStyle(vs, vsName);
 			newStyle = true;
 		}
-	
-		
-	     
 
-		
-		
-		DiscreteMapping disMapping = new DiscreteMapping(Color.WHITE, label,ObjectMapping.NODE_MAPPING);
-		
-		//disMapping.setControllingAttributeName(label, network, false);
-		//System.out.println("hey "+currentColor);
-		
+		DiscreteMapping disMapping = new DiscreteMapping(Color.WHITE, label,
+				ObjectMapping.NODE_MAPPING);
+
+		// disMapping.setControllingAttributeName(label, network, false);
+		// System.out.println("hey "+currentColor);
+
 		disMapping.putMapValue(Boolean.TRUE, currentColor);
 		disMapping.putMapValue(Boolean.FALSE, Color.WHITE);
-		
+
 		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
-   		//EdgeAppearanceCalculator edgeAppCalc = vs.getEdgeAppearanceCalculator();
-   		//GlobalAppearanceCalculator globalAppCalc = vs.getGlobalAppearanceCalculator();
-		
-		
-		Calculator nodeColorCalculator = new BasicCalculator("Single Node Border Color Calc",
-                disMapping,
-                VisualPropertyType.NODE_BORDER_COLOR);
-		
+		// EdgeAppearanceCalculator edgeAppCalc =
+		// vs.getEdgeAppearanceCalculator();
+		// GlobalAppearanceCalculator globalAppCalc =
+		// vs.getGlobalAppearanceCalculator();
+
+		Calculator nodeColorCalculator = new BasicCalculator(
+				"Single Node Border Color Calc", disMapping,
+				VisualPropertyType.NODE_BORDER_COLOR);
+
 		nodeAppCalc.setCalculator(nodeColorCalculator);
-		
+
 		vs.setNodeAppearanceCalculator(nodeAppCalc);
 		// Create the visual style
-		
-		  	
-		
-		//VisualStyle visualStyle = new VisualStyle(vsName, nodeAppCalc, edgeAppCalc, globalAppCalc);
-		 
-		
-		
-		
+
+		// VisualStyle visualStyle = new VisualStyle(vsName, nodeAppCalc,
+		// edgeAppCalc, globalAppCalc);
+
 		if (newStyle) {
 			catalog.addVisualStyle(vs);
 			if (update) {
@@ -322,21 +302,18 @@ public class ColorMapper {
 			}
 		} else if (update) {
 			Cytoscape.getCurrentNetworkView().applyVizmapper(vs);
-		} 
-		
-		 //catalog.addVisualStyle(visualStyle);
-	    
-		
-		
-		//manager.setVisualStyle(visualStyle);
-		networkView.redrawGraph(true,true);
+		}
+
+		// catalog.addVisualStyle(visualStyle);
+
+		// manager.setVisualStyle(visualStyle);
+		networkView.redrawGraph(true, true);
 
 		return vs;
 	}
-	
-	
-	
-	public VisualStyle createContinuousMapping(CyNetwork network, String label, Color currentColor, boolean update){
+
+	public VisualStyle createContinuousMapping(CyNetwork network, String label,
+			Color currentColor, boolean update) {
 		boolean newStyle = false;
 		boolean edge = false;
 		// Get our current vizmap
@@ -346,29 +323,30 @@ public class ColorMapper {
 		// Get the current style
 		VisualStyle style = Cytoscape.getCurrentNetworkView().getVisualStyle();
 		// Get our colors
-		//Color missingColor = currentColor;
+		// Color missingColor = currentColor;
 		// Color zeroColor = colorExtractor.getColor(0.0f);
 		// Color upColor = colorExtractor.getColor(maxValue);
 		// Color downColor = colorExtractor.getColor(minValue);
 
-		// Adjust for contrast.  Since we really don't have contrast control,
+		// Adjust for contrast. Since we really don't have contrast control,
 		// we try to provide the same basic idea by adding extra points
 		// in the continuous mapper
 		// Color downDeltaColor = colorExtractor.getColor(minValue/100.0);
 		// Color upDeltaColor = colorExtractor.getColor(maxValue/100.0);
 
-		//if (!style.getName().endsWith(suffix)) {
-			// Create a new vizmap
-			Set<String> styles = calculatorCatalog.getVisualStyleNames();
-			if (styles.contains(style.getName()))
-				style = calculatorCatalog.getVisualStyle(style.getName());
-			else {
-				style = new VisualStyle(style, style.getName());
-				newStyle = true;
-			}
-		//}
+		// if (!style.getName().endsWith(suffix)) {
+		// Create a new vizmap
+		Set<String> styles = calculatorCatalog.getVisualStyleNames();
+		if (styles.contains(style.getName()))
+			style = calculatorCatalog.getVisualStyle(style.getName());
+		else {
+			style = new VisualStyle(style, style.getName());
+			newStyle = true;
+		}
+		// }
 
-		// Get the right mapping, depending on whether we are mapping an edge or a node
+		// Get the right mapping, depending on whether we are mapping an edge or
+		// a node
 		byte mapping = ObjectMapping.NODE_MAPPING;
 		VisualPropertyType vizType = VisualPropertyType.NODE_FILL_COLOR;
 		if (edge) {
@@ -377,53 +355,51 @@ public class ColorMapper {
 		}
 
 		// Create the new continuous mapper
-		ContinuousMapping colorMapping = new ContinuousMapping(currentColor, mapping);
-		colorMapping.setControllingAttributeName(label, Cytoscape.getCurrentNetwork(), false);
+		ContinuousMapping colorMapping = new ContinuousMapping(currentColor,
+				mapping);
+		colorMapping.setControllingAttributeName(label, Cytoscape
+				.getCurrentNetwork(), false);
 		colorMapping.setInterpolator(new LinearNumberToColorInterpolator());
-		
-		
-/*
-		colorMapping.addPoint (minValue,
-       new BoundaryRangeValues (downColor, downColor, downColor));
-		colorMapping.addPoint (minValue/100.0,
-       new BoundaryRangeValues (downDeltaColor, downDeltaColor, downDeltaColor));
-   	colorMapping.addPoint(0,
-       new BoundaryRangeValues (zeroColor, zeroColor, zeroColor));
-   	colorMapping.addPoint(maxValue/100.0,
-       new BoundaryRangeValues (upDeltaColor, upDeltaColor, upDeltaColor));
-   	colorMapping.addPoint(maxValue,
-       new BoundaryRangeValues (upColor, upColor, upColor));
-*/
 
+		/*
+		 * colorMapping.addPoint (minValue, new BoundaryRangeValues (downColor,
+		 * downColor, downColor)); colorMapping.addPoint (minValue/100.0, new
+		 * BoundaryRangeValues (downDeltaColor, downDeltaColor,
+		 * downDeltaColor)); colorMapping.addPoint(0, new BoundaryRangeValues
+		 * (zeroColor, zeroColor, zeroColor));
+		 * colorMapping.addPoint(maxValue/100.0, new BoundaryRangeValues
+		 * (upDeltaColor, upDeltaColor, upDeltaColor));
+		 * colorMapping.addPoint(maxValue, new BoundaryRangeValues (upColor,
+		 * upColor, upColor));
+		 */
 
-   	Calculator colorCalculator = new BasicCalculator("TreeView Color Calculator", 
-		                                                 colorMapping, vizType);
-
+		Calculator colorCalculator = new BasicCalculator(
+				"TreeView Color Calculator", colorMapping, vizType);
 
 		// Apply it
-	
+
 		if (edge) {
-			EdgeAppearanceCalculator edgeAppCalc = style.getEdgeAppearanceCalculator();
-   		edgeAppCalc.setCalculator(colorCalculator);
+			EdgeAppearanceCalculator edgeAppCalc = style
+					.getEdgeAppearanceCalculator();
+			edgeAppCalc.setCalculator(colorCalculator);
 			style.setEdgeAppearanceCalculator(edgeAppCalc);
 		} else {
-			NodeAppearanceCalculator nodeAppCalc = style.getNodeAppearanceCalculator();
-   		nodeAppCalc.setCalculator(colorCalculator);
+			NodeAppearanceCalculator nodeAppCalc = style
+					.getNodeAppearanceCalculator();
+			nodeAppCalc.setCalculator(colorCalculator);
 			style.setNodeAppearanceCalculator(nodeAppCalc);
 		}
 		if (newStyle) {
 			calculatorCatalog.addVisualStyle(style);
 			if (update) {
-				Cytoscape.getCurrentNetworkView().setVisualStyle(style.getName());
+				Cytoscape.getCurrentNetworkView().setVisualStyle(
+						style.getName());
 				manager.setVisualStyle(style);
 			}
 		} else if (update) {
 			Cytoscape.getCurrentNetworkView().applyVizmapper(style);
-		} 
+		}
 		return style;
 	}
 
-
-		
 }
-

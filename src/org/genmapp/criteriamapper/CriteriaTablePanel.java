@@ -90,7 +90,7 @@ public class CriteriaTablePanel implements ActionListener,
 	public boolean savedFlag = false;
 
 	protected String setName; // = "New...";
-	protected String mapTo[] = { "Node Color", "Node Size", "Node Shape" };
+	protected String mapTo[] = { "Node Color", "Node Stripe", "None" };
 	public String mapToPick = mapTo[0];
 
 	private CriteriaCalculator calculate = new CriteriaCalculator();
@@ -478,13 +478,17 @@ public class CriteriaTablePanel implements ActionListener,
 
 	public String[] getLabelArray(int[] indices) {
 		String[] temp = new String[indices.length];
-		ArrayList<String> stemp = new ArrayList<String>();
 		for (int i = 0; i < indices.length; i++) {
-
 			temp[i] = getCell(indices[i], 1) + "";
-
 		}
-		// return stemp.toArray(String[] tem);
+		return temp;
+	}
+
+	public String[] getMapToArray(int[] indices) {
+		String[] temp = new String[indices.length];
+		for (int i = 0; i < indices.length; i++) {
+			temp[i] = getCell(indices[i], 1) + "";
+		}
 		return temp;
 	}
 
@@ -532,7 +536,7 @@ public class CriteriaTablePanel implements ActionListener,
 
 					int[] temp = table.getSelectedRows();
 
-					System.out.println("LENGTHHH: " + temp.length);
+					System.out.println("LENGTH: " + temp.length);
 					if (temp.length == 1) {
 						System.out.println("Selected Index: " + i);
 						String colorString = getCell(i, VALUE_COL) + "";
@@ -546,6 +550,7 @@ public class CriteriaTablePanel implements ActionListener,
 								c, mapToPick);
 					} else {
 						String[] labels = getLabelArray(temp);
+						String[] maptos = getMapToArray(temp);
 						Color[] colors = getColorArray(temp);
 
 						String compositeLabel = getCompositeLabel(labels);
@@ -554,7 +559,7 @@ public class CriteriaTablePanel implements ActionListener,
 						if (labels.length == 1) {
 							mapper.createDiscreteMapping(labels[0]
 									+ "_discrete", labels[0], colors[0],
-									mapToPick);
+									maptos[0]);
 							break;
 						}
 						if (labels.length == 2
@@ -573,7 +578,7 @@ public class CriteriaTablePanel implements ActionListener,
 						}
 						mapper.createCompositeMapping(compositeLabel
 								+ "_discrete", compositeLabel, colors,
-								mapToPick);
+								maptos);
 					}
 
 				}
@@ -587,6 +592,7 @@ public class CriteriaTablePanel implements ActionListener,
 	public void applyCriteria() {
 
 		ArrayList<String> labels = new ArrayList<String>();
+		ArrayList<String> maptos = new ArrayList<String>();
 		ArrayList<Color> colors = new ArrayList<Color>();
 		String compositeLabel = "";
 		String[] nameLabels = new String[getDataLength()];
@@ -628,6 +634,8 @@ public class CriteriaTablePanel implements ActionListener,
 
 				Color c = stringToColor(getCell(i, VALUE_COL) + "");
 				colors.add(c);
+				
+				maptos.add((String) getCell(i, MAPTO_COL));
 
 			}
 		}
@@ -635,6 +643,11 @@ public class CriteriaTablePanel implements ActionListener,
 		String[] labelsA = new String[labels.size()];
 		for (int h = 0; h < labels.size(); h++) {
 			labelsA[h] = labels.get(h);
+		}
+
+		String[] maptosA = new String[maptos.size()];
+		for (int h = 0; h < maptos.size(); h++) {
+			maptosA[h] = maptos.get(h);
 		}
 
 		try {
@@ -658,7 +671,7 @@ public class CriteriaTablePanel implements ActionListener,
 					colorsA[0], mapToPick);
 		} else {
 			mapper.createCompositeMapping(compositeLabel + "_discrete",
-					compositeLabel, colorsA, mapToPick);
+					compositeLabel, colorsA, maptosA);
 		}
 
 	}
