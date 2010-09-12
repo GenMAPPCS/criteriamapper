@@ -90,7 +90,7 @@ public class CriteriaTablePanel implements ActionListener,
 	public boolean savedFlag = false;
 
 	protected String setName; // = "New...";
-	protected String mapTo[] = { "Node Color", "Node Stripe", "None" };
+	protected String mapTo[] = { "Node Color", "None" };
 	public String mapToPick = mapTo[0];
 
 	private CriteriaCalculator calculate = new CriteriaCalculator();
