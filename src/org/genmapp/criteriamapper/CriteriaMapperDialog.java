@@ -287,7 +287,6 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			nameBox.setEditable(false);
 			pack();
 		} else if (command.equals("applySet")) {
-			// TODO: apply criteria set
 			ctPanel.applyCriteria();
 		} else if (command.equals("saveSet")) {
 			// User is saving Set while editing an existing Set
@@ -355,9 +354,6 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			System.out.println("Skipped Save!");
 			return; // skip saving "New..." or already saved
 		}
-		// System.out.println(nameBox.getSelectedItem());
-
-		String mapTo = (String) mapToBox.getSelectedItem();
 
 		attributeManager.addNamesAttribute(Cytoscape.getCurrentNetwork(), sn);
 
@@ -374,7 +370,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			// attributeManager.setColorAttribute(label, color, nodeID);
 			// System.out.println(criteriaLabels.length+"AAA"+temp);
 		}
-		attributeManager.setValuesAttribute(sn, mapTo, criteriaLabels);
+		attributeManager.setValuesAttribute(sn, ctPanel.mapToPick, criteriaLabels);
 		ctPanel.savedFlag = true;
 	}
 
@@ -424,7 +420,6 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 	}
 
 	private JComboBox nameBox;
-	private JComboBox mapToBox;
 	private String[] nameBoxArray;
 
 	public String[] getAllAttributes(ArrayList<String> attributeList) {

@@ -72,7 +72,7 @@ public class AttributeManager {
 	public String[] getNamesAttribute(CyNetwork network) {
 		if (networkAttributes.hasAttribute(network.getIdentifier(),
 				"__criteria")) {
-			String[] a = { "" };
+			String[] a = {""};
 			ArrayList<String> temp = (ArrayList<String>) networkAttributes
 					.getListAttribute(network.getIdentifier(), "__criteria");
 			ArrayList<String> full = new ArrayList<String>();
@@ -83,7 +83,7 @@ public class AttributeManager {
 			return full.toArray(a);
 		} else {
 
-			return new String[] { "New..." };
+			return new String[]{"New..."};
 		}
 	}
 
@@ -146,13 +146,19 @@ public class AttributeManager {
 	// }
 
 	/*
-	 * This is perhaps one of the most important and confusing pieces of the
-	 * entire program. This method takes an array of user entered labels that
-	 * each represent some user entered criteria. It then progressively iterates
-	 * through the value at each node for each label. If the value is already
-	 * true then
+	 * This method is responsible for assessing the hierarchy of criteria.
+	 * It creates a composite node attribute and assigns an integer 
+	 * corresponding the to criteria (i.e., row number) that both true
+	 * and highest ranking. If a node fails all criteria, then the value
+	 * is set to -1.
 	 */
 	public void setCompositeAttribute(String[] labels) throws Exception {
+
+		if (labels.length <= 1) {
+			// only a single criteria; skip composition
+			return;
+		}
+
 		CyNetwork network = Cytoscape.getCurrentNetwork();
 		List<Node> nodesList = network.nodesList();
 		String compositeName = labels[0];
@@ -166,7 +172,11 @@ public class AttributeManager {
 		for (int i = 0; i < nodesList.size(); i++) {
 			Node node = nodesList.get(i);
 			String nodeID = node.getIdentifier();
+			
+			// initialize value to all false (-1)
+			nodeAttributes.setAttribute(nodeID, compositeName, -1);
 
+			// loop through each label in order
 			for (int j = 0; j < labels.length; j++) {
 				if (labels[j].equals("")) {
 					continue;
@@ -177,38 +187,18 @@ public class AttributeManager {
 							+ labels[j] + " has not been calculated");
 				}
 
+				// if true, then mark label row position and skip to next node.
 				if (nodeAttributes.getBooleanAttribute(nodeID, labels[j])) {
 
-					if (nodeAttributes.hasAttribute(nodeID, compositeName)) {
-						//System.out.println("set attribute " + compositeName
-						//		+ " at node: " + nodeID + " to " + j);
-						int b = nodeAttributes.getIntegerAttribute(nodeID,
-								compositeName);
-						if (b == -1) {
-							//System.out.println("set attribute "+compositeName+
-							// " at node: "+nodeID +" to "+j);
 							nodeAttributes.setAttribute(nodeID, compositeName,
 									j);
-						}
+							break; //next node
 
-					} else {
-						// System.out.println("possibly overwrote");
-						nodeAttributes.setAttribute(nodeID, compositeName, j);
-
-					}
-				} else {
-					if (!(nodeAttributes.hasAttribute(nodeID, compositeName))) {
-						// System.out.println("set attribute "+compositeName+
-						// " at node: "+nodeID +" to -1");
-						nodeAttributes.setAttribute(nodeID, compositeName, -1);
-					}
-				}
-				// System.out.println("compositeName: "+compositeName);
+				} 
+				// update reference to node attributes
 				nodeAttributes = Cytoscape.getNodeAttributes();
 			}
-
 		}
-
 	}
 
 	public boolean isCompositeAttribute(String compositeName) {

@@ -366,22 +366,8 @@ public class CriteriaCalculator {
 			//network.setSelectedNodeState(node, false);
 			if(!finalValue.isEmpty()){
 				boolean outcome = finalValue.pop();
-
-				//System.out.println("true");
-				//createAttribute()
-				//System.out.println(label+":  "+node.getIdentifier()+"  "+outcome);
-
 				attManager.setColorAttribute(label, node.getIdentifier(), outcome);
-				//if(outcome){
-					//network.setSelectedNodeState(node,true);
-
-				//}
-				//System.out.println("label: "+label);
-				//System.out.println(outcome);
-
 			}
-
-
 		}
 	}
 

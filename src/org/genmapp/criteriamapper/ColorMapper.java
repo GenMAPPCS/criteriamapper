@@ -80,30 +80,14 @@ public class ColorMapper {
 	 * are subsequently mapped.
 	 */
 	public VisualStyle createCompositeMapping(String vsName,
-			String compositeLabel, Color[] colors, String[] mapTo) {
+			String compositeLabel, Color[] colors, String mapTo) {
 		boolean newStyle = false;
 		boolean update = true;
 
 		if (!compositeLabel.contains(":")) {
 			return createDiscreteMapping(compositeLabel + "discrete",
-					compositeLabel, colors[0], mapTo[0]);
+					compositeLabel, colors[0], mapTo);
 		}
-
-		// clear nodecharts
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("node", "all");
-		try {
-			CyCommandManager.execute("nodecharts", "clear", args);
-		} catch (CyCommandException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (RuntimeException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		args.clear();
-
-		CyAttributes nodeAttributes = Cytoscape.getNodeAttributes();
 
 		network = Cytoscape.getCurrentNetwork();
 		networkView = Cytoscape.getCurrentNetworkView();
@@ -132,16 +116,10 @@ public class ColorMapper {
 		List<Integer> rowList = new ArrayList<Integer>();
 		boolean doCalc = false;
 
-		// collect colors intended for Node Color into disMapping;
-		// collect those intended for Node Stripe into array.
+		// collect colors intended for Node Color into disMapping
 		for (int i = 0; i < colors.length; i++) {
-			if (mapTo[i].equals("Node Color")) {
 				disMapping.putMapValue(new Integer(i), colors[i]);
 				doCalc = true;
-
-			} else if (mapTo[i].equals("Node Stripe")) {
-				rowList.add(i);
-			}
 		}
 
 		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
@@ -155,9 +133,10 @@ public class ColorMapper {
 				List<Node> nodeList = network.nodesList();
 				for (Node node : nodeList) {
 					String id = node.getIdentifier();
-					boolean b = AttributeManager.getColorAttribute(id, labels[j]);
-					//CyAttributes nodeAttrs = Cytoscape.getNodeAttributes();
-					//b = nodeAttributes.getBooleanAttribute(id, labels[j]);
+					boolean b = AttributeManager.getColorAttribute(id,
+							labels[j]);
+					// CyAttributes nodeAttrs = Cytoscape.getNodeAttributes();
+					// b = nodeAttributes.getBooleanAttribute(id, labels[j]);
 					Color c = colors[j];
 					if (!b)
 						c = Color.white; // TODO: set to default node color
@@ -166,25 +145,6 @@ public class ColorMapper {
 						cl = new ArrayList<Color>();
 					cl.add(c);
 					nodeMap.put(id, cl);
-				}
-			}
-
-			for (Map.Entry<String, List<Color>> entry : nodeMap.entrySet()) {
-				args.put("node", entry.getKey());
-				args.put("labellist", "null");
-				args.put("valuelist", "0");
-				args.put("colorlist", entry.getValue());
-//				System.out.println("nodecharts stripe node=\"" + entry.getKey()
-//				 +"\" labellist=\"null\" valuelist=\"0\" colorlist=\"" +
-//				 colorstring + "\"");
-				try {
-					CyCommandManager.execute("nodecharts", "stripe", args);
-				} catch (CyCommandException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				} catch (RuntimeException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				}
 			}
 		}
@@ -267,11 +227,12 @@ public class ColorMapper {
 
 		Calculator nodeColorCalculator = null;
 
-		if (mapTo.equals("None")) {
-			nodeColorCalculator = null;
-		} else { // do this for either Node Color or Node Stripe
+		if (mapTo.equals("Node Color")) {
 			nodeColorCalculator = new BasicCalculator("Single Node Color Calc",
 					disMapping, VisualPropertyType.NODE_FILL_COLOR);
+
+		} else {
+			nodeColorCalculator = null;
 		}
 
 		nodeAppCalc.setCalculator(nodeColorCalculator);
