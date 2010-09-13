@@ -82,32 +82,16 @@ public class ColorMapper {
 	public VisualStyle createCompositeMapping(String vsName,
 			String compositeLabel, Color[] colors, String mapTo) {
 		boolean newStyle = false;
-		boolean update = true;
 
 		if (!compositeLabel.contains(":")) {
-			return createDiscreteMapping(compositeLabel + "discrete",
-					compositeLabel, colors[0], mapTo);
+			return createDiscreteMapping(vsName, compositeLabel, colors[0],
+					mapTo);
 		}
 
 		network = Cytoscape.getCurrentNetwork();
 		networkView = Cytoscape.getCurrentNetworkView();
 
-		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
-		CalculatorCatalog catalog = manager.getCalculatorCatalog();
-
-		VisualStyle vs = Cytoscape.getCurrentNetworkView().getVisualStyle();
-		// VisualStyle visualStyle = null;
-
-		// System.out.println("make Composite mapping");
-
-		Set<String> styles = catalog.getVisualStyleNames();
-		if (!(vs == null) && styles.contains(vs.getName())) {
-			vs = catalog.getVisualStyle(vs.getName());
-		} else {
-			// System.out.println("apply new style");
-			vs = new VisualStyle(vs, vsName);
-			newStyle = true;
-		}
+		VisualStyle vs = networkView.getVisualStyle();
 
 		DiscreteMapping disMapping = new DiscreteMapping(new Color(0),
 				compositeLabel, ObjectMapping.NODE_MAPPING);
@@ -118,8 +102,8 @@ public class ColorMapper {
 
 		// collect colors intended for Node Color into disMapping
 		for (int i = 0; i < colors.length; i++) {
-				disMapping.putMapValue(new Integer(i), colors[i]);
-				doCalc = true;
+			disMapping.putMapValue(new Integer(i), colors[i]);
+			doCalc = true;
 		}
 
 		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
@@ -159,16 +143,9 @@ public class ColorMapper {
 		}
 		vs.setNodeAppearanceCalculator(nodeAppCalc);
 
-		// Create the visual style
-		if (newStyle) {
-			catalog.addVisualStyle(vs);
-			if (update) {
-				Cytoscape.getCurrentNetworkView().setVisualStyle(vs.getName());
-				manager.setVisualStyle(vs);
-			}
-		} else if (update) {
-			Cytoscape.getCurrentNetworkView().applyVizmapper(vs);
-		}
+		// Set the visual style
+		Cytoscape.getCurrentNetworkView().setVisualStyle(vs.getName());
+		Cytoscape.getCurrentNetworkView().applyVizmapper(vs);
 
 		networkView.redrawGraph(true, true);
 
@@ -196,26 +173,10 @@ public class ColorMapper {
 	public VisualStyle createDiscreteMapping(String vsName, String label,
 			Color currentColor, String mapTo) {
 
-		boolean newStyle = false;
-		boolean update = true;
-
 		network = Cytoscape.getCurrentNetwork();
 		networkView = Cytoscape.getCurrentNetworkView();
 
-		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
-		CalculatorCatalog catalog = manager.getCalculatorCatalog();
-
-		VisualStyle vs = Cytoscape.getCurrentNetworkView().getVisualStyle();
-
-		Set<String> styles = catalog.getVisualStyleNames();
-		if (!(vs == null) && styles.contains(vs.getName())) {
-			vs = catalog.getVisualStyle(vs.getName());
-			// System.out.println("apply style");
-		} else {
-			// System.out.println("apply new style");
-			vs = new VisualStyle(vs, vsName);
-			newStyle = true;
-		}
+		VisualStyle vs = networkView.getVisualStyle();
 
 		DiscreteMapping disMapping = new DiscreteMapping(new Color(0), label,
 				ObjectMapping.NODE_MAPPING);
@@ -238,17 +199,10 @@ public class ColorMapper {
 		nodeAppCalc.setCalculator(nodeColorCalculator);
 
 		vs.setNodeAppearanceCalculator(nodeAppCalc);
-		// Create the visual style
 
-		if (newStyle) {
-			catalog.addVisualStyle(vs);
-			if (update) {
-				Cytoscape.getCurrentNetworkView().setVisualStyle(vs.getName());
-				manager.setVisualStyle(vs);
-			}
-		} else if (update) {
-			Cytoscape.getCurrentNetworkView().applyVizmapper(vs);
-		}
+		// Set the visual style
+		Cytoscape.getCurrentNetworkView().setVisualStyle(vs.getName());
+		Cytoscape.getCurrentNetworkView().applyVizmapper(vs);
 
 		networkView.redrawGraph(true, true);
 
@@ -262,26 +216,10 @@ public class ColorMapper {
 	public VisualStyle createDiscreteBorderMapping(String vsName, String label,
 			Color currentColor) {
 
-		boolean newStyle = false;
-		boolean update = true;
-
 		network = Cytoscape.getCurrentNetwork();
 		networkView = Cytoscape.getCurrentNetworkView();
 
-		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
-		CalculatorCatalog catalog = manager.getCalculatorCatalog();
-
-		VisualStyle vs = Cytoscape.getCurrentNetworkView().getVisualStyle();
-		// VisualStyle visualStyle = null;
-
-		Set<String> styles = catalog.getVisualStyleNames();
-		if (!(vs == null) && styles.contains(vs.getName())) {
-			vs = catalog.getVisualStyle(vs.getName());
-		} else {
-			System.out.println("apply new style");
-			vs = new VisualStyle(vs, vsName);
-			newStyle = true;
-		}
+		VisualStyle vs = networkView.getVisualStyle();
 
 		DiscreteMapping disMapping = new DiscreteMapping(Color.WHITE, label,
 				ObjectMapping.NODE_MAPPING);
@@ -305,24 +243,11 @@ public class ColorMapper {
 		nodeAppCalc.setCalculator(nodeColorCalculator);
 
 		vs.setNodeAppearanceCalculator(nodeAppCalc);
-		// Create the visual style
 
-		// VisualStyle visualStyle = new VisualStyle(vsName, nodeAppCalc,
-		// edgeAppCalc, globalAppCalc);
+		// Set the visual style
+		Cytoscape.getCurrentNetworkView().setVisualStyle(vs.getName());
+		Cytoscape.getCurrentNetworkView().applyVizmapper(vs);
 
-		if (newStyle) {
-			catalog.addVisualStyle(vs);
-			if (update) {
-				Cytoscape.getCurrentNetworkView().setVisualStyle(vs.getName());
-				manager.setVisualStyle(vs);
-			}
-		} else if (update) {
-			Cytoscape.getCurrentNetworkView().applyVizmapper(vs);
-		}
-
-		// catalog.addVisualStyle(visualStyle);
-
-		// manager.setVisualStyle(visualStyle);
 		networkView.redrawGraph(true, true);
 
 		return vs;
@@ -330,36 +255,10 @@ public class ColorMapper {
 
 	public VisualStyle createContinuousMapping(CyNetwork network, String label,
 			Color currentColor, boolean update) {
-		boolean newStyle = false;
+
 		boolean edge = false;
-		// Get our current vizmap
-		VisualMappingManager manager = Cytoscape.getVisualMappingManager();
-		CalculatorCatalog calculatorCatalog = manager.getCalculatorCatalog();
 
-		// Get the current style
-		VisualStyle style = Cytoscape.getCurrentNetworkView().getVisualStyle();
-		// Get our colors
-		// Color missingColor = currentColor;
-		// Color zeroColor = colorExtractor.getColor(0.0f);
-		// Color upColor = colorExtractor.getColor(maxValue);
-		// Color downColor = colorExtractor.getColor(minValue);
-
-		// Adjust for contrast. Since we really don't have contrast control,
-		// we try to provide the same basic idea by adding extra points
-		// in the continuous mapper
-		// Color downDeltaColor = colorExtractor.getColor(minValue/100.0);
-		// Color upDeltaColor = colorExtractor.getColor(maxValue/100.0);
-
-		// if (!style.getName().endsWith(suffix)) {
-		// Create a new vizmap
-		Set<String> styles = calculatorCatalog.getVisualStyleNames();
-		if (styles.contains(style.getName()))
-			style = calculatorCatalog.getVisualStyle(style.getName());
-		else {
-			style = new VisualStyle(style, style.getName());
-			newStyle = true;
-		}
-		// }
+		VisualStyle vs = networkView.getVisualStyle();
 
 		// Get the right mapping, depending on whether we are mapping an edge or
 		// a node
@@ -393,29 +292,23 @@ public class ColorMapper {
 				"TreeView Color Calculator", colorMapping, vizType);
 
 		// Apply it
-
 		if (edge) {
-			EdgeAppearanceCalculator edgeAppCalc = style
+			EdgeAppearanceCalculator edgeAppCalc = vs
 					.getEdgeAppearanceCalculator();
 			edgeAppCalc.setCalculator(colorCalculator);
-			style.setEdgeAppearanceCalculator(edgeAppCalc);
+			vs.setEdgeAppearanceCalculator(edgeAppCalc);
 		} else {
-			NodeAppearanceCalculator nodeAppCalc = style
+			NodeAppearanceCalculator nodeAppCalc = vs
 					.getNodeAppearanceCalculator();
 			nodeAppCalc.setCalculator(colorCalculator);
-			style.setNodeAppearanceCalculator(nodeAppCalc);
+			vs.setNodeAppearanceCalculator(nodeAppCalc);
 		}
-		if (newStyle) {
-			calculatorCatalog.addVisualStyle(style);
-			if (update) {
-				Cytoscape.getCurrentNetworkView().setVisualStyle(
-						style.getName());
-				manager.setVisualStyle(style);
-			}
-		} else if (update) {
-			Cytoscape.getCurrentNetworkView().applyVizmapper(style);
-		}
-		return style;
+
+		// Set the visual style
+		Cytoscape.getCurrentNetworkView().setVisualStyle(vs.getName());
+		Cytoscape.getCurrentNetworkView().applyVizmapper(vs);
+
+		return vs;
 	}
 
 }

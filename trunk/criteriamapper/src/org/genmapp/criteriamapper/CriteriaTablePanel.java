@@ -89,7 +89,7 @@ public class CriteriaTablePanel implements ActionListener,
 	public boolean savedFlag = false;
 
 	protected String setName; 
-	public String mapToPick = "Node Color"; //fixed
+	public static String mapToPick = "Node Color"; //fixed
 
 	private CriteriaCalculator calculate = new CriteriaCalculator();
 
@@ -538,8 +538,7 @@ public class CriteriaTablePanel implements ActionListener,
 						System.out
 								.println("COMPOSITE LABEL: " + compositeLabel);
 						if (labels.length == 1) {
-							mapper.createDiscreteMapping(labels[0]
-									+ "_discrete", labels[0], colors[0],
+							mapper.createDiscreteMapping(setName, labels[0], colors[0],
 									mapToPick);
 							break;
 						}
@@ -557,8 +556,7 @@ public class CriteriaTablePanel implements ActionListener,
 							//System.out.println("NO"+setAttFailure.getMessage()
 							// +"WAY");
 						}
-						mapper.createCompositeMapping(compositeLabel
-								+ "_discrete", compositeLabel, colors,
+						mapper.createCompositeMapping(setName, compositeLabel, colors,
 								mapToPick);
 					}
 
@@ -573,10 +571,8 @@ public class CriteriaTablePanel implements ActionListener,
 	public void applyCriteria() {
 
 		ArrayList<String> labels = new ArrayList<String>();
-		ArrayList<String> maptos = new ArrayList<String>();
 		ArrayList<Color> colors = new ArrayList<Color>();
 		String compositeLabel = "";
-		String[] nameLabels = new String[getDataLength()];
 		if (setName.equals("")) {
 			JOptionPane.showMessageDialog(cbDialog,
 					"Must have a set name.");
@@ -603,8 +599,9 @@ public class CriteriaTablePanel implements ActionListener,
 						compositeLabel = compositeLabel + ":" + label;
 					}
 				}
-				// System.out.println("compositeLabel: "+compositeLabel);
+				// evaluates expression and sets node attribute
 				calculate.evaluateLeftToRight(label);
+				
 				if (labels.contains(label)) {
 					JOptionPane.showMessageDialog(cbDialog,
 							"Must have unique labels");
@@ -612,6 +609,7 @@ public class CriteriaTablePanel implements ActionListener,
 				} else {
 					labels.add(label);
 				}
+				
 				Color c = stringToColor(getCell(i, VALUE_COL) + "");
 				colors.add(c);
 			}
@@ -620,11 +618,6 @@ public class CriteriaTablePanel implements ActionListener,
 		String[] labelsA = new String[labels.size()];
 		for (int h = 0; h < labels.size(); h++) {
 			labelsA[h] = labels.get(h);
-		}
-
-		String[] maptosA = new String[maptos.size()];
-		for (int h = 0; h < maptos.size(); h++) {
-			maptosA[h] = maptos.get(h);
 		}
 
 		try {
@@ -643,10 +636,10 @@ public class CriteriaTablePanel implements ActionListener,
 			return;
 		}
 		if (labels.size() == 1) {
-			mapper.createDiscreteMapping(labelsA[0] + "_discrete", labelsA[0],
+			mapper.createDiscreteMapping(setName, labelsA[0],
 					colorsA[0], mapToPick);
 		} else {
-			mapper.createCompositeMapping(compositeLabel + "_discrete",
+			mapper.createCompositeMapping(setName,
 					compositeLabel, colorsA, mapToPick);
 		}
 
@@ -729,7 +722,7 @@ public class CriteriaTablePanel implements ActionListener,
 		table.setRowSelectionInterval(selectableRow, selectableRow);
 		String currentValue = (String) table.getValueAt(selectableRow, EXP_COL);
 		cbDialog.criteriaField.setText((String) currentValue);
-		savedFlag = true;
+		//savedFlag = true;
 	}
 
 	public void moveRowUp(int rowNumber) {
