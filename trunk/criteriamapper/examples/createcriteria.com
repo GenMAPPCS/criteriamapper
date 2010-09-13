@@ -1,0 +1,1 @@
+criteriamapper create set setname="test" network="galFiltered.sif" mapTo="Node Color" labellist="[happy,joy]" expressionlist="[gal4RGexp < .1,gal80Rexp > .1]" colorlist="[#bbffbb,#bbbbbb]"
