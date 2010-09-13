@@ -33,8 +33,6 @@ import javax.swing.JMenuItem;
 import cytoscape.Cytoscape;
 import cytoscape.command.CyCommandException;
 import cytoscape.command.CyCommandHandler;
-import cytoscape.command.CyCommandManager;
-import cytoscape.command.CyCommandNamespace;
 import cytoscape.logger.CyLogger;
 import cytoscape.plugin.CytoscapePlugin;
 
@@ -52,19 +50,9 @@ public class CriteriaMapper extends CytoscapePlugin {
 		JMenu pluginMenu = Cytoscape.getDesktop().getCyMenus().getMenuBar()
 				.getMenu("Plugins");
 		pluginMenu.add(item);
-
-		// register cycommands
-		try {
-			// You must reserve your namespace first
-			CyCommandNamespace ns = CyCommandManager
-					.reserveNamespace("criteria mapper");
-			// Now register handlers
-			cch = new CriteriaCommandHandler(ns);
-		} catch (RuntimeException e) {
-			// Handle already registered exceptions
-			System.out.println(e);
-		}
-
+		
+		// CyCommands
+		new CriteriaCommandHandler();
 	}
 
 
@@ -79,11 +67,20 @@ public class CriteriaMapper extends CytoscapePlugin {
 		public void actionPerformed(ActionEvent e) {
 			// if (alg != null) {
 			// Create the dialog
-			try {
-				cch.execute(CriteriaCommandHandler.OPEN, new HashMap());
-			} catch (CyCommandException e1) {
-				logger.warning(e1.getMessage());
+			// Create the dialog
+			if (null == settingsDialog) {
+				settingsDialog = new CriteriaMapperDialog();
+			} else if (!settingsDialog.isVisible()) {
+				settingsDialog = new CriteriaMapperDialog();
+			} else {
+				settingsDialog.setVisible(true);
 			}
+			// Keep it on top and active?
+			settingsDialog.setAlwaysOnTop(true);
+			// settingsDialog.setModal(false);
+			// Pop it up
+			settingsDialog.actionPerformed(null);
+
 		}
 	}
 }

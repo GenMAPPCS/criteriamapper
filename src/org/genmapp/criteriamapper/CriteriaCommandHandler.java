@@ -20,46 +20,63 @@ import java.util.Map;
 
 import cytoscape.command.AbstractCommandHandler;
 import cytoscape.command.CyCommandException;
+import cytoscape.command.CyCommandManager;
 import cytoscape.command.CyCommandNamespace;
 import cytoscape.command.CyCommandResult;
 import cytoscape.layout.Tunable;
 
 public class CriteriaCommandHandler extends AbstractCommandHandler {
 
-	//args
-	public static final String SETNAME = "setname";
-	
-	//commands
-	public static final String OPEN = "open";
+	public final static String NAMESPACE = "criteriaMapper";
+
+	// Commands and associated args
+	public static final String OPEN = "open dialog";
 	public static final String LIST_SETS = "list sets";
+
 	public static final String LIST_CRITERIA = "list criteria";
 	public static final String DELETE_SET = "delete set";
-	public static final String SAVE_SET = "save set";
+	public static final String CREATE_SET = "create set";
+	public static final String ARG_SETNAME = "setname";
+
 	
+	public static final String APPLY_SET = "apply set";
+	public static final String ARG_NETWORK = "network";
+
 	public CriteriaMapperDialog settingsDialog;
-	
-	public CriteriaCommandHandler(CyCommandNamespace ns) {
-		super(ns);
-		
-		addDescription(OPEN, "blah blah");
+
+	public CriteriaCommandHandler() {
+		super(CyCommandManager.reserveNamespace(NAMESPACE));
+
+		addDescription(OPEN, "Open set dialog");
 		addArgument(OPEN);
-		
-		addDescription(LIST_SETS, "blah blah");
+
+		addDescription(LIST_SETS, "List existing criteria sets");
 		addArgument(LIST_SETS);
-		
-		addDescription(LIST_CRITERIA, "blah blah");
-		addArgument(LIST_CRITERIA, SETNAME);
-		
-		addDescription(SAVE_SET, "blah blah");
-		addArgument(SAVE_SET, SETNAME);
-		
-		
+
+		addDescription(LIST_CRITERIA, "List criteria for a given set");
+		addArgument(LIST_CRITERIA, ARG_SETNAME);
+
+		addDescription(DELETE_SET, "Delete a set");
+		addArgument(DELETE_SET, ARG_SETNAME);
+
+		addDescription(CREATE_SET, "Create a new set");
+		addArgument(CREATE_SET, ARG_SETNAME);
+
+		addDescription(APPLY_SET, "Apply set to a network");
+		addArgument(APPLY_SET, ARG_SETNAME);
+		addArgument(APPLY_SET, ARG_NETWORK);
+
+	}
+
+	public CyCommandResult execute(String command, Collection<Tunable> args)
+			throws CyCommandException {
+		return execute(command, createKVMap(args));
 	}
 
 	public CyCommandResult execute(String command, Map<String, Object> args)
 			throws CyCommandException {
-		
-		if(command.equals(OPEN)){
+
+		if (command.equals(OPEN)) {
 			// Create the dialog
 			if (null == settingsDialog) {
 				settingsDialog = new CriteriaMapperDialog();
@@ -74,19 +91,14 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			// Pop it up
 			settingsDialog.actionPerformed(null);
 
-		} else if(command.equals(LIST_CRITERIA)){
-			String set = getArg(command, SETNAME, args);
-			if(null == set)	
-				throw new CyCommandException("List criteria requires a set name");
-			 
+		} else if (command.equals(LIST_CRITERIA)) {
+			String set = getArg(command, ARG_SETNAME, args);
+			if (null == set)
+				throw new CyCommandException(
+						"List criteria requires a set name");
+
 			// do the thing
 		}
-		return null;
-	}
-
-	public CyCommandResult execute(String arg0, Collection<Tunable> arg1)
-			throws CyCommandException {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
