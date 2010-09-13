@@ -16,6 +16,7 @@
 package org.genmapp.criteriamapper;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -362,7 +363,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		for (int k = 0; k < criteriaLabels.length; k++) {
 			String temp = ctPanel.getCell(k, ctPanel.EXP_COL) + ":"
 					+ ctPanel.getCell(k, ctPanel.LABEL_COL) + ":"
-					+ ctPanel.getCell(k, ctPanel.VALUE_COL);
+					+ ctPanel.getCell(k, ctPanel.COLOR_COL);
 			System.out.println("SAVE SETTINGS: " + sn + "  " + temp);
 			if (!temp.equals(null)) {
 				criteriaLabels[k] = temp;
@@ -393,8 +394,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			}
 			System.out.println("LOAD SETTINGS: " + setName + " " + temp[0]
 					+ " :" + temp[1] + " :" + temp[2]);
-			ctPanel.populateList(temp[0], temp[1], ctPanel
-					.stringToColor(temp[2]));
+			ctPanel.populateList(temp[0], temp[1], Color.decode(temp[2]));
 
 		}
 		ctPanel.applyCriteria();
