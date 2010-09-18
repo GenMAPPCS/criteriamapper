@@ -32,16 +32,14 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
-import javax.swing.DefaultCellEditor;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
-import javax.swing.JComboBox;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -63,6 +61,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import cytoscape.Cytoscape;
+import cytoscape.command.CyCommandException;
+import cytoscape.command.CyCommandManager;
 
 public class CriteriaTablePanel
 		implements
@@ -606,7 +606,6 @@ public class CriteriaTablePanel
 			mapper.createCompositeMapping(setName, compositeLabel, colorsA,
 					mapToPick);
 		}
-
 	}
 
 	// Wrapper methods for the inner class BooleanTableModel

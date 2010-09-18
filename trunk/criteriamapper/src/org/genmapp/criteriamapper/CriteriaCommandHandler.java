@@ -18,6 +18,7 @@ package org.genmapp.criteriamapper;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -320,6 +321,25 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 
 		return (result);
 
+	}
+	
+	/**
+	 * Tell Workspaces to update criteria set info
+	 * 
+	 * @param setname
+	 */
+	public static void updateWorkspaces(String setname){
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("setname", setname);
+		try {
+			CyCommandManager.execute("workspaces", "update criteria", args);
+		} catch (CyCommandException cce) {
+			// TODO Auto-generated catch block
+			cce.printStackTrace();
+		} catch (RuntimeException cce) {
+			// TODO Auto-generated catch block
+			cce.printStackTrace();
+		}
 	}
 
 }
