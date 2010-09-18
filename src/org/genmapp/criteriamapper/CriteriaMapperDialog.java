@@ -289,6 +289,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			pack();
 		} else if (command.equals("applySet")) {
 			ctPanel.applyCriteria();
+//			CriteriaCommandHandler.updateWorkspaces(setName);
 		} else if (command.equals("saveSet")) {
 			// User is saving Set while editing an existing Set
 			setName = (String) nameBox.getSelectedItem();
@@ -311,6 +312,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 				deletedFlag = true; // to avoid autosave via nameBoxChanged
 				nameBox.removeItem(setName);
 				ctPanel.clearTable();
+				CriteriaCommandHandler.updateWorkspaces(setName);
 			} else { // NO
 				// do nothing...
 			}
@@ -372,6 +374,8 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			// System.out.println(criteriaLabels.length+"AAA"+temp);
 		}
 		attributeManager.setValuesAttribute(sn, ctPanel.mapToPick, criteriaLabels);
+		ctPanel.applyCriteria();
+		CriteriaCommandHandler.updateWorkspaces(setName);
 		ctPanel.savedFlag = true;
 	}
 
@@ -398,6 +402,8 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 		}
 		ctPanel.applyCriteria();
+		CriteriaCommandHandler.updateWorkspaces(setName);
+		ctPanel.savedFlag = true;
 	}
 
 	public void valueChanged(ListSelectionEvent e) {
