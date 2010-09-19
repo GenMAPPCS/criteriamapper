@@ -35,8 +35,9 @@ public class AttributeManager {
 	private CyAttributes networkAttributes;
 	private static CyAttributes nodeAttributes;
 	// private SortedSet<String> criteriaSetNames = null;
-	private ArrayList<String> criteriaSetNames = new ArrayList<String>();
-	public static final String NET_ATTR = "__CriteriaSets";
+	private List<String> criteriaSetNames = new ArrayList<String>();
+	public static final String NET_ATTR_SETS = "org.genmapp.criteriasets_1.0";
+	public static final String NET_ATTR_SET_PREFIX = "org.genmapp.criteriaset.";
 
 	public AttributeManager() {
 		networkAttributes = Cytoscape.getNetworkAttributes();
@@ -53,11 +54,9 @@ public class AttributeManager {
 	 */
 	public void addNamesAttribute(CyNetwork network, String setName) {
 		networkAttributes = Cytoscape.getNetworkAttributes();
-		// System.out.println("setname: "+setName);
-		if (networkAttributes.hasAttribute(network.getIdentifier(),
-				NET_ATTR)) {
+		if (networkAttributes.hasAttribute(network.getIdentifier(), NET_ATTR_SETS)) {
 			criteriaSetNames = (ArrayList<String>) networkAttributes
-					.getListAttribute(network.getIdentifier(), NET_ATTR);
+					.getListAttribute(network.getIdentifier(), NET_ATTR_SETS);
 		} else {
 			criteriaSetNames.add(setName);
 		}
@@ -66,17 +65,16 @@ public class AttributeManager {
 			criteriaSetNames.add(setName);
 		}
 
-		networkAttributes.setListAttribute(network.getIdentifier(),
-				NET_ATTR, criteriaSetNames);
+		networkAttributes.setListAttribute(network.getIdentifier(), NET_ATTR_SETS,
+				criteriaSetNames);
 	}
 
 	public String[] getNamesAttribute(CyNetwork network) {
-		if (networkAttributes.hasAttribute(network.getIdentifier(),
-				NET_ATTR)) {
+		if (networkAttributes.hasAttribute(network.getIdentifier(), NET_ATTR_SETS)) {
 			String[] a = {""};
-			ArrayList<String> temp = (ArrayList<String>) networkAttributes
-					.getListAttribute(network.getIdentifier(), NET_ATTR);
-			ArrayList<String> full = new ArrayList<String>();
+			List<String> temp = (ArrayList<String>) networkAttributes
+					.getListAttribute(network.getIdentifier(), NET_ATTR_SETS);
+			List<String> full = new ArrayList<String>();
 			full.add("New...");
 			for (String s : temp) {
 				full.add(s);
@@ -90,31 +88,25 @@ public class AttributeManager {
 
 	public void removeNamesAttribute(CyNetwork network, String setName) {
 		criteriaSetNames = (ArrayList<String>) networkAttributes
-				.getListAttribute(network.getIdentifier(), NET_ATTR);
+				.getListAttribute(network.getIdentifier(), NET_ATTR_SETS);
 		criteriaSetNames.remove(setName);
 		if (criteriaSetNames.size() == 0) { // removed last set
-			networkAttributes.deleteAttribute(NET_ATTR);
+			networkAttributes.deleteAttribute(NET_ATTR_SETS);
 		} else {
-			List temp = (List) criteriaSetNames;
 			networkAttributes.setListAttribute(network.getIdentifier(),
-					NET_ATTR, temp);
+					NET_ATTR_SETS, criteriaSetNames);
 		}
-		networkAttributes.deleteAttribute(setName);
+		networkAttributes.deleteAttribute(NET_ATTR_SET_PREFIX + setName);
 	}
 
 	public void setNamesAttribute(CyNetwork network, String[] setNames) {
-		// System.out.println("SET NAMES ATTRIBUTE!!!");
 		networkAttributes = Cytoscape.getNetworkAttributes();
-		// if(!networkAttributes.hasAttribute(Cytoscape.getCurrentNetwork().
-		// toString(), "Criteria")){
-		List<String> temp = null;
+		List<String> temp = new ArrayList<String>();
 		for (int i = 0; i < setNames.length; i++) {
 			temp.add(setNames[i]);
 		}
-		networkAttributes.setListAttribute(network.getIdentifier(),
-				NET_ATTR, temp);
-		// }
-		// networkAttributes = Cytoscape.getNetworkAttributes();
+		networkAttributes.setListAttribute(network.getIdentifier(), NET_ATTR_SETS,
+				temp);
 	}
 
 	/*
@@ -132,7 +124,7 @@ public class AttributeManager {
 		}
 		networkAttributes = Cytoscape.getNetworkAttributes();
 		networkAttributes.setListAttribute(Cytoscape.getCurrentNetwork()
-				.getIdentifier(), setName, temp);
+				.getIdentifier(), NET_ATTR_SET_PREFIX + setName, temp);
 
 	}
 
@@ -147,11 +139,10 @@ public class AttributeManager {
 	// }
 
 	/*
-	 * This method is responsible for assessing the hierarchy of criteria.
-	 * It creates a composite node attribute and assigns an integer 
-	 * corresponding the to criteria (i.e., row number) that both true
-	 * and highest ranking. If a node fails all criteria, then the value
-	 * is set to -1.
+	 * This method is responsible for assessing the hierarchy of criteria. It
+	 * creates a composite node attribute and assigns an integer corresponding
+	 * the to criteria (i.e., row number) that both true and highest ranking. If
+	 * a node fails all criteria, then the value is set to -1.
 	 */
 	public void setCompositeAttribute(String[] labels) throws Exception {
 		if (labels.length <= 1) {
@@ -171,7 +162,7 @@ public class AttributeManager {
 		for (int i = 0; i < nodesList.size(); i++) {
 			Node node = nodesList.get(i);
 			String nodeID = node.getIdentifier();
-			
+
 			// initialize value to all false (-1)
 			nodeAttributes.setAttribute(nodeID, compositeName, -1);
 
@@ -189,11 +180,10 @@ public class AttributeManager {
 				// if true, then mark label row position and skip to next node.
 				if (nodeAttributes.getBooleanAttribute(nodeID, labels[j])) {
 
-							nodeAttributes.setAttribute(nodeID, compositeName,
-									j);
-							break; //next node
+					nodeAttributes.setAttribute(nodeID, compositeName, j);
+					break; // next node
 
-				} 
+				}
 				// update reference to node attributes
 				nodeAttributes = Cytoscape.getNodeAttributes();
 			}
@@ -215,8 +205,8 @@ public class AttributeManager {
 
 	public String[] getValuesAttribute(CyNetwork network, String setName) {
 		String[] a = {};
-		ArrayList<String> temp = (ArrayList<String>) networkAttributes
-				.getListAttribute(network.getIdentifier(), setName);
+		List<String> temp = (List<String>) networkAttributes
+				.getListAttribute(network.getIdentifier(), NET_ATTR_SET_PREFIX + setName);
 		if (temp != null) {
 			return temp.toArray(a);
 		} else {

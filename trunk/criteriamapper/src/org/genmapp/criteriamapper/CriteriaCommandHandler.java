@@ -139,7 +139,7 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			List<String> sets = new ArrayList<String>();
 			sets = (List<String>) Cytoscape.getNetworkAttributes()
 					.getListAttribute(network.getIdentifier(),
-							AttributeManager.NET_ATTR);
+							AttributeManager.NET_ATTR_SETS);
 			result.addResult(sets);
 			for (String set : sets) {
 				result.addMessage(set);
@@ -236,7 +236,7 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			// now do it
 			CyAttributes na = Cytoscape.getNetworkAttributes();
 			List<String> setList = na.getListAttribute(network.getIdentifier(),
-					AttributeManager.NET_ATTR);
+					AttributeManager.NET_ATTR_SETS);
 			if (null == setList) {
 				setList = new ArrayList<String>();
 			}
@@ -246,7 +246,7 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			}
 			setList.add(setName);
 			na.setListAttribute(network.getIdentifier(),
-					AttributeManager.NET_ATTR, setList);
+					AttributeManager.NET_ATTR_SETS, setList);
 
 			// construct criteria set list
 			ArrayList<String> critList = new ArrayList<String>();
@@ -256,7 +256,7 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 						+ CriteriaTablePanel.colorToString(colors.get(k)));
 			}
 			System.out.println("CREATE SETTINGS: " + critList);
-			na.setListAttribute(network.getIdentifier(), setName, critList);
+			na.setListAttribute(network.getIdentifier(), AttributeManager.NET_ATTR_SET_PREFIX + setName, critList);
 
 			// TODO: calculate and apply
 			String compositeLabel = "";
