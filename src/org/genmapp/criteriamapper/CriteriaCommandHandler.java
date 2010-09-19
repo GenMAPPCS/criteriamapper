@@ -330,9 +330,9 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 	 */
 	public static void updateWorkspaces(String setname){
 		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("setname", setname);
+		args.put("name", setname);
 		try {
-			CyCommandManager.execute("workspaces", "update criteria", args);
+			CyCommandManager.execute("workspaces", "update criteriasets", args);
 		} catch (CyCommandException cce) {
 			// TODO Auto-generated catch block
 			cce.printStackTrace();
