@@ -17,15 +17,17 @@ package org.genmapp.criteriamapper;
 
 import java.awt.Color;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
+import cytoscape.CytoscapeInit;
 import cytoscape.command.AbstractCommandHandler;
 import cytoscape.command.CyCommandException;
 import cytoscape.command.CyCommandManager;
@@ -36,23 +38,28 @@ import cytoscape.layout.Tunable;
 public class CriteriaCommandHandler extends AbstractCommandHandler {
 
 	public final static String NAMESPACE = "criteriamapper";
+	public final static String NET_ATTR_SETS = "org.genmapp.criteriasets_1.0";
+	public final static String NET_ATTR_SET_PREFIX = "org.genmapp.criteriaset.";
 
 	// Commands and associated args
-	public static final String OPEN = "open dialog";
+	public static final String OPEN_CRITERIA_MAPPER = "open dialog";
 	public static final String LIST_SETS = "list sets";
-
 	public static final String LIST_CRITERIA = "list criteria";
 	public static final String DELETE_SET = "delete set";
-	public static final String CREATE_SET = "create set";
+	public static final String APPLY_SET = "apply set";
+
 	public static final String ARG_SETNAME = "setname";
 	public static final String ARG_NETWORK = "network";
 	public static final String ARG_MAP_TO = "mapto";
 	public static final String ARG_LABEL_LIST = "labellist";
 	public static final String ARG_EXP_LIST = "expressionlist";
 	public static final String ARG_COLOR_LIST = "colorlist";
-
-	public static final String APPLY_SET = "apply set";
-	public static final String ARG_CREATE_FLAG = "createflag";
+	// public static final String ARG_CREATE_FLAG = "createflag";
+	
+	//EXTERNAL
+	private final static String WORKSPACES = "workspaces";
+	private final static String UPDATE_CRITERIASETS = "update criteriasets";
+	
 
 	public CriteriaMapperDialog settingsDialog;
 	private CriteriaCalculator calculate = new CriteriaCalculator();
@@ -62,35 +69,27 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 	public CriteriaCommandHandler() {
 		super(CyCommandManager.reserveNamespace(NAMESPACE));
 
-		addDescription(OPEN, "Open set dialog");
-		addArgument(OPEN);
+		addDescription(OPEN_CRITERIA_MAPPER, "Open set dialog");
+		addArgument(OPEN_CRITERIA_MAPPER, ARG_SETNAME);
 
 		addDescription(LIST_SETS, "List existing criteria sets per network");
 		addArgument(LIST_SETS);
-		addArgument(LIST_SETS, ARG_NETWORK);
 
 		addDescription(LIST_CRITERIA,
 				"List criteria for a given set and network");
 		addArgument(LIST_CRITERIA, ARG_SETNAME);
-		addArgument(LIST_CRITERIA, ARG_NETWORK);
 
 		addDescription(DELETE_SET, "Delete a set from a given network");
 		addArgument(DELETE_SET, ARG_SETNAME);
-		addArgument(DELETE_SET, ARG_NETWORK);
-
-		addDescription(CREATE_SET, "Create a new set for a given network");
-		addArgument(CREATE_SET, ARG_SETNAME);
-		addArgument(CREATE_SET, ARG_NETWORK);
-		addArgument(CREATE_SET, ARG_MAP_TO);
-		addArgument(CREATE_SET, ARG_LABEL_LIST);
-		addArgument(CREATE_SET, ARG_EXP_LIST);
-		addArgument(CREATE_SET, ARG_COLOR_LIST);
 
 		addDescription(APPLY_SET,
-				"Apply set to a network, creating the set if indicated. ");
+				"Apply set to a network, creating the set if needed");
 		addArgument(APPLY_SET, ARG_SETNAME);
 		addArgument(APPLY_SET, ARG_NETWORK);
-		addArgument(APPLY_SET, ARG_CREATE_FLAG);
+		addArgument(APPLY_SET, ARG_MAP_TO);
+		addArgument(APPLY_SET, ARG_LABEL_LIST);
+		addArgument(APPLY_SET, ARG_EXP_LIST);
+		addArgument(APPLY_SET, ARG_COLOR_LIST);
 
 	}
 
@@ -104,7 +103,15 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 
 		CyCommandResult result = new CyCommandResult();
 
-		if (command.equals(OPEN)) {
+		if (command.equals(OPEN_CRITERIA_MAPPER)) {
+			String setName;
+			Object sn = getArg(command, ARG_SETNAME, args);
+			if (sn instanceof String) {
+				setName = (String) sn;
+			} else {
+				setName = null;
+			}
+			
 			// Create the dialog
 			if (null == settingsDialog) {
 				settingsDialog = new CriteriaMapperDialog();
@@ -116,42 +123,64 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			// Keep it on top and active?
 			settingsDialog.setAlwaysOnTop(true);
 			// settingsDialog.setModal(false);
-			// Pop it up
-			settingsDialog.actionPerformed(null);
+			
+			if (null != setName) {
+				settingsDialog.setName = setName;
+				settingsDialog.ctPanel.setName = setName;
+				settingsDialog.ctPanel.clearTable();
+				settingsDialog.loadSettings(setName);
+				settingsDialog.nameBox.setSelectedItem(setName);
+				
+				settingsDialog.tablePanel.setVisible(true);
+				settingsDialog.controlPanel.setVisible(true);
+				settingsDialog.applySet.setEnabled(true);
+				settingsDialog.saveSet.setEnabled(true);
+				settingsDialog.deleteSet.setEnabled(true);
+				settingsDialog.duplicateSet.setEnabled(true);
+				settingsDialog.nameBox.setEditable(false);
+				settingsDialog.pack();
+			} else {
+				// just pop it up
+				settingsDialog.actionPerformed(null);
+			}
 
 		} else if (command.equals(LIST_SETS)) {
+			List<String> sets = new ArrayList<String>();
+			String setString = CytoscapeInit.getProperties().getProperty(NET_ATTR_SETS);
+			setString = setString.substring(1, setString.length() - 1);
+			String[] setArray = setString.split("\\]\\[");
+			sets = Arrays.asList(setArray);
+			result.addResult(sets);
+			for (String set : sets) {
+				result.addMessage(set);
+			}
+
+		} else if (command.equals(LIST_CRITERIA)) {
 			String setName;
-			CyNetwork network = null;
 			Object sn = getArg(command, ARG_SETNAME, args);
 			if (sn instanceof String) {
 				setName = (String) sn;
 			} else {
 				setName = null;
 			}
-			Object n = getArg(command, ARG_NETWORK, args);
-			if (n instanceof CyNetwork) {
-				network = (CyNetwork) n;
-			} else if (n instanceof String) {
-				network = Cytoscape.getNetwork((String) n);
-			} else {
-				network = null;
-			}
-			List<String> sets = new ArrayList<String>();
-			sets = (List<String>) Cytoscape.getNetworkAttributes()
-					.getListAttribute(network.getIdentifier(),
-							AttributeManager.NET_ATTR_SETS);
-			result.addResult(sets);
-			for (String set : sets) {
-				result.addMessage(set);
+			List<String> criteria = new ArrayList<String>();
+			String criteriaStr = CytoscapeInit.getProperties().getProperty(NET_ATTR_SET_PREFIX+setName);
+			criteriaStr = criteriaStr.substring(1, criteriaStr.length() - 1);
+			String[] criteriaArray = criteriaStr.split("\\]\\[");
+			criteria = Arrays.asList(criteriaArray);
+			result.addResult(criteria);
+			for (String c : criteria) {
+				result.addMessage(c);
 			}
 
-		} else if (command.equals(CREATE_SET)) {
+		} else if (command.equals(APPLY_SET)) {
 			String setName;
 			CyNetwork network;
 			String mapTo;
 			List<String> labels;
 			List<String> expressions;
 			List<Color> colors;
+			boolean createFlag;
 
 			Object sn = getArg(command, ARG_SETNAME, args);
 			if (sn instanceof String) {
@@ -233,32 +262,38 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			} else
 				throw new CyCommandException("unknown type for color list");
 
-			// now do it
+			/*
+			 * Proceed to create/apply criteria set
+			 */
+
+			// First, check if it already exists
 			CyAttributes na = Cytoscape.getNetworkAttributes();
 			List<String> setList = na.getListAttribute(network.getIdentifier(),
-					AttributeManager.NET_ATTR_SETS);
+					CriteriaCommandHandler.NET_ATTR_SETS);
 			if (null == setList) {
 				setList = new ArrayList<String>();
 			}
-			if (setList.contains(setName)) {
-				throw new CyCommandException(setName
-						+ " already exists for this network");
-			}
-			setList.add(setName);
-			na.setListAttribute(network.getIdentifier(),
-					AttributeManager.NET_ATTR_SETS, setList);
+			if (!setList.contains(setName) && !setName.equals("")) {
+				// then, add set name
+				setList.add(setName);
+				na.setListAttribute(network.getIdentifier(),
+						CriteriaCommandHandler.NET_ATTR_SETS, setList);
 
-			// construct criteria set list
-			ArrayList<String> critList = new ArrayList<String>();
-			critList.add(mapTo);
-			for (int k = 0; k < labels.size(); k++) {
-				critList.add(expressions.get(k) + ":" + labels.get(k) + ":"
-						+ CriteriaTablePanel.colorToString(colors.get(k)));
-			}
-			System.out.println("CREATE SETTINGS: " + critList);
-			na.setListAttribute(network.getIdentifier(), AttributeManager.NET_ATTR_SET_PREFIX + setName, critList);
+				// and construct criteria list
+				ArrayList<String> critList = new ArrayList<String>();
+				critList.add(mapTo);
+				for (int k = 0; k < labels.size(); k++) {
+					critList.add(expressions.get(k) + ":" + labels.get(k) + ":"
+							+ CriteriaTablePanel.colorToString(colors.get(k)));
+				}
+				System.out.println("CREATE SETTINGS: " + critList);
+				na.setListAttribute(network.getIdentifier(),
+						CriteriaCommandHandler.NET_ATTR_SET_PREFIX + setName,
+						critList);
 
-			// TODO: calculate and apply
+			}
+
+			// Now, calculate and apply
 			String compositeLabel = "";
 			if (setName.equals(""))
 				throw new CyCommandException("Must have a set name.");
@@ -308,12 +343,13 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			}
 
 			if (labels.size() == 1) {
-				mapper.createDiscreteMapping(setName, labelsA[0], colorsA[0],
-						mapTo);
+				mapper.createDiscreteMapping(network, setName, labelsA[0],
+						colorsA[0], mapTo);
 			} else {
-				mapper.createCompositeMapping(setName, compositeLabel, colorsA,
-						mapTo);
+				mapper.createCompositeMapping(network, setName, compositeLabel,
+						colorsA, mapTo);
 			}
+			result.addMessage("Success!");
 
 		} else {
 			result.addError("Command not supported: " + command);
@@ -322,17 +358,19 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 		return (result);
 
 	}
-	
+
 	/**
-	 * Tell Workspaces to update criteria set info
+	 * Tell Workspaces to update criteria set info. Called when loading, saving
+	 * or deleting a set via the UI. Workspaces will update CyCriteriaset
+	 * objects as well as panel display and selection accordingly.
 	 * 
 	 * @param setname
 	 */
-	public static void updateWorkspaces(String setname){
+	public static void updateWorkspaces(String setname) {
 		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("name", setname);
+		args.put(ARG_SETNAME, setname);
 		try {
-			CyCommandManager.execute("workspaces", "update criteriasets", args);
+			CyCommandManager.execute(WORKSPACES, UPDATE_CRITERIASETS, args);
 		} catch (CyCommandException cce) {
 			// TODO Auto-generated catch block
 			cce.printStackTrace();

@@ -24,6 +24,7 @@ import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
+import java.util.Set;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -39,7 +40,9 @@ import javax.swing.border.TitledBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
+import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
+import cytoscape.CytoscapeInit;
 import cytoscape.data.CyAttributes;
 import cytoscape.view.CytoscapeDesktop;
 
@@ -50,22 +53,25 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 	// private BooleanScanner scan = null; // Not currently used
 	private AttributeManager attributeManager;
 	// private ColorMapper colorMapper;
-	private CriteriaTablePanel ctPanel;
+	public CriteriaTablePanel ctPanel;
 	// private CriteriaCalculator calculate = new CriteriaCalculator(); // Not
 	// currently
 	// used
 
-	private String setName = null;
+	public String setName = null;
 
-	private JButton applySet;
-	private JButton saveSet;
+	public JButton applySet;
+	public JButton saveSet;
 	private JButton closeAll;
-	private JButton deleteSet;
-	private JButton duplicateSet;
+	public JButton deleteSet;
+	public JButton duplicateSet;
 	private JPanel mainPanel;
-	private JPanel tablePanel;
+	public JPanel tablePanel;
 	private JPanel setPanel;
-	private JPanel controlPanel;
+	public JPanel controlPanel;
+	
+	public JComboBox nameBox;
+	private String[] nameBoxArray;
 
 	private boolean deletedFlag = false;
 	private boolean dupFlag = false;
@@ -98,8 +104,8 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
 		setPanel = getCriteriaSetPanel();
-		setPanel.setMaximumSize(new Dimension(Cytoscape.getDesktop()
-				.getWidth(), 150));
+		setPanel.setMaximumSize(new Dimension(
+				Cytoscape.getDesktop().getWidth(), 150));
 
 		tablePanel = ctPanel.getTablePanel();
 
@@ -139,8 +145,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 	public JPanel getCriteriaSetPanel() {
 		// JPanel setPanel = new JPanel(new BorderLayout(0, 2));
 
-		nameBoxArray = attributeManager.getNamesAttribute(Cytoscape
-				.getCurrentNetwork());
+		nameBoxArray = attributeManager.getNamesAttributeForMenu();
 
 		JPanel setPanel = new JPanel();
 		BoxLayout box = new BoxLayout(setPanel, BoxLayout.Y_AXIS);
@@ -151,7 +156,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 		JPanel namePanel = new JPanel(new BorderLayout(0, 2));
 		JLabel setLabel = new JLabel("Name");
-		// System.out.println(Cytoscape.getCurrentNetwork().getIdentifier());
+
 		nameBox = new JComboBox(nameBoxArray);
 		nameBox.setEditable((nameBoxArray.length == 1) ? true : false);
 		nameBox.setPreferredSize(new Dimension(240, 20));
@@ -210,10 +215,10 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 	public void actionPerformed(ActionEvent e) {
 
-		if (null == e){ //e.g., when called by CyCommands
+		if (null == e) { // e.g., when called by CyCommands
 			return;
 		}
-		
+
 		String command = e.getActionCommand();
 
 		if (command.equals("nameBoxChanged")) {
@@ -227,8 +232,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 			// check to see if new set name already exists
 			boolean setExists = false;
-			nameBoxArray = attributeManager.getNamesAttribute(Cytoscape
-					.getCurrentNetwork());
+			nameBoxArray = attributeManager.getNamesAttributeForMenu();
 			for (int i = 0; i < nameBoxArray.length; i++) {
 				if (nameBoxArray[i].equals(setName)) {
 					setExists = true;
@@ -271,8 +275,6 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 				loadSettings(setName);
 			} else { // User has typed a new set name
 				// Add new set name and open table
-				// attributeManager.addNamesAttribute(Cytoscape
-				// .getCurrentNetwork(), setName);
 				nameBox.addItem(setName);
 				ctPanel.setName = setName;
 				ctPanel.clearTable();
@@ -288,8 +290,9 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			nameBox.setEditable(false);
 			pack();
 		} else if (command.equals("applySet")) {
+			ctPanel.calcNodeAttributes();
 			ctPanel.applyCriteria();
-//			CriteriaCommandHandler.updateWorkspaces(setName);
+			// CriteriaCommandHandler.updateWorkspaces(setName);
 		} else if (command.equals("saveSet")) {
 			// User is saving Set while editing an existing Set
 			setName = (String) nameBox.getSelectedItem();
@@ -307,8 +310,12 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 					"", JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 			if (n == 1) { // YES
-				attributeManager.removeNamesAttribute(Cytoscape
-						.getCurrentNetwork(), setName);
+				Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
+				for (CyNetwork network : allNetworks) {
+					attributeManager.removeNamesAttribute(network, setName);
+				}
+				// also remove from cytoprefs
+				attributeManager.removeNamesAttribute(null, setName);
 				deletedFlag = true; // to avoid autosave via nameBoxChanged
 				nameBox.removeItem(setName);
 				ctPanel.clearTable();
@@ -358,8 +365,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			return; // skip saving "New..." or already saved
 		}
 
-		attributeManager.addNamesAttribute(Cytoscape.getCurrentNetwork(), sn);
-
+		// prepare parameters
 		String[] criteriaLabels = new String[ctPanel.getDataLength()];
 
 		for (int k = 0; k < criteriaLabels.length; k++) {
@@ -367,27 +373,33 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 					+ ctPanel.getCell(k, ctPanel.LABEL_COL) + ":"
 					+ ctPanel.getCell(k, ctPanel.COLOR_COL);
 			System.out.println("SAVE SETTINGS: " + sn + "  " + temp);
-			if (!temp.equals(null)) {
+			if (!temp.equals(null))
 				criteriaLabels[k] = temp;
-			}
-			// attributeManager.setColorAttribute(label, color, nodeID);
-			// System.out.println(criteriaLabels.length+"AAA"+temp);
+
 		}
-		attributeManager.setValuesAttribute(sn, ctPanel.mapToPick, criteriaLabels);
+
+		// write to cytoprefs and tag networks
+		attributeManager.setNameAttribute(sn);
+		attributeManager.setValuesAttribute(sn, ctPanel.mapToPick,
+				criteriaLabels);
+
+		// calculate and apply to networks
+		ctPanel.calcNodeAttributes();
 		ctPanel.applyCriteria();
+
+		// update workspaces
 		CriteriaCommandHandler.updateWorkspaces(setName);
 		ctPanel.savedFlag = true;
 	}
 
 	public void loadSettings(String setName) {
-		String[] criteria = attributeManager.getValuesAttribute(Cytoscape
-				.getCurrentNetwork(), setName);
+		String[] criteria = attributeManager.getValuesAttribute(setName);
 
 		ctPanel.clearTable();
 		if (criteria.length > 0) {
 			mapTo = criteria[0];
 		}
-		//System.out.println("MAP TO: " + mapTo);
+		// System.out.println("MAP TO: " + mapTo);
 		ctPanel.mapToPick = mapTo;
 
 		for (int i = 1; i < criteria.length; i++) {
@@ -401,6 +413,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			ctPanel.populateList(temp[0], temp[1], Color.decode(temp[2]));
 
 		}
+		ctPanel.calcNodeAttributes();
 		ctPanel.applyCriteria();
 		CriteriaCommandHandler.updateWorkspaces(setName);
 		ctPanel.savedFlag = true;
@@ -425,8 +438,6 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 		}
 	}
 
-	private JComboBox nameBox;
-	private String[] nameBoxArray;
 
 	public String[] getAllAttributes(ArrayList<String> attributeList) {
 		// Create the list by combining node and edge attributes into a single

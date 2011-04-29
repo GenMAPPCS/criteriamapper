@@ -25,10 +25,14 @@ package org.genmapp.criteriamapper;
 import giny.model.Node;
 
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Properties;
+import java.util.Set;
 
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
+import cytoscape.CytoscapeInit;
 import cytoscape.data.CyAttributes;
 
 public class AttributeManager {
@@ -36,8 +40,6 @@ public class AttributeManager {
 	private static CyAttributes nodeAttributes;
 	// private SortedSet<String> criteriaSetNames = null;
 	private List<String> criteriaSetNames = new ArrayList<String>();
-	public static final String NET_ATTR_SETS = "org.genmapp.criteriasets_1.0";
-	public static final String NET_ATTR_SET_PREFIX = "org.genmapp.criteriaset.";
 
 	public AttributeManager() {
 		networkAttributes = Cytoscape.getNetworkAttributes();
@@ -47,66 +49,84 @@ public class AttributeManager {
 		getAllAttributes();
 	}
 
-	/*
-	 * The names attribute refers to a list of 'Criteria Set names'. A 'Criteria
-	 * Set Name' is a name which identifies a session that can be saved when
-	 * creating criteria using the criteria builder.
-	 */
-	public void addNamesAttribute(CyNetwork network, String setName) {
-		networkAttributes = Cytoscape.getNetworkAttributes();
-		if (networkAttributes.hasAttribute(network.getIdentifier(), NET_ATTR_SETS)) {
-			criteriaSetNames = (ArrayList<String>) networkAttributes
-					.getListAttribute(network.getIdentifier(), NET_ATTR_SETS);
-		} else {
-			criteriaSetNames.add(setName);
-		}
-
-		if (!(criteriaSetNames.contains(setName))) {
-			criteriaSetNames.add(setName);
-		}
-
-		networkAttributes.setListAttribute(network.getIdentifier(), NET_ATTR_SETS,
-				criteriaSetNames);
-	}
-
-	public String[] getNamesAttribute(CyNetwork network) {
-		if (networkAttributes.hasAttribute(network.getIdentifier(), NET_ATTR_SETS)) {
-			String[] a = {""};
-			List<String> temp = (ArrayList<String>) networkAttributes
-					.getListAttribute(network.getIdentifier(), NET_ATTR_SETS);
-			List<String> full = new ArrayList<String>();
-			full.add("New...");
-			for (String s : temp) {
+	public String[] getNamesAttributeForMenu() {
+		String[] a = {};
+		List<String> full = new ArrayList<String>();
+		full.add("New...");
+		String setList = CytoscapeInit.getProperties().getProperty(
+				CriteriaCommandHandler.NET_ATTR_SETS);
+		if (null != setList) {
+			// trim leading and trailing brackets
+			setList = setList.substring(1, setList.length() - 1);
+			a = setList.split("\\]\\[");
+			for (String s : a) {
 				full.add(s);
 			}
-			return full.toArray(a);
-		} else {
-
-			return new String[]{"New..."};
 		}
+		return full.toArray(a);
 	}
 
 	public void removeNamesAttribute(CyNetwork network, String setName) {
-		criteriaSetNames = (ArrayList<String>) networkAttributes
-				.getListAttribute(network.getIdentifier(), NET_ATTR_SETS);
-		criteriaSetNames.remove(setName);
-		if (criteriaSetNames.size() == 0) { // removed last set
-			networkAttributes.deleteAttribute(NET_ATTR_SETS);
+		if (null == network) {
+			// remove from cytoprefs
+			String setList = CytoscapeInit.getProperties().getProperty(
+					CriteriaCommandHandler.NET_ATTR_SETS);
+			if (null != setList) {
+				// trim leading and trailing brackets
+				setList = setList.replace("[" + setName + "]", "");
+				if (setList.length() > 1)
+					CytoscapeInit.getProperties().setProperty(
+							CriteriaCommandHandler.NET_ATTR_SETS, setList);
+				else
+					CytoscapeInit.getProperties().remove(
+							CriteriaCommandHandler.NET_ATTR_SETS);
+			}
+
+			CytoscapeInit.getProperties().remove(
+					CriteriaCommandHandler.NET_ATTR_SET_PREFIX + setName);
+
 		} else {
-			networkAttributes.setListAttribute(network.getIdentifier(),
-					NET_ATTR_SETS, criteriaSetNames);
+			// remove from networks
+			criteriaSetNames = (ArrayList<String>) networkAttributes
+					.getListAttribute(network.getIdentifier(),
+							CriteriaCommandHandler.NET_ATTR_SETS);
+			criteriaSetNames.remove(setName);
+			if (criteriaSetNames.size() == 0) { // removed last set
+				networkAttributes
+						.deleteAttribute(CriteriaCommandHandler.NET_ATTR_SETS);
+			} else {
+				networkAttributes.setListAttribute(network.getIdentifier(),
+						CriteriaCommandHandler.NET_ATTR_SETS, criteriaSetNames);
+			}
+			networkAttributes
+					.deleteAttribute(CriteriaCommandHandler.NET_ATTR_SET_PREFIX
+							+ setName);
 		}
-		networkAttributes.deleteAttribute(NET_ATTR_SET_PREFIX + setName);
 	}
 
-	public void setNamesAttribute(CyNetwork network, String[] setNames) {
-		networkAttributes = Cytoscape.getNetworkAttributes();
-		List<String> temp = new ArrayList<String>();
-		for (int i = 0; i < setNames.length; i++) {
-			temp.add(setNames[i]);
+	public void setNameAttribute(String sn) {
+		// set cyto prefs
+		String sets = CytoscapeInit.getProperties().getProperty(
+				CriteriaCommandHandler.NET_ATTR_SETS);
+		if (null == sets)
+			sets = new String();
+		if (!sets.contains(sn))
+			sets = sets + "[" + sn + "]";
+		CytoscapeInit.getProperties().setProperty(
+				CriteriaCommandHandler.NET_ATTR_SETS, sets);
+		
+		// set network attrs
+		Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
+		for (CyNetwork network : allNetworks) {
+			List<String> temp = networkAttributes.getListAttribute(network
+					.getIdentifier(), CriteriaCommandHandler.NET_ATTR_SETS);
+			if (null == temp)
+				temp = new ArrayList<String>();
+			if (!temp.contains(sn))
+				temp.add(sn);
+			networkAttributes.setListAttribute(network.getIdentifier(),
+					CriteriaCommandHandler.NET_ATTR_SETS, temp);
 		}
-		networkAttributes.setListAttribute(network.getIdentifier(), NET_ATTR_SETS,
-				temp);
 	}
 
 	/*
@@ -117,14 +137,27 @@ public class AttributeManager {
 	 */
 	public void setValuesAttribute(String setName, String mapTo,
 			String[] criteriaLabelColor) {
-		ArrayList<String> temp = new ArrayList<String>();
-		temp.add(mapTo);
+		String str = new String();
+		ArrayList<String> list = new ArrayList<String>();
+		str = "[" + mapTo + "]";
+		list.add(mapTo);
 		for (int i = 0; i < criteriaLabelColor.length; i++) {
-			temp.add(criteriaLabelColor[i]);
+			str = str + "[" + criteriaLabelColor[i] + "]";
+			list.add(criteriaLabelColor[i]);
 		}
-		networkAttributes = Cytoscape.getNetworkAttributes();
-		networkAttributes.setListAttribute(Cytoscape.getCurrentNetwork()
-				.getIdentifier(), NET_ATTR_SET_PREFIX + setName, temp);
+
+		// update cyto prefs
+		CytoscapeInit.getProperties().setProperty(
+				CriteriaCommandHandler.NET_ATTR_SET_PREFIX + setName, str);
+
+		// then update networks and nodes
+		Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
+		for (CyNetwork network : allNetworks) {
+			// otherwise, just do the network
+			networkAttributes = Cytoscape.getNetworkAttributes();
+			networkAttributes.setListAttribute(network.getIdentifier(),
+					CriteriaCommandHandler.NET_ATTR_SET_PREFIX + setName, list);
+		}
 
 	}
 
@@ -144,14 +177,14 @@ public class AttributeManager {
 	 * the to criteria (i.e., row number) that both true and highest ranking. If
 	 * a node fails all criteria, then the value is set to -1.
 	 */
-	public void setCompositeAttribute(String[] labels) throws Exception {
+	public void setCompositeAttribute(String[] labels)
+			throws Exception {
 		if (labels.length <= 1) {
 			// only a single criteria; skip composition
 			return;
 		}
 
-		CyNetwork network = Cytoscape.getCurrentNetwork();
-		List<Node> nodesList = network.nodesList();
+		List<Node> nodesList = Cytoscape.getCyNodesList();
 		String compositeName = labels[0];
 		for (int k = 1; k < labels.length; k++) {
 			if (labels[k].equals("")) {
@@ -203,15 +236,16 @@ public class AttributeManager {
 		nodeAttributes.deleteAttribute(compositeName);
 	}
 
-	public String[] getValuesAttribute(CyNetwork network, String setName) {
+	public String[] getValuesAttribute(String setName) {
 		String[] a = {};
-		List<String> temp = (List<String>) networkAttributes
-				.getListAttribute(network.getIdentifier(), NET_ATTR_SET_PREFIX + setName);
-		if (temp != null) {
-			return temp.toArray(a);
-		} else {
-			return a;
-		}
+
+		String setParameters = CytoscapeInit.getProperties().getProperty(
+				CriteriaCommandHandler.NET_ATTR_SET_PREFIX + setName);
+		// trim leading and trailing brackets
+		setParameters = setParameters.substring(1, setParameters.length() - 1);
+		a = setParameters.split("\\]\\[");
+		return a;
+
 	}
 
 	public static boolean getColorAttribute(String nodeID, String label) {
