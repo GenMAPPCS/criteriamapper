@@ -11,12 +11,7 @@
   	<property name="src.dir" value="src"/>
 
 	<!--  The directory containing library jar files -->	
-	<property name="cytoroot.dir" value="../cytoscape2.6"/>
-	
-	
-	<property name="release.dir" value="../cytoscape2.6"/>
-
-	<property name="lib.dir" value = "../cytoscape2.6/lib"/>
+	<property name="release.dir" value="/Applications/Cytoscape_v2.8.1"/>
 	
   	<!-- Temporary build directories -->
 
@@ -32,10 +27,6 @@
 	
 	<!-- Classpath with all lib JAR Files and all Cytoscape Core classes -->
 	<path id="classpath">
-		
-		<fileset dir="${lib.dir}">
-			<include name="*.jar"/>
-		</fileset>
 		
 		<!-- include cytoscape.jar, which is it release directory top level -->
 		<fileset dir="${release.dir}">
@@ -65,10 +56,6 @@
 		<delete dir="${dist.dir}"/>
   	</target>
 	
-	<!-- Target to create Cytoscape Jar File  -->
-	<target name="build_cytoscape">
-		<ant antfile="${cytoroot.dir}/cytoscape/build.xml" inheritAll="false" target="jar"/>
-	</target>
 
  <!--       Target to create the javadoc information -->
      <target name="doc" depends="prepare"> 
@@ -97,11 +84,11 @@
         </unjar>
 		-->
    		
-        <!-- copy over images -->
+        <!-- copy over images 
    		<mkdir dir="${build.classes}/org/genmapp/criteriamapper/img"/>
  		<copy todir="${build.classes}/org/genmapp/criteriamapper/img">
  			<fileset dir="${src.dir}/img" />
- 			</copy>
+ 			</copy> -->
 
       <jar destfile="${build.dir}/${plugin.name}.jar">
         <fileset dir="${build.classes}"/>
@@ -109,8 +96,7 @@
    		 
  		<echo message="${plugin.name}.jar is now complete.  It is located in build/ directory"/>
 
-   		<copy file="${build.dir}/${plugin.name}.jar" todir="../cytoscape2.6/plugins/core/"/>
-   		<copy file="${build.dir}/${plugin.name}.jar" todir="/Applications/Cytoscape_v2.6.3/plugins/"/>
+   		<copy file="${build.dir}/${plugin.name}.jar" todir="${release.dir}/plugins/"/>
 	</target>
 
 </project>

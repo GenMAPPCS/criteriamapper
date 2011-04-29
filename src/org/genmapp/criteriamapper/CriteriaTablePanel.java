@@ -32,8 +32,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
@@ -60,14 +59,11 @@ import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
+import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
-import cytoscape.command.CyCommandException;
-import cytoscape.command.CyCommandManager;
 
-public class CriteriaTablePanel
-		implements
-			ActionListener,
-			ListSelectionListener {
+public class CriteriaTablePanel implements ActionListener,
+		ListSelectionListener {
 
 	// external classes
 	private AttributeManager attManager;
@@ -94,6 +90,11 @@ public class CriteriaTablePanel
 	public static String mapToPick = "Node Color"; // fixed
 
 	private CriteriaCalculator calculate = new CriteriaCalculator();
+	private String[] labelsA = new String[0];
+	private ArrayList<String> labels = new ArrayList<String>();
+	private String compositeLabel = "";
+	
+	private Color[] colorsA = new Color[0];
 
 	public CriteriaTablePanel() {
 		dataModel = new BooleanTableModel();
@@ -208,7 +209,7 @@ public class CriteriaTablePanel
 
 		// JCheckBox showBox = new JCheckBox();
 		// showCol.setCellEditor(new DefaultCellEditor(showBox));
-		//showBox.setToolTipText("Click to show/hide criteria as visual style");
+		// showBox.setToolTipText("Click to show/hide criteria as visual style");
 
 		DefaultTableCellRenderer labelRenderer = new DefaultTableCellRenderer();
 		labelRenderer.setToolTipText("Double-click to edit");
@@ -433,73 +434,80 @@ public class CriteriaTablePanel
 	 */
 	public void valueChanged(ListSelectionEvent e) {
 
-		ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+		/*
+		 * Actually, nothing happens here. This was an old behavior no longer
+		 * desired. The composite of criteria are always evalutated, not
+		 * individual criteria.
+		 */
 
-		int firstIndex = e.getFirstIndex();
-		int lastIndex = e.getLastIndex();
-		boolean isAdjusting = e.getValueIsAdjusting();
-
-		if (lsm.isSelectionEmpty() || true) {
-			// System.out.println(" <none>");
-		} else {
-
-			// Find out which indexes are selected.
-			int minIndex = lsm.getMinSelectionIndex();
-			int maxIndex = lsm.getMaxSelectionIndex();
-			int last = -1;
-
-			for (int i = minIndex; i <= maxIndex; i++) {
-				if (lsm.isSelectedIndex(i)) {
-
-					int[] temp = table.getSelectedRows();
-
-					System.out.println("LENGTH: " + temp.length);
-					if (temp.length == 1) {
-						System.out.println("Selected Index: " + i);
-						String colorString = getCell(i, COLOR_COL) + "";
-
-						// if (getCell(i, 0).equals("")) {
-						// return;
-						// }
-						Color c = Color.decode(colorString);
-						mapper.createDiscreteMapping(getCell(i, LABEL_COL)
-								+ "_discrete", (String) getCell(i, LABEL_COL),
-								c, mapToPick);
-					} else {
-						String[] labels = getLabelArray(temp);
-						Color[] colors = getColorArray(temp);
-
-						String compositeLabel = getCompositeLabel(labels);
-						System.out
-								.println("COMPOSITE LABEL: " + compositeLabel);
-						if (labels.length == 1) {
-							mapper.createDiscreteMapping(setName, labels[0],
-									colors[0], mapToPick);
-							break;
-						}
-						if (labels.length == 2
-								&& (labels[0].equals("") || labels[1]
-										.equals(""))) {
-
-						}
-						if (attManager.isCompositeAttribute(compositeLabel)) {
-							attManager.removeCompositeAttribute(compositeLabel);
-						}
-						try {
-							attManager.setCompositeAttribute(labels);
-						} catch (Exception setAttFailure) {
-							//System.out.println("NO"+setAttFailure.getMessage()
-							// +"WAY");
-						}
-						mapper.createCompositeMapping(setName, compositeLabel,
-								colors, mapToPick);
-					}
-
-				}
-
-			}
-
-		}
+		// CyNetwork network = Cytoscape.getCurrentNetwork();
+		// ListSelectionModel lsm = (ListSelectionModel) e.getSource();
+		//
+		// int firstIndex = e.getFirstIndex();
+		// int lastIndex = e.getLastIndex();
+		// boolean isAdjusting = e.getValueIsAdjusting();
+		//
+		// if (lsm.isSelectionEmpty() || true) {
+		// // System.out.println(" <none>");
+		// } else {
+		//
+		// // Find out which indexes are selected.
+		// int minIndex = lsm.getMinSelectionIndex();
+		// int maxIndex = lsm.getMaxSelectionIndex();
+		// int last = -1;
+		//
+		// for (int i = minIndex; i <= maxIndex; i++) {
+		// if (lsm.isSelectedIndex(i)) {
+		//
+		// int[] temp = table.getSelectedRows();
+		//
+		// System.out.println("LENGTH: " + temp.length);
+		// if (temp.length == 1) {
+		// System.out.println("Selected Index: " + i);
+		// String colorString = getCell(i, COLOR_COL) + "";
+		//
+		// // if (getCell(i, 0).equals("")) {
+		// // return;
+		// // }
+		// Color c = Color.decode(colorString);
+		// mapper.createDiscreteMapping(network, getCell(i, LABEL_COL)
+		// + "_discrete", (String) getCell(i, LABEL_COL),
+		// c, mapToPick);
+		// } else {
+		// String[] labels = getLabelArray(temp);
+		// Color[] colors = getColorArray(temp);
+		//
+		// String compositeLabel = getCompositeLabel(labels);
+		// System.out
+		// .println("COMPOSITE LABEL: " + compositeLabel);
+		// if (labels.length == 1) {
+		// mapper.createDiscreteMapping(network, setName, labels[0],
+		// colors[0], mapToPick);
+		// break;
+		// }
+		// if (labels.length == 2
+		// && (labels[0].equals("") || labels[1]
+		// .equals(""))) {
+		//
+		// }
+		// if (attManager.isCompositeAttribute(compositeLabel)) {
+		// attManager.removeCompositeAttribute(compositeLabel);
+		// }
+		// try {
+		// attManager.setCompositeAttribute(labels, network);
+		// } catch (Exception setAttFailure) {
+		// // System.out.println("NO"+setAttFailure.getMessage()
+		// // +"WAY");
+		// }
+		// mapper.createCompositeMapping(network, setName, compositeLabel,
+		// colors, mapToPick);
+		// }
+		//
+		// }
+		//
+		// }
+		//
+		// }
 
 	}
 
@@ -533,11 +541,17 @@ public class CriteriaTablePanel
 		return String.valueOf(buf);
 	}
 
-	public void applyCriteria() {
 
-		ArrayList<String> labels = new ArrayList<String>();
+
+	/**
+	 * Parses attributes for all nodes independent of networks. Sets variables
+	 * used in downstream network visual mapping.
+	 */
+	public void calcNodeAttributes() {
+
+		this.labels = new ArrayList<String>();
 		ArrayList<Color> colors = new ArrayList<Color>();
-		String compositeLabel = "";
+	
 		if (setName.equals("")) {
 			JOptionPane.showMessageDialog(cbDialog, "Must have a set name.");
 			return;
@@ -579,7 +593,7 @@ public class CriteriaTablePanel
 			}
 		}
 
-		String[] labelsA = new String[labels.size()];
+		this.labelsA = new String[labels.size()];
 		for (int h = 0; h < labels.size(); h++) {
 			labelsA[h] = labels.get(h);
 		}
@@ -590,21 +604,33 @@ public class CriteriaTablePanel
 			System.out.println("COMPOSITE FAILED!! " + e.getMessage());
 		}
 
-		Color[] colorsA = new Color[labels.size()];
+		this.colorsA = new Color[labels.size()];
 		for (int g = 0; g < labels.size(); g++) {
 			colorsA[g] = colors.get(g);
 		}
 
+	}
+	
+	public void applyCriteria() {
+		Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
+		for (CyNetwork network : allNetworks) {
+			if (Cytoscape.viewExists(network.getIdentifier()))
+				applyCriteria(network);
+		}
+	}
+
+	public void applyCriteria(CyNetwork network) {
+
 		if (labels.size() == 0) {
-			mapper.clearNetwork();
+			mapper.clearNetwork(network);
 			return;
 		}
 		if (labels.size() == 1) {
-			mapper.createDiscreteMapping(setName, labelsA[0], colorsA[0],
-					mapToPick);
+			mapper.createDiscreteMapping(network, setName, labelsA[0],
+					colorsA[0], mapToPick);
 		} else {
-			mapper.createCompositeMapping(setName, compositeLabel, colorsA,
-					mapToPick);
+			mapper.createCompositeMapping(network, setName, compositeLabel,
+					colorsA, mapToPick);
 		}
 	}
 
@@ -617,7 +643,7 @@ public class CriteriaTablePanel
 		if (col == COLOR_COL) {
 			// java.awt.Color[r=0,g=0,b=255]
 			Color c = Color.decode(value);
-			System.out.println("colors: "+ value+":"+c.toString());
+			System.out.println("colors: " + value + ":" + c.toString());
 			dataModel.setValueAt(c, row, col);
 			// System.out.println("set values");
 			return;
@@ -694,7 +720,8 @@ public class CriteriaTablePanel
 			dataModel.setValueAt(temp1, rowNumber - 1, 1);
 			dataModel.setValueAt(temp2, rowNumber - 1, 2);
 
-			applyCriteria();
+			this.calcNodeAttributes();
+			this.applyCriteria();
 		}
 	}
 
@@ -716,7 +743,8 @@ public class CriteriaTablePanel
 			dataModel.setValueAt(temp1, rowNumber + 1, 1);
 			dataModel.setValueAt(temp2, rowNumber + 1, 2);
 
-			applyCriteria();
+			this.calcNodeAttributes();
+			this.applyCriteria();
 			// initializeTable();
 		}
 	}
@@ -728,7 +756,7 @@ public class CriteriaTablePanel
 		int colCount = 3;
 		// boolean empty = true;
 
-		String[] columnNames = {"Label", "Expression", "Value"};
+		String[] columnNames = { "Label", "Expression", "Value" };
 		Object[][] data = new Object[rowCount][colCount];
 
 		public void addRow() {
@@ -836,7 +864,6 @@ public class CriteriaTablePanel
  * ColorRenderer and ColorEditor are taken almost verbatim from the Java Trail's
  * sun tutorial on using tables at
  * http://java.sun.com/docs/books/tutorial/uiswing/components/table.html
- * 
  */
 
 class ColorRenderer extends JLabel implements TableCellRenderer {
@@ -852,7 +879,7 @@ class ColorRenderer extends JLabel implements TableCellRenderer {
 	public Component getTableCellRendererComponent(JTable table, Object color,
 			boolean isSelected, boolean hasFocus, int row, int column) {
 		setToolTipText("Double-click to pick a color");
-		Color newColor = Color.decode((String)color);
+		Color newColor = Color.decode((String) color);
 		setBackground(newColor);
 		if (isBordered) {
 			if (isSelected) {
@@ -874,10 +901,8 @@ class ColorRenderer extends JLabel implements TableCellRenderer {
 	}
 }
 
-class ColorEditor extends AbstractCellEditor
-		implements
-			TableCellEditor,
-			ActionListener {
+class ColorEditor extends AbstractCellEditor implements TableCellEditor,
+		ActionListener {
 	Color currentColor;
 	JButton button;
 	JColorChooser colorChooser;
@@ -937,10 +962,8 @@ class ColorEditor extends AbstractCellEditor
 
 }
 
-class CriteriaEditor extends AbstractCellEditor
-		implements
-			TableCellEditor,
-			ActionListener {
+class CriteriaEditor extends AbstractCellEditor implements TableCellEditor,
+		ActionListener {
 	JButton button;
 
 	String criteria;

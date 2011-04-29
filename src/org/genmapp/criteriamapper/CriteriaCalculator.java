@@ -281,8 +281,7 @@ public class CriteriaCalculator {
 	
 	public void evaluateLeftToRight(String label){
 
-		CyNetwork network = Cytoscape.getCurrentNetwork();
-		List<Node> nodeList = network.nodesList();
+		List<Node> nodeList = Cytoscape.getCyNodesList();
 		HashMap<String, String> nodeValueMap = new HashMap<String, String>();
 		//createAttributeTypeHash();
 		
@@ -570,9 +569,7 @@ public class CriteriaCalculator {
 		public void createAttributeTypeHash(){
 			
 			ArrayList<String> names = getAllAttributes();
-			
-			CyNetwork network = Cytoscape.getCurrentNetwork();
-			List<Node> nodeList = network.nodesList();
+			List<Node> nodeList = Cytoscape.getCyNodesList();
 			
 			for(int i=0;i<names.size();i++){
 				//System.out.println(names.get(i)+"d");

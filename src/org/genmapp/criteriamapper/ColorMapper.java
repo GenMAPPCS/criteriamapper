@@ -33,15 +33,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
-import cytoscape.command.CyCommandException;
-import cytoscape.command.CyCommandManager;
-import cytoscape.data.CyAttributes;
 import cytoscape.view.CyNetworkView;
-import cytoscape.visual.CalculatorCatalog;
 import cytoscape.visual.EdgeAppearanceCalculator;
 import cytoscape.visual.NodeAppearanceCalculator;
 import cytoscape.visual.VisualMappingManager;
@@ -61,6 +56,7 @@ public class ColorMapper {
 	String attributeLabel;
 	Color color;
 	List<Node> nodes = null;
+
 	// VisualMappingManager manager;
 	// CalculatorCatalog catalog;
 	// VisualStyle vs;
@@ -79,22 +75,24 @@ public class ColorMapper {
 	 * table in the actual GUI. The Colors are in an array parallel to this and
 	 * are subsequently mapped.
 	 */
-	public VisualStyle createCompositeMapping(String vsName,
+	public VisualStyle createCompositeMapping(CyNetwork net, String vsName,
 			String compositeLabel, Color[] colors, String mapTo) {
 		boolean newStyle = false;
 
 		if (!compositeLabel.contains(":")) {
-			return createDiscreteMapping(vsName, compositeLabel, colors[0],
-					mapTo);
+			return createDiscreteMapping(net, vsName, compositeLabel,
+					colors[0], mapTo);
 		}
 
-		network = Cytoscape.getCurrentNetwork();
-		networkView = Cytoscape.getCurrentNetworkView();
+		this.network = net;
+		this.networkView = Cytoscape.getNetworkView(net.getIdentifier());
 
 		VisualStyle vs = networkView.getVisualStyle();
 
 		DiscreteMapping disMapping = new DiscreteMapping(new Color(0),
 				compositeLabel, ObjectMapping.NODE_MAPPING);
+		// DiscreteMapping disMapping = new DiscreteMapping(Color.class,
+		// compositeLabel);
 		disMapping.putMapValue(new Integer(-1), Color.WHITE);
 
 		List<Integer> rowList = new ArrayList<Integer>();
@@ -152,10 +150,11 @@ public class ColorMapper {
 		return vs;
 	}
 
-	public void clearNetwork() {
-		CyNetwork currentNetwork = Cytoscape.getCurrentNetwork();
-		CyNetworkView networkView = Cytoscape.getCurrentNetworkView();
-		List<Node> nodeList = currentNetwork.nodesList();
+	public void clearNetwork(CyNetwork network) {
+
+		CyNetworkView networkView = Cytoscape.getNetworkView(network
+				.getIdentifier());
+		List<Node> nodeList = network.nodesList();
 		for (Node node : nodeList) {
 
 			NodeView nodeView = networkView.getNodeView(node);
@@ -170,16 +169,23 @@ public class ColorMapper {
 	 * This method creates a single discreteMapping taking the label of an
 	 * evaluated criteria and the color it should be mapped to.
 	 */
-	public VisualStyle createDiscreteMapping(String vsName, String label,
-			Color currentColor, String mapTo) {
+	public VisualStyle createDiscreteMapping(CyNetwork net, String vsName,
+			String label, Color currentColor, String mapTo) {
 
-		network = Cytoscape.getCurrentNetwork();
-		networkView = Cytoscape.getCurrentNetworkView();
+		network = net;
+		networkView = Cytoscape.getNetworkView(net.getIdentifier());
 
-		VisualStyle vs = networkView.getVisualStyle();
+		// must set current view to retrieve visual style via vmm
+		Cytoscape.setCurrentNetworkView(networkView.getIdentifier());
+		VisualMappingManager vmm = Cytoscape.getVisualMappingManager();
+		VisualStyle vs = vmm.getNetworkView().getVisualStyle();
+		networkView.setVisualStyle(vs.getName()); // stabilize setting
+		// this is important for wikipathways imports, for some reason...
 
 		DiscreteMapping disMapping = new DiscreteMapping(new Color(0), label,
 				ObjectMapping.NODE_MAPPING);
+		// DiscreteMapping disMapping = new DiscreteMapping(Boolean.class,
+		// label);
 
 		disMapping.putMapValue(Boolean.TRUE, currentColor);
 		disMapping.putMapValue(Boolean.FALSE, Color.WHITE);
@@ -213,16 +219,18 @@ public class ColorMapper {
 	 * This method creates a single discreteMapping of the border color taking
 	 * the label of an evaluated criteria and the color it should be mapped to.
 	 */
-	public VisualStyle createDiscreteBorderMapping(String vsName, String label,
-			Color currentColor) {
+	public VisualStyle createDiscreteBorderMapping(CyNetwork net,
+			String vsName, String label, Color currentColor) {
 
-		network = Cytoscape.getCurrentNetwork();
-		networkView = Cytoscape.getCurrentNetworkView();
+		this.network = net;
+		networkView = Cytoscape.getNetworkView(net.getIdentifier());
 
 		VisualStyle vs = networkView.getVisualStyle();
 
 		DiscreteMapping disMapping = new DiscreteMapping(Color.WHITE, label,
 				ObjectMapping.NODE_MAPPING);
+
+		// DiscreteMapping disMapping = new DiscreteMapping(Color.class, label);
 
 		// disMapping.setControllingAttributeName(label, network, false);
 		// System.out.println("hey "+currentColor);
@@ -272,8 +280,11 @@ public class ColorMapper {
 		// Create the new continuous mapper
 		ContinuousMapping colorMapping = new ContinuousMapping(currentColor,
 				mapping);
-		colorMapping.setControllingAttributeName(label, Cytoscape
-				.getCurrentNetwork(), false);
+		colorMapping.setControllingAttributeName(label, network, false);
+
+		// ContinuousMapping colorMapping = new ContinuousMapping(Color.class,
+		// label);
+
 		colorMapping.setInterpolator(new LinearNumberToColorInterpolator());
 
 		/*
