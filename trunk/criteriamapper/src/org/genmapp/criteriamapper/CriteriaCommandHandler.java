@@ -19,11 +19,10 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.swing.JPanel;
 
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
@@ -55,11 +54,10 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 	public static final String ARG_EXP_LIST = "expressionlist";
 	public static final String ARG_COLOR_LIST = "colorlist";
 	// public static final String ARG_CREATE_FLAG = "createflag";
-	
-	//EXTERNAL
+
+	// EXTERNAL
 	private final static String WORKSPACES = "workspaces";
 	private final static String UPDATE_CRITERIASETS = "update criteriasets";
-	
 
 	public CriteriaMapperDialog settingsDialog;
 	private CriteriaCalculator calculate = new CriteriaCalculator();
@@ -111,7 +109,7 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			} else {
 				setName = null;
 			}
-			
+
 			// Create the dialog
 			if (null == settingsDialog) {
 				settingsDialog = new CriteriaMapperDialog();
@@ -123,14 +121,14 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			// Keep it on top and active?
 			settingsDialog.setAlwaysOnTop(true);
 			// settingsDialog.setModal(false);
-			
+
 			if (null != setName) {
 				settingsDialog.setName = setName;
 				settingsDialog.ctPanel.setName = setName;
 				settingsDialog.ctPanel.clearTable();
 				settingsDialog.loadSettings(setName);
 				settingsDialog.nameBox.setSelectedItem(setName);
-				
+
 				settingsDialog.tablePanel.setVisible(true);
 				settingsDialog.controlPanel.setVisible(true);
 				settingsDialog.applySet.setEnabled(true);
@@ -146,7 +144,8 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 
 		} else if (command.equals(LIST_SETS)) {
 			List<String> sets = new ArrayList<String>();
-			String setString = CytoscapeInit.getProperties().getProperty(NET_ATTR_SETS);
+			String setString = CytoscapeInit.getProperties().getProperty(
+					NET_ATTR_SETS);
 			setString = setString.substring(1, setString.length() - 1);
 			String[] setArray = setString.split("\\]\\[");
 			sets = Arrays.asList(setArray);
@@ -164,7 +163,8 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 				setName = null;
 			}
 			List<String> criteria = new ArrayList<String>();
-			String criteriaStr = CytoscapeInit.getProperties().getProperty(NET_ATTR_SET_PREFIX+setName);
+			String criteriaStr = CytoscapeInit.getProperties().getProperty(
+					NET_ATTR_SET_PREFIX + setName);
 			criteriaStr = criteriaStr.substring(1, criteriaStr.length() - 1);
 			String[] criteriaArray = criteriaStr.split("\\]\\[");
 			criteria = Arrays.asList(criteriaArray);
@@ -273,24 +273,30 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			if (null == setList) {
 				setList = new ArrayList<String>();
 			}
-			if (!setList.contains(setName) && !setName.equals("")) {
-				// then, add set name
-				setList.add(setName);
+			if (!setName.equals("")) {
+				if (!setList.contains(setName)) {
+					// then, add set name
+					setList.add(setName);
+					
+					// and construct criteria list
+					ArrayList<String> critList = new ArrayList<String>();
+					critList.add(mapTo);
+					for (int k = 0; k < labels.size(); k++) {
+						critList.add(expressions.get(k) + ":" + labels.get(k) + ":"
+								+ CriteriaTablePanel.colorToString(colors.get(k)));
+					}
+					System.out.println("CREATE SETTINGS: " + critList);
+					na.setListAttribute(network.getIdentifier(),
+							CriteriaCommandHandler.NET_ATTR_SET_PREFIX + setName,
+							critList);
+				}
+				// position set name in front to indicate latest mapping
+				// choice
+				java.util.Collections
+						.swap(setList, 0, setList.indexOf(setName));
+
 				na.setListAttribute(network.getIdentifier(),
 						CriteriaCommandHandler.NET_ATTR_SETS, setList);
-
-				// and construct criteria list
-				ArrayList<String> critList = new ArrayList<String>();
-				critList.add(mapTo);
-				for (int k = 0; k < labels.size(); k++) {
-					critList.add(expressions.get(k) + ":" + labels.get(k) + ":"
-							+ CriteriaTablePanel.colorToString(colors.get(k)));
-				}
-				System.out.println("CREATE SETTINGS: " + critList);
-				na.setListAttribute(network.getIdentifier(),
-						CriteriaCommandHandler.NET_ATTR_SET_PREFIX + setName,
-						critList);
-
 			}
 
 			// Now, calculate and apply
