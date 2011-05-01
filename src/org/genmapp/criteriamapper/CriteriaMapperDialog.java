@@ -414,7 +414,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 		}
 		ctPanel.calcNodeAttributes();
-		//ctPanel.applyCriteria();
+		//ctPanel.applyCriteria(Cytoscape.getCurrentNetwork());
 		CriteriaCommandHandler.updateWorkspaces(setName);
 		ctPanel.savedFlag = true;
 	}

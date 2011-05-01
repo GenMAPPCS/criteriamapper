@@ -19,7 +19,6 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +30,6 @@ import cytoscape.command.AbstractCommandHandler;
 import cytoscape.command.CyCommandException;
 import cytoscape.command.CyCommandManager;
 import cytoscape.command.CyCommandResult;
-import cytoscape.data.CyAttributes;
 import cytoscape.layout.Tunable;
 
 public class CriteriaCommandHandler extends AbstractCommandHandler {
@@ -258,7 +256,7 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 				// parse at comma delimiters
 				String[] list = ((String) cl).split(",");
 				for (String colorString : list) {
-					colors.add(Color.decode(colorString));
+					colors.add(Color.decode(colorString.trim()));
 				}
 			} else
 				throw new CyCommandException("unknown type for color list");
@@ -268,13 +266,13 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			 */
 
 //			 //First, check if it already exists
-			CyAttributes na = Cytoscape.getNetworkAttributes();
+//			CyAttributes na = Cytoscape.getNetworkAttributes();
 //			List<String> setList = na.getListAttribute(network.getIdentifier(),
 //					CriteriaCommandHandler.PROPERTY_SETS);
 //			if (null == setList) {
 //				setList = new ArrayList<String>();
 //			}
-			if (!setName.equals("")) {
+//			if (!setName.equals("")) {
 //				if (!setList.contains(setName)) {
 //					// then, add set name
 //					setList.add(setName);
@@ -299,7 +297,7 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 //				na.setAttribute(network.getIdentifier(),
 //						CriteriaCommandHandler.NET_ATTR_APPLIED_SET, setName);
 				
-			}
+//			}
 
 			// Now, calculate and apply
 			String compositeLabel = "";

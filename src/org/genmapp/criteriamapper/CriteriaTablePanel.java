@@ -440,75 +440,6 @@ public class CriteriaTablePanel implements ActionListener,
 		 * individual criteria.
 		 */
 
-		// CyNetwork network = Cytoscape.getCurrentNetwork();
-		// ListSelectionModel lsm = (ListSelectionModel) e.getSource();
-		//
-		// int firstIndex = e.getFirstIndex();
-		// int lastIndex = e.getLastIndex();
-		// boolean isAdjusting = e.getValueIsAdjusting();
-		//
-		// if (lsm.isSelectionEmpty() || true) {
-		// // System.out.println(" <none>");
-		// } else {
-		//
-		// // Find out which indexes are selected.
-		// int minIndex = lsm.getMinSelectionIndex();
-		// int maxIndex = lsm.getMaxSelectionIndex();
-		// int last = -1;
-		//
-		// for (int i = minIndex; i <= maxIndex; i++) {
-		// if (lsm.isSelectedIndex(i)) {
-		//
-		// int[] temp = table.getSelectedRows();
-		//
-		// System.out.println("LENGTH: " + temp.length);
-		// if (temp.length == 1) {
-		// System.out.println("Selected Index: " + i);
-		// String colorString = getCell(i, COLOR_COL) + "";
-		//
-		// // if (getCell(i, 0).equals("")) {
-		// // return;
-		// // }
-		// Color c = Color.decode(colorString);
-		// mapper.createDiscreteMapping(network, getCell(i, LABEL_COL)
-		// + "_discrete", (String) getCell(i, LABEL_COL),
-		// c, mapToPick);
-		// } else {
-		// String[] labels = getLabelArray(temp);
-		// Color[] colors = getColorArray(temp);
-		//
-		// String compositeLabel = getCompositeLabel(labels);
-		// System.out
-		// .println("COMPOSITE LABEL: " + compositeLabel);
-		// if (labels.length == 1) {
-		// mapper.createDiscreteMapping(network, setName, labels[0],
-		// colors[0], mapToPick);
-		// break;
-		// }
-		// if (labels.length == 2
-		// && (labels[0].equals("") || labels[1]
-		// .equals(""))) {
-		//
-		// }
-		// if (attManager.isCompositeAttribute(compositeLabel)) {
-		// attManager.removeCompositeAttribute(compositeLabel);
-		// }
-		// try {
-		// attManager.setCompositeAttribute(labels, network);
-		// } catch (Exception setAttFailure) {
-		// // System.out.println("NO"+setAttFailure.getMessage()
-		// // +"WAY");
-		// }
-		// mapper.createCompositeMapping(network, setName, compositeLabel,
-		// colors, mapToPick);
-		// }
-		//
-		// }
-		//
-		// }
-		//
-		// }
-
 	}
 
 	public static String colorToString(Color c) {
@@ -721,7 +652,7 @@ public class CriteriaTablePanel implements ActionListener,
 			dataModel.setValueAt(temp2, rowNumber - 1, 2);
 
 			this.calcNodeAttributes();
-			this.applyCriteria();
+			this.applyCriteria(Cytoscape.getCurrentNetwork());
 		}
 	}
 
@@ -744,7 +675,7 @@ public class CriteriaTablePanel implements ActionListener,
 			dataModel.setValueAt(temp2, rowNumber + 1, 2);
 
 			this.calcNodeAttributes();
-			this.applyCriteria();
+			this.applyCriteria(Cytoscape.getCurrentNetwork());
 			// initializeTable();
 		}
 	}
