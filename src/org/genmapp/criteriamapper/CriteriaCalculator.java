@@ -66,7 +66,7 @@ public class CriteriaCalculator {
 		int i;
 		double tmp;
 		String variable;
-		System.out.println("SCANNER: "+ a);
+		System.out.println("Evaluate: "+ a);
 		while((i = st.nextToken()) != StreamTokenizer.TT_EOF ){
 			switch(i) {
 			
