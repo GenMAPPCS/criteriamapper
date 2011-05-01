@@ -54,7 +54,7 @@ public class AttributeManager {
 		List<String> full = new ArrayList<String>();
 		full.add("New...");
 		String setList = CytoscapeInit.getProperties().getProperty(
-				CriteriaCommandHandler.NET_ATTR_SETS);
+				CriteriaCommandHandler.PROPERTY_SETS);
 		if (null != setList) {
 			// trim leading and trailing brackets
 			setList = setList.substring(1, setList.length() - 1);
@@ -70,63 +70,68 @@ public class AttributeManager {
 		if (null == network) {
 			// remove from cytoprefs
 			String setList = CytoscapeInit.getProperties().getProperty(
-					CriteriaCommandHandler.NET_ATTR_SETS);
+					CriteriaCommandHandler.PROPERTY_SETS);
 			if (null != setList) {
 				// trim leading and trailing brackets
 				setList = setList.replace("[" + setName + "]", "");
 				if (setList.length() > 1)
 					CytoscapeInit.getProperties().setProperty(
-							CriteriaCommandHandler.NET_ATTR_SETS, setList);
+							CriteriaCommandHandler.PROPERTY_SETS, setList);
 				else
 					CytoscapeInit.getProperties().remove(
-							CriteriaCommandHandler.NET_ATTR_SETS);
+							CriteriaCommandHandler.PROPERTY_SETS);
 			}
 
 			CytoscapeInit.getProperties().remove(
-					CriteriaCommandHandler.NET_ATTR_SET_PREFIX + setName);
+					CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName);
 
 		} else {
 			// remove from networks
-			criteriaSetNames = (ArrayList<String>) networkAttributes
-					.getListAttribute(network.getIdentifier(),
-							CriteriaCommandHandler.NET_ATTR_SETS);
-			criteriaSetNames.remove(setName);
-			if (criteriaSetNames.size() == 0) { // removed last set
-				networkAttributes
-						.deleteAttribute(CriteriaCommandHandler.NET_ATTR_SETS);
-			} else {
-				networkAttributes.setListAttribute(network.getIdentifier(),
-						CriteriaCommandHandler.NET_ATTR_SETS, criteriaSetNames);
-			}
-			networkAttributes
-					.deleteAttribute(CriteriaCommandHandler.NET_ATTR_SET_PREFIX
-							+ setName);
+//			networkAttributes
+//					.deleteAttribute(CriteriaCommandHandler.NET_ATTR_APPLIED_SET);
+			// criteriaSetNames = (ArrayList<String>) networkAttributes
+			// .getListAttribute(network.getIdentifier(),
+			// CriteriaCommandHandler.PROPERTY_SETS);
+			// criteriaSetNames.remove(setName);
+			// if (criteriaSetNames.size() == 0) { // removed last set
+			// networkAttributes
+			// .deleteAttribute(CriteriaCommandHandler.PROPERTY_SETS);
+			// } else {
+			// networkAttributes.setListAttribute(network.getIdentifier(),
+			// CriteriaCommandHandler.PROPERTY_SETS, criteriaSetNames);
+			// }
+			// networkAttributes
+			// .deleteAttribute(CriteriaCommandHandler.PROPERTY_SET_PREFIX
+			// + setName);
 		}
 	}
 
 	public void setNameAttribute(String sn) {
 		// set cyto prefs
 		String sets = CytoscapeInit.getProperties().getProperty(
-				CriteriaCommandHandler.NET_ATTR_SETS);
+				CriteriaCommandHandler.PROPERTY_SETS);
 		if (null == sets)
 			sets = new String();
 		if (!sets.contains(sn))
 			sets = sets + "[" + sn + "]";
 		CytoscapeInit.getProperties().setProperty(
-				CriteriaCommandHandler.NET_ATTR_SETS, sets);
-		
-		// set network attrs
-		Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
-		for (CyNetwork network : allNetworks) {
-			List<String> temp = networkAttributes.getListAttribute(network
-					.getIdentifier(), CriteriaCommandHandler.NET_ATTR_SETS);
-			if (null == temp)
-				temp = new ArrayList<String>();
-			if (!temp.contains(sn))
-				temp.add(sn);
-			networkAttributes.setListAttribute(network.getIdentifier(),
-					CriteriaCommandHandler.NET_ATTR_SETS, temp);
-		}
+				CriteriaCommandHandler.PROPERTY_SETS, sets);
+
+		// set network attr
+//		networkAttributes.setAttribute(Cytoscape.getCurrentNetwork()
+//				.getIdentifier(), CriteriaCommandHandler.NET_ATTR_APPLIED_SET,
+//				sn);
+//		Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
+//		for (CyNetwork network : allNetworks) {
+//			List<String> temp = networkAttributes.getListAttribute(network
+//					.getIdentifier(), CriteriaCommandHandler.PROPERTY_SETS);
+//			if (null == temp)
+//				temp = new ArrayList<String>();
+//			if (!temp.contains(sn))
+//				temp.add(sn);
+//			networkAttributes.setListAttribute(network.getIdentifier(),
+//					CriteriaCommandHandler.PROPERTY_SETS, temp);
+//		}
 	}
 
 	/*
@@ -148,16 +153,21 @@ public class AttributeManager {
 
 		// update cyto prefs
 		CytoscapeInit.getProperties().setProperty(
-				CriteriaCommandHandler.NET_ATTR_SET_PREFIX + setName, str);
+				CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName, str);
 
-		// then update networks and nodes
-		Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
-		for (CyNetwork network : allNetworks) {
-			// otherwise, just do the network
-			networkAttributes = Cytoscape.getNetworkAttributes();
-			networkAttributes.setListAttribute(network.getIdentifier(),
-					CriteriaCommandHandler.NET_ATTR_SET_PREFIX + setName, list);
-		}
+//		// then update networks and nodes
+//		Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
+//		for (CyNetwork network : allNetworks) {
+//			// otherwise, just do the network
+//			networkAttributes = Cytoscape.getNetworkAttributes();
+//			List<String> cset = networkAttributes.getListAttribute(network
+//					.getIdentifier(), CriteriaCommandHandler.PROPERTY_SETS);
+//			cset.add(setName);
+//			networkAttributes.setListAttribute(network.getIdentifier(),
+//					CriteriaCommandHandler.PROPERTY_SETS, cset);
+//			networkAttributes.setListAttribute(network.getIdentifier(),
+//					CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName, list);
+//		}
 
 	}
 
@@ -177,8 +187,7 @@ public class AttributeManager {
 	 * the to criteria (i.e., row number) that both true and highest ranking. If
 	 * a node fails all criteria, then the value is set to -1.
 	 */
-	public void setCompositeAttribute(String[] labels)
-			throws Exception {
+	public void setCompositeAttribute(String[] labels) throws Exception {
 		if (labels.length <= 1) {
 			// only a single criteria; skip composition
 			return;
@@ -240,7 +249,7 @@ public class AttributeManager {
 		String[] a = {};
 
 		String setParameters = CytoscapeInit.getProperties().getProperty(
-				CriteriaCommandHandler.NET_ATTR_SET_PREFIX + setName);
+				CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName);
 		// trim leading and trailing brackets
 		setParameters = setParameters.substring(1, setParameters.length() - 1);
 		a = setParameters.split("\\]\\[");

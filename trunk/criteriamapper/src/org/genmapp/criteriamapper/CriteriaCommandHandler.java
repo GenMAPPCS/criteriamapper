@@ -37,8 +37,9 @@ import cytoscape.layout.Tunable;
 public class CriteriaCommandHandler extends AbstractCommandHandler {
 
 	public final static String NAMESPACE = "criteriamapper";
-	public final static String NET_ATTR_SETS = "org.genmapp.criteriasets_1.0";
-	public final static String NET_ATTR_SET_PREFIX = "org.genmapp.criteriaset.";
+	public final static String PROPERTY_SETS = "org.genmapp.criteriasets_1.0";
+	public final static String PROPERTY_SET_PREFIX = "org.genmapp.criteriaset.";
+//	public final static String NET_ATTR_APPLIED_SET = "org.genmapp.criteriaset";
 
 	// Commands and associated args
 	public static final String OPEN_CRITERIA_MAPPER = "open dialog";
@@ -145,7 +146,7 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 		} else if (command.equals(LIST_SETS)) {
 			List<String> sets = new ArrayList<String>();
 			String setString = CytoscapeInit.getProperties().getProperty(
-					NET_ATTR_SETS);
+					PROPERTY_SETS);
 			setString = setString.substring(1, setString.length() - 1);
 			String[] setArray = setString.split("\\]\\[");
 			sets = Arrays.asList(setArray);
@@ -164,7 +165,7 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			}
 			List<String> criteria = new ArrayList<String>();
 			String criteriaStr = CytoscapeInit.getProperties().getProperty(
-					NET_ATTR_SET_PREFIX + setName);
+					PROPERTY_SET_PREFIX + setName);
 			criteriaStr = criteriaStr.substring(1, criteriaStr.length() - 1);
 			String[] criteriaArray = criteriaStr.split("\\]\\[");
 			criteria = Arrays.asList(criteriaArray);
@@ -266,37 +267,38 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			 * Proceed to create/apply criteria set
 			 */
 
-			// First, check if it already exists
+//			 //First, check if it already exists
 			CyAttributes na = Cytoscape.getNetworkAttributes();
-			List<String> setList = na.getListAttribute(network.getIdentifier(),
-					CriteriaCommandHandler.NET_ATTR_SETS);
-			if (null == setList) {
-				setList = new ArrayList<String>();
-			}
+//			List<String> setList = na.getListAttribute(network.getIdentifier(),
+//					CriteriaCommandHandler.PROPERTY_SETS);
+//			if (null == setList) {
+//				setList = new ArrayList<String>();
+//			}
 			if (!setName.equals("")) {
-				if (!setList.contains(setName)) {
-					// then, add set name
-					setList.add(setName);
-					
-					// and construct criteria list
-					ArrayList<String> critList = new ArrayList<String>();
-					critList.add(mapTo);
-					for (int k = 0; k < labels.size(); k++) {
-						critList.add(expressions.get(k) + ":" + labels.get(k) + ":"
-								+ CriteriaTablePanel.colorToString(colors.get(k)));
-					}
-					System.out.println("CREATE SETTINGS: " + critList);
-					na.setListAttribute(network.getIdentifier(),
-							CriteriaCommandHandler.NET_ATTR_SET_PREFIX + setName,
-							critList);
-				}
+//				if (!setList.contains(setName)) {
+//					// then, add set name
+//					setList.add(setName);
+//					
+//					// and construct criteria list
+//					ArrayList<String> critList = new ArrayList<String>();
+//					critList.add(mapTo);
+//					for (int k = 0; k < labels.size(); k++) {
+//						critList.add(expressions.get(k) + ":" + labels.get(k) + ":"
+//								+ CriteriaTablePanel.colorToString(colors.get(k)));
+//					}
+//					System.out.println("CREATE SETTINGS: " + critList);
+//					na.setListAttribute(network.getIdentifier(),
+//							CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName,
+//							critList);
+//				}
 				// position set name in front to indicate latest mapping
 				// choice
-				java.util.Collections
-						.swap(setList, 0, setList.indexOf(setName));
+//				java.util.Collections
+//						.swap(setList, 0, setList.indexOf(setName));
 
-				na.setListAttribute(network.getIdentifier(),
-						CriteriaCommandHandler.NET_ATTR_SETS, setList);
+//				na.setAttribute(network.getIdentifier(),
+//						CriteriaCommandHandler.NET_ATTR_APPLIED_SET, setName);
+				
 			}
 
 			// Now, calculate and apply

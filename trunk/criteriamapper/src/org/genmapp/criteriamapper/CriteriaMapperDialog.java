@@ -291,7 +291,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			pack();
 		} else if (command.equals("applySet")) {
 			ctPanel.calcNodeAttributes();
-			ctPanel.applyCriteria();
+			ctPanel.applyCriteria(Cytoscape.getCurrentNetwork());
 			// CriteriaCommandHandler.updateWorkspaces(setName);
 		} else if (command.equals("saveSet")) {
 			// User is saving Set while editing an existing Set
@@ -378,14 +378,14 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 		}
 
-		// write to cytoprefs and tag networks
+		// write to cytoprefs 
 		attributeManager.setNameAttribute(sn);
 		attributeManager.setValuesAttribute(sn, ctPanel.mapToPick,
 				criteriaLabels);
 
 		// calculate and apply to networks
 		ctPanel.calcNodeAttributes();
-		ctPanel.applyCriteria();
+		ctPanel.applyCriteria(Cytoscape.getCurrentNetwork());
 
 		// update workspaces
 		CriteriaCommandHandler.updateWorkspaces(setName);
@@ -414,7 +414,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 		}
 		ctPanel.calcNodeAttributes();
-		ctPanel.applyCriteria();
+		//ctPanel.applyCriteria();
 		CriteriaCommandHandler.updateWorkspaces(setName);
 		ctPanel.savedFlag = true;
 	}
