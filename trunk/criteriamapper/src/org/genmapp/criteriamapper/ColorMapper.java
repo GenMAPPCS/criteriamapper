@@ -88,13 +88,13 @@ public class ColorMapper {
 		 * Get clone of current visual style and append setName
 		 */
 		VisualStyle vs;
-		vs = (VisualStyle) vmm.getVisualStyle();
+		vs = (VisualStyle) networkView.getVisualStyle();
 		String[] baseName = vs.getName().split("__");
 		String newVsName = baseName[0] + "__" + vsName;
 		vs = catalog.getVisualStyle(newVsName);
 		if (null == vs) {
 			try {
-				vs = (VisualStyle) vmm.getVisualStyle().clone();
+				vs = (VisualStyle) networkView.getVisualStyle().clone();
 			} catch (CloneNotSupportedException e) {
 				vs = new VisualStyle(newVsName);
 			}
@@ -154,6 +154,7 @@ public class ColorMapper {
 		// Set the visual style
 		vmm.setVisualStyle(vs);
 		vmm.applyAppearances();
+		networkView.setVisualStyle(newVsName);
 
 		networkView.redrawGraph(true, true);
 
@@ -193,13 +194,13 @@ public class ColorMapper {
 		 * Get clone of current visual style and append setName
 		 */
 		VisualStyle vs;
-		vs = (VisualStyle) vmm.getVisualStyle();
+		vs = (VisualStyle) networkView.getVisualStyle();
 		String[] baseName = vs.getName().split("__");
 		String newVsName = baseName[0] + "__" + vsName;
 		vs = catalog.getVisualStyle(newVsName);
 		if (null == vs) {
 			try {
-				vs = (VisualStyle) vmm.getVisualStyle().clone();
+				vs = (VisualStyle) networkView.getVisualStyle().clone();
 			} catch (CloneNotSupportedException e) {
 				vs = new VisualStyle(newVsName);
 			}
@@ -231,6 +232,7 @@ public class ColorMapper {
 		// Set the visual style
 		vmm.setVisualStyle(vs);
 		vmm.applyAppearances();
+		networkView.setVisualStyle(newVsName);
 
 		networkView.redrawGraph(true, true);
 
@@ -255,13 +257,13 @@ public class ColorMapper {
 		 * Get clone of current visual style and append setName
 		 */
 		VisualStyle vs;
-		vs = (VisualStyle) vmm.getVisualStyle();
+		vs = (VisualStyle) networkView.getVisualStyle();
 		String[] baseName = vs.getName().split("__");
 		String newVsName = baseName[0] + "__" + vsName;
 		vs = catalog.getVisualStyle(newVsName);
 		if (null == vs) {
 			try {
-				vs = (VisualStyle) vmm.getVisualStyle().clone();
+				vs = (VisualStyle) networkView.getVisualStyle().clone();
 			} catch (CloneNotSupportedException e) {
 				vs = new VisualStyle(newVsName);
 			}
@@ -287,6 +289,7 @@ public class ColorMapper {
 		// Set the visual style
 		vmm.setVisualStyle(vs);
 		vmm.applyAppearances();
+		networkView.setVisualStyle(newVsName);
 
 		networkView.redrawGraph(true, true);
 
