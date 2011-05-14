@@ -46,8 +46,12 @@ import cytoscape.CytoscapeInit;
 import cytoscape.data.CyAttributes;
 import cytoscape.view.CytoscapeDesktop;
 
-public class CriteriaMapperDialog extends JDialog implements ActionListener,
-		FocusListener, ListSelectionListener, java.beans.PropertyChangeListener {
+public class CriteriaMapperDialog extends JDialog
+		implements
+			ActionListener,
+			FocusListener,
+			ListSelectionListener,
+			java.beans.PropertyChangeListener {
 
 	// private BooleanCalculator calculator = null;
 	// private BooleanScanner scan = null; // Not currently used
@@ -69,7 +73,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 	public JPanel tablePanel;
 	private JPanel setPanel;
 	public JPanel controlPanel;
-	
+
 	public JComboBox nameBox;
 	private String[] nameBoxArray;
 
@@ -304,18 +308,13 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			}
 			// prompt user to confirm deletion
 			setName = (String) nameBox.getSelectedItem();
-			Object[] options = { "No", "Yes" };
+			Object[] options = {"No", "Yes"};
 			int n = JOptionPane.showOptionDialog(this,
 					"Are you sure that you want to delete " + setName + "?",
 					"", JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 			if (n == 1) { // YES
-				Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
-				for (CyNetwork network : allNetworks) {
-					attributeManager.removeNamesAttribute(network, setName);
-				}
-				// also remove from cytoprefs
-				attributeManager.removeNamesAttribute(null, setName);
+				attributeManager.removeSetFromProps(setName);
 				deletedFlag = true; // to avoid autosave via nameBoxChanged
 				nameBox.removeItem(setName);
 				ctPanel.clearTable();
@@ -340,7 +339,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 				return;
 			}
 			setName = (String) nameBox.getSelectedItem();
-			Object[] options = { "Cancel", "No", "Yes" };
+			Object[] options = {"Cancel", "No", "Yes"};
 			int n = JOptionPane.showOptionDialog(this,
 					"Do you want to save this Set before closing?", "",
 					JOptionPane.YES_NO_CANCEL_OPTION,
@@ -378,7 +377,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 		}
 
-		// write to cytoprefs 
+		// write to cytoprefs
 		attributeManager.setNameAttribute(sn);
 		attributeManager.setValuesAttribute(sn, ctPanel.mapToPick,
 				criteriaLabels);
@@ -414,7 +413,7 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 
 		}
 		ctPanel.calcNodeAttributes();
-		//ctPanel.applyCriteria(Cytoscape.getCurrentNetwork());
+		// ctPanel.applyCriteria(Cytoscape.getCurrentNetwork());
 		CriteriaCommandHandler.updateWorkspaces(setName);
 		ctPanel.savedFlag = true;
 	}
@@ -437,7 +436,6 @@ public class CriteriaMapperDialog extends JDialog implements ActionListener,
 			setVisible(true);
 		}
 	}
-
 
 	public String[] getAllAttributes(ArrayList<String> attributeList) {
 		// Create the list by combining node and edge attributes into a single
