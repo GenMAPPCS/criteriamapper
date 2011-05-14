@@ -66,44 +66,44 @@ public class AttributeManager {
 		return full.toArray(a);
 	}
 
-	public void removeNamesAttribute(CyNetwork network, String setName) {
-		if (null == network) {
-			// remove from cytoprefs
-			String setList = CytoscapeInit.getProperties().getProperty(
-					CriteriaCommandHandler.PROPERTY_SETS);
-			if (null != setList) {
-				// trim leading and trailing brackets
-				setList = setList.replace("[" + setName + "]", "");
-				if (setList.length() > 1)
-					CytoscapeInit.getProperties().setProperty(
-							CriteriaCommandHandler.PROPERTY_SETS, setList);
-				else
-					CytoscapeInit.getProperties().remove(
-							CriteriaCommandHandler.PROPERTY_SETS);
-			}
+	public void removeSetFromProps(String setName) {
 
-			CytoscapeInit.getProperties().remove(
-					CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName);
-
-		} else {
-			// remove from networks
-//			networkAttributes
-//					.deleteAttribute(CriteriaCommandHandler.NET_ATTR_APPLIED_SET);
-			// criteriaSetNames = (ArrayList<String>) networkAttributes
-			// .getListAttribute(network.getIdentifier(),
-			// CriteriaCommandHandler.PROPERTY_SETS);
-			// criteriaSetNames.remove(setName);
-			// if (criteriaSetNames.size() == 0) { // removed last set
-			// networkAttributes
-			// .deleteAttribute(CriteriaCommandHandler.PROPERTY_SETS);
-			// } else {
-			// networkAttributes.setListAttribute(network.getIdentifier(),
-			// CriteriaCommandHandler.PROPERTY_SETS, criteriaSetNames);
-			// }
-			// networkAttributes
-			// .deleteAttribute(CriteriaCommandHandler.PROPERTY_SET_PREFIX
-			// + setName);
+		// remove from cytoprefs
+		String setList = CytoscapeInit.getProperties().getProperty(
+				CriteriaCommandHandler.PROPERTY_SETS);
+		if (null != setList) {
+			// trim leading and trailing brackets
+			setList = setList.replace("[" + setName + "]", "");
+			if (setList.length() > 1)
+				CytoscapeInit.getProperties().setProperty(
+						CriteriaCommandHandler.PROPERTY_SETS, setList);
+			else
+				CytoscapeInit.getProperties().remove(
+						CriteriaCommandHandler.PROPERTY_SETS);
 		}
+
+		CytoscapeInit.getProperties().remove(
+				CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName);
+
+		//THIS SHOULD ALL BE HANDLED BY VISUAL STYLES, RATHER THAN NET ATTRS
+		// remove from network attributes
+		// networkAttributes
+		// .deleteAttribute(CriteriaCommandHandler.NET_ATTR_APPLIED_SET);
+		// criteriaSetNames = (ArrayList<String>) networkAttributes
+		// .getListAttribute(network.getIdentifier(),
+		// CriteriaCommandHandler.PROPERTY_SETS);
+		// criteriaSetNames.remove(setName);
+		// if (criteriaSetNames.size() == 0) { // removed last set
+		// networkAttributes
+		// .deleteAttribute(CriteriaCommandHandler.PROPERTY_SETS);
+		// } else {
+		// networkAttributes.setListAttribute(network.getIdentifier(),
+		// CriteriaCommandHandler.PROPERTY_SETS, criteriaSetNames);
+		// }
+		// networkAttributes
+		// .deleteAttribute(CriteriaCommandHandler.PROPERTY_SET_PREFIX
+		// + setName);
+
 	}
 
 	public void setNameAttribute(String sn) {
@@ -118,20 +118,20 @@ public class AttributeManager {
 				CriteriaCommandHandler.PROPERTY_SETS, sets);
 
 		// set network attr
-//		networkAttributes.setAttribute(Cytoscape.getCurrentNetwork()
-//				.getIdentifier(), CriteriaCommandHandler.NET_ATTR_APPLIED_SET,
-//				sn);
-//		Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
-//		for (CyNetwork network : allNetworks) {
-//			List<String> temp = networkAttributes.getListAttribute(network
-//					.getIdentifier(), CriteriaCommandHandler.PROPERTY_SETS);
-//			if (null == temp)
-//				temp = new ArrayList<String>();
-//			if (!temp.contains(sn))
-//				temp.add(sn);
-//			networkAttributes.setListAttribute(network.getIdentifier(),
-//					CriteriaCommandHandler.PROPERTY_SETS, temp);
-//		}
+		// networkAttributes.setAttribute(Cytoscape.getCurrentNetwork()
+		// .getIdentifier(), CriteriaCommandHandler.NET_ATTR_APPLIED_SET,
+		// sn);
+		// Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
+		// for (CyNetwork network : allNetworks) {
+		// List<String> temp = networkAttributes.getListAttribute(network
+		// .getIdentifier(), CriteriaCommandHandler.PROPERTY_SETS);
+		// if (null == temp)
+		// temp = new ArrayList<String>();
+		// if (!temp.contains(sn))
+		// temp.add(sn);
+		// networkAttributes.setListAttribute(network.getIdentifier(),
+		// CriteriaCommandHandler.PROPERTY_SETS, temp);
+		// }
 	}
 
 	/*
@@ -155,19 +155,19 @@ public class AttributeManager {
 		CytoscapeInit.getProperties().setProperty(
 				CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName, str);
 
-//		// then update networks and nodes
-//		Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
-//		for (CyNetwork network : allNetworks) {
-//			// otherwise, just do the network
-//			networkAttributes = Cytoscape.getNetworkAttributes();
-//			List<String> cset = networkAttributes.getListAttribute(network
-//					.getIdentifier(), CriteriaCommandHandler.PROPERTY_SETS);
-//			cset.add(setName);
-//			networkAttributes.setListAttribute(network.getIdentifier(),
-//					CriteriaCommandHandler.PROPERTY_SETS, cset);
-//			networkAttributes.setListAttribute(network.getIdentifier(),
-//					CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName, list);
-//		}
+		// // then update networks and nodes
+		// Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
+		// for (CyNetwork network : allNetworks) {
+		// // otherwise, just do the network
+		// networkAttributes = Cytoscape.getNetworkAttributes();
+		// List<String> cset = networkAttributes.getListAttribute(network
+		// .getIdentifier(), CriteriaCommandHandler.PROPERTY_SETS);
+		// cset.add(setName);
+		// networkAttributes.setListAttribute(network.getIdentifier(),
+		// CriteriaCommandHandler.PROPERTY_SETS, cset);
+		// networkAttributes.setListAttribute(network.getIdentifier(),
+		// CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName, list);
+		// }
 
 	}
 
