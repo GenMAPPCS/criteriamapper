@@ -432,8 +432,7 @@ public class CriteriaMapperDialog extends JDialog
 
 	public void propertyChange(PropertyChangeEvent e) {
 		if (e.getPropertyName().equals("ATTRIBUTES_CHANGED")) {
-			initialize();
-			setVisible(true);
+			//TODO: update attr list
 		}
 	}
 
