@@ -347,7 +347,7 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			for (int g = 0; g < labels.size(); g++) {
 				colorsA[g] = colors.get(g);
 			}
-
+			
 			if (labels.size() == 1) {
 				mapper.createDiscreteMapping(network, setName, labelsA[0],
 						colorsA[0], mapTo);
