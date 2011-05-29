@@ -36,17 +36,10 @@ import cytoscape.CytoscapeInit;
 import cytoscape.data.CyAttributes;
 
 public class AttributeManager {
-	private CyAttributes networkAttributes;
 	private static CyAttributes nodeAttributes;
-	// private SortedSet<String> criteriaSetNames = null;
-	private List<String> criteriaSetNames = new ArrayList<String>();
 
 	public AttributeManager() {
-		networkAttributes = Cytoscape.getNetworkAttributes();
 		nodeAttributes = Cytoscape.getNodeAttributes();
-		// criteriaSetNames.add("");
-		// criteriaSetNames.add("New...");
-		getAllAttributes();
 	}
 
 	public String[] getNamesAttributeForMenu() {
@@ -85,25 +78,6 @@ public class AttributeManager {
 		CytoscapeInit.getProperties().remove(
 				CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName);
 
-		//THIS SHOULD ALL BE HANDLED BY VISUAL STYLES, RATHER THAN NET ATTRS
-		// remove from network attributes
-		// networkAttributes
-		// .deleteAttribute(CriteriaCommandHandler.NET_ATTR_APPLIED_SET);
-		// criteriaSetNames = (ArrayList<String>) networkAttributes
-		// .getListAttribute(network.getIdentifier(),
-		// CriteriaCommandHandler.PROPERTY_SETS);
-		// criteriaSetNames.remove(setName);
-		// if (criteriaSetNames.size() == 0) { // removed last set
-		// networkAttributes
-		// .deleteAttribute(CriteriaCommandHandler.PROPERTY_SETS);
-		// } else {
-		// networkAttributes.setListAttribute(network.getIdentifier(),
-		// CriteriaCommandHandler.PROPERTY_SETS, criteriaSetNames);
-		// }
-		// networkAttributes
-		// .deleteAttribute(CriteriaCommandHandler.PROPERTY_SET_PREFIX
-		// + setName);
-
 	}
 
 	public void setNameAttribute(String sn) {
@@ -117,28 +91,17 @@ public class AttributeManager {
 		CytoscapeInit.getProperties().setProperty(
 				CriteriaCommandHandler.PROPERTY_SETS, sets);
 
-		// set network attr
-		// networkAttributes.setAttribute(Cytoscape.getCurrentNetwork()
-		// .getIdentifier(), CriteriaCommandHandler.NET_ATTR_APPLIED_SET,
-		// sn);
-		// Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
-		// for (CyNetwork network : allNetworks) {
-		// List<String> temp = networkAttributes.getListAttribute(network
-		// .getIdentifier(), CriteriaCommandHandler.PROPERTY_SETS);
-		// if (null == temp)
-		// temp = new ArrayList<String>();
-		// if (!temp.contains(sn))
-		// temp.add(sn);
-		// networkAttributes.setListAttribute(network.getIdentifier(),
-		// CriteriaCommandHandler.PROPERTY_SETS, temp);
-		// }
 	}
 
-	/*
+	/**
 	 * The values attribute refers to a list of colon separated Strings. The
 	 * values separated by the colons are the criteria, label, and color
 	 * respectively. Any number of values, or colon separated strings can be
 	 * associated with a setName or 'Criteria Set Name' attribute.
+	 *
+	 * @param setName
+	 * @param mapTo
+	 * @param criteriaLabelColor
 	 */
 	public void setValuesAttribute(String setName, String mapTo,
 			String[] criteriaLabelColor) {
@@ -155,37 +118,28 @@ public class AttributeManager {
 		CytoscapeInit.getProperties().setProperty(
 				CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName, str);
 
-		// // then update networks and nodes
-		// Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
-		// for (CyNetwork network : allNetworks) {
-		// // otherwise, just do the network
-		// networkAttributes = Cytoscape.getNetworkAttributes();
-		// List<String> cset = networkAttributes.getListAttribute(network
-		// .getIdentifier(), CriteriaCommandHandler.PROPERTY_SETS);
-		// cset.add(setName);
-		// networkAttributes.setListAttribute(network.getIdentifier(),
-		// CriteriaCommandHandler.PROPERTY_SETS, cset);
-		// networkAttributes.setListAttribute(network.getIdentifier(),
-		// CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName, list);
-		// }
-
 	}
 
+	/**
+	 * @param label
+	 * @param nodeID
+	 * @param outcome
+	 */
 	public void setColorAttribute(String label, String nodeID, Boolean outcome) {
 		nodeAttributes.setAttribute(nodeID, label, outcome);
+		nodeAttributes.setUserVisible(label, false);
 		nodeAttributes = Cytoscape.getNodeAttributes();
 	}
 
-	// public int getCompositeAttribute(String nodeID, String compositeName){
-	// nodeAttributes.getIntegerAttribute(nodeID, compositeName);
 
-	// }
-
-	/*
+	/**
 	 * This method is responsible for assessing the hierarchy of criteria. It
 	 * creates a composite node attribute and assigns an integer corresponding
 	 * the to criteria (i.e., row number) that both true and highest ranking. If
 	 * a node fails all criteria, then the value is set to -1.
+	 *
+	 * @param labels
+	 * @throws Exception
 	 */
 	public void setCompositeAttribute(String[] labels) throws Exception {
 		if (labels.length <= 1) {
@@ -201,6 +155,8 @@ public class AttributeManager {
 			}
 			compositeName = compositeName + ":" + labels[k];
 		}
+		
+
 		for (int i = 0; i < nodesList.size(); i++) {
 			Node node = nodesList.get(i);
 			String nodeID = node.getIdentifier();
@@ -230,15 +186,8 @@ public class AttributeManager {
 				nodeAttributes = Cytoscape.getNodeAttributes();
 			}
 		}
-	}
-
-	public boolean isCompositeAttribute(String compositeName) {
-		getAllAttributes();
-		if (attributeList.contains(compositeName)) {
-			return true;
-		} else {
-			return false;
-		}
+		// set attr to hidden
+		nodeAttributes.setUserVisible(compositeName, false);
 	}
 
 	public void removeCompositeAttribute(String compositeName) {
@@ -271,41 +220,4 @@ public class AttributeManager {
 
 	}
 
-	ArrayList<String> attributeList;
-
-	public String[] getAllAttributes() {
-		// Create the list by combining node and edge attributes into a single
-		// list
-		attributeList = new ArrayList<String>();
-		getAttributesList(attributeList, Cytoscape.getNodeAttributes(), "");
-		getAttributesList(attributeList, Cytoscape.getEdgeAttributes(), "");
-
-		String[] str = (String[]) attributeList
-				.toArray(new String[attributeList.size()]);
-		attributeList.clear();
-		return str;
-
-	}
-
-	public void getAttributesList(ArrayList<String> attributeList,
-			CyAttributes attributes, String prefix) {
-		String[] names = attributes.getAttributeNames();
-
-		for (int i = 0; i < names.length; i++) {
-			if (attributes.getType(names[i]) == CyAttributes.TYPE_FLOATING
-					|| attributes.getType(names[i]) == CyAttributes.TYPE_INTEGER
-					|| attributes.getType(names[i]) == CyAttributes.TYPE_BOOLEAN) {
-
-				/*
-				 * for(int j = 0; j < names[i].length(); j++){ String temp =
-				 * names[i].charAt(j) + ""; if(temp.matches(" ")){ names[i] =
-				 * names[i].substring(0,j) + "-" + names[i].substring(j+2,
-				 * names[i].length()); } }
-				 */
-
-				attributeList.add(names[i]);
-			}
-		}
-
-	}
 }

@@ -40,201 +40,217 @@ import javax.swing.event.ListSelectionListener;
 import cytoscape.Cytoscape;
 import cytoscape.data.CyAttributes;
 
+/**
+ * 
+ */
+public class CriteriaBuilderDialog extends JPanel
+		implements
+			ActionListener,
+			ListSelectionListener {
 
-
-public class CriteriaBuilderDialog extends JPanel implements ActionListener, ListSelectionListener{
-	
 	public JTextField criteriaField;
 	private JList attList;
 	private JList opList;
 	private CriteriaTablePanel ctPanel;
 	private JPanel tablePanel;
-	private ArrayList<String> attributeList = new ArrayList<String>(); //List which holds all of the attributes
-	private String[] opArray = {"=", "<", ">", ">=", "<=", "AND", "OR", "NOT"}; 
+	// List which holds all of the attributes we want to display in builder
+	private ArrayList<String> attributeList = new ArrayList<String>();
+	private String[] opArray = {"=", "<", ">", ">=", "<=", "AND", "OR", "NOT"};
 	private String[] attributesArray;
-	
-	public CriteriaBuilderDialog(CriteriaTablePanel panel){
-		
+
+	public CriteriaBuilderDialog(CriteriaTablePanel panel) {
+
 		ctPanel = panel;
 
 	}
-	
-	
-	public void initialize(){
+
+	/**
+	 * 
+	 */
+	public void initialize() {
 		this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
 
 		this.add(getCriteriaChooserPanel());
 		this.add(getListPanel());
-		
+
 		tablePanel = ctPanel.getTablePanel();
 		tablePanel.add(this);
 	}
-	
-	public void actionPerformed(ActionEvent e){
-    	String command = e.getActionCommand();
+
+	public void actionPerformed(ActionEvent e) {
+		String command = e.getActionCommand();
 	}
-	
-	private JPanel getListPanel(){
+
+	/**
+	 * @return
+	 */
+	private JPanel getListPanel() {
 		JPanel bigPanel = new JPanel();
-		
+
 		BoxLayout bigBox = new BoxLayout(bigPanel, BoxLayout.Y_AXIS);
 		bigPanel.setLayout(bigBox);
-		
-		
-		Border refBorder = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
-		TitledBorder titleBorder = BorderFactory.createTitledBorder(refBorder, "");
+
+		Border refBorder = BorderFactory
+				.createEtchedBorder(EtchedBorder.LOWERED);
+		TitledBorder titleBorder = BorderFactory.createTitledBorder(refBorder,
+				"");
 		titleBorder.setTitlePosition(TitledBorder.LEFT);
 		titleBorder.setTitlePosition(TitledBorder.TOP);
 		bigPanel.setBorder(titleBorder);
-		
-		
-		//make label panel
+
+		// make label panel
 		JPanel labelPanel = new JPanel();
 		BoxLayout labelBox = new BoxLayout(labelPanel, BoxLayout.X_AXIS);
 		labelPanel.setLayout(labelBox);
-		
-		
-		JPanel attPanel = new JPanel(new BorderLayout(0,2));
+
+		JPanel attPanel = new JPanel(new BorderLayout(0, 2));
 		JLabel attLabel = new JLabel("      Attributes");
 		attPanel.add(attLabel, BorderLayout.LINE_START);
-		JPanel opPanel = new JPanel(new BorderLayout(0,2));
+		JPanel opPanel = new JPanel(new BorderLayout(0, 2));
 		JLabel opLabel = new JLabel("Operations           ");
-		
+
 		opPanel.add(opLabel, BorderLayout.LINE_END);
-		
+
 		labelPanel.add(attPanel);
 		labelPanel.add(opPanel);
-		
+
 		JPanel listPanel = new JPanel();
 		BoxLayout listBox = new BoxLayout(listPanel, BoxLayout.X_AXIS);
 		listPanel.setLayout(listBox);
-		
-		JPanel attListPanel = new JPanel(new BorderLayout(0,2));
-		attributesArray = getAllAttributes(); 
+
+		JPanel attListPanel = new JPanel(new BorderLayout(0, 2));
+		attributesArray = getAllAttributes();
 		attList = new JList();
 		attList.setModel(new javax.swing.AbstractListModel() {
-            String[] strings = attributesArray;
-            public String getName() { return "attList"; }
-            public int getSize() { 
-            	//if(strings.length == 8){ return 9; }
-            	//else{ 
-            		return strings.length; //}
-            }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
-		ListSelectionModel listSelectModel = attList.getSelectionModel();        
-        listSelectModel.addListSelectionListener(this);
-        
-    	attList.setSelectionModel(listSelectModel);
-		
-    	JScrollPane attpane = new JScrollPane();
-    	attpane.setToolTipText("Click on attribute names to copy them into the expression above");
+			String[] strings = attributesArray;
+			public String getName() {
+				return "attList";
+			}
+			public int getSize() {
+				// if(strings.length == 8){ return 9; }
+				// else{
+				return strings.length; // }
+			}
+			public Object getElementAt(int i) {
+				return strings[i];
+			}
+		});
+		ListSelectionModel listSelectModel = attList.getSelectionModel();
+		listSelectModel.addListSelectionListener(this);
+
+		attList.setSelectionModel(listSelectModel);
+
+		JScrollPane attpane = new JScrollPane();
+		attpane
+				.setToolTipText("Click on attribute names to copy them into the expression above");
 		attpane.setViewportView(attList);
-		attpane.setMinimumSize(new Dimension(125,100));
-		attpane.setPreferredSize(new Dimension(125,100));
-		attpane.setMaximumSize(new Dimension(125,Cytoscape.getDesktop().getHeight()));
+		attpane.setMinimumSize(new Dimension(125, 100));
+		attpane.setPreferredSize(new Dimension(125, 100));
+		attpane.setMaximumSize(new Dimension(125, Cytoscape.getDesktop()
+				.getHeight()));
 		attListPanel.add(attpane, BorderLayout.LINE_START);
-		
-    	
-		JPanel opListPanel = new JPanel(new BorderLayout(0,2));
+
+		JPanel opListPanel = new JPanel(new BorderLayout(0, 2));
 		opList = new JList(opArray);
-		ListSelectionModel listSelectionModel = opList.getSelectionModel(); 
+		ListSelectionModel listSelectionModel = opList.getSelectionModel();
 		getOperationSelection opSelection = new getOperationSelection();
-        listSelectionModel.addListSelectionListener(opSelection);
-    	opList.setSelectionModel(listSelectionModel);
-    	
-    	JScrollPane oppane = new JScrollPane();
-    	oppane.setToolTipText("Click on operations to copy them into the expression above");
+		listSelectionModel.addListSelectionListener(opSelection);
+		opList.setSelectionModel(listSelectionModel);
+
+		JScrollPane oppane = new JScrollPane();
+		oppane
+				.setToolTipText("Click on operations to copy them into the expression above");
 		oppane.setViewportView(opList);
-		oppane.setMinimumSize(new Dimension(125,100));
-		oppane.setPreferredSize(new Dimension(125,100));
-		oppane.setMaximumSize(new Dimension(125,Cytoscape.getDesktop().getHeight()));
+		oppane.setMinimumSize(new Dimension(125, 100));
+		oppane.setPreferredSize(new Dimension(125, 100));
+		oppane.setMaximumSize(new Dimension(125, Cytoscape.getDesktop()
+				.getHeight()));
 		opListPanel.add(oppane, BorderLayout.LINE_START);
-		
+
 		JPanel buttonBox = new JPanel();
 
 		listPanel.add(attListPanel);
 		listPanel.add(opListPanel);
-		
-		
+
 		bigPanel.add(labelPanel);
 		bigPanel.add(listPanel);
 		bigPanel.add(buttonBox);
-		bigPanel.setMaximumSize(new Dimension(300,Cytoscape.getDesktop().getHeight()));
-		
+		bigPanel.setMaximumSize(new Dimension(300, Cytoscape.getDesktop()
+				.getHeight()));
+
 		return bigPanel;
 	}
-	
-	
-	/*
-	 * Creates the criteria and label text fields, along with the color chooser, add, 
-	 * and clear buttons.
+
+	/**
+	 * Creates the criteria and label text fields, along with the color chooser,
+	 * add, and clear buttons.
 	 */
-	private JPanel getCriteriaChooserPanel(){
+	private JPanel getCriteriaChooserPanel() {
 		JPanel fieldPanel = new JPanel();
-		
+
 		BoxLayout box = new BoxLayout(fieldPanel, BoxLayout.Y_AXIS);
 		fieldPanel.setLayout(box);
-		
-		Border refBorder = BorderFactory.createEtchedBorder(EtchedBorder.LOWERED);
-		TitledBorder titleBorder = BorderFactory.createTitledBorder(refBorder, "Expression Editor");
+
+		Border refBorder = BorderFactory
+				.createEtchedBorder(EtchedBorder.LOWERED);
+		TitledBorder titleBorder = BorderFactory.createTitledBorder(refBorder,
+				"Expression Editor");
 		titleBorder.setTitlePosition(TitledBorder.LEFT);
 		titleBorder.setTitlePosition(TitledBorder.TOP);
 		fieldPanel.setBorder(titleBorder);
-		
-		JTextArea jt = new JTextArea("Use this field to construct expressions using Attributes and Operations below.");
+
+		JTextArea jt = new JTextArea(
+				"Use this field to construct expressions using Attributes and Operations below.");
 		jt.setFont(new Font("Arial", Font.PLAIN, 10));
 		jt.setBackground(this.getBackground());
 		fieldPanel.add(jt);
 
 		criteriaField = new JTextField();
-		
+
 		criteriaField.setHorizontalAlignment(JTextField.LEFT);
-		
+
 		fieldPanel.add(criteriaField);
-		fieldPanel.setMaximumSize(new Dimension(Cytoscape.getDesktop().getWidth(), 80));
-	
+		fieldPanel.setMaximumSize(new Dimension(Cytoscape.getDesktop()
+				.getWidth(), 80));
+
 		return fieldPanel;
 	}
-	
+
 	String criteriaBuild = "";
 	int last = -1;
-	/*
-	 * Handles list selection on attributes.  Further below their is a
-	 * separate class, getOperationSelection which does the exact same thing as this method 
-	 * but on the other list.  Since their were two lists, one for the attributes, and one for
-	 * operations I found that their was no good way to tell apart ListSelectionEvents from two
-	 * separate lists.  I thus was forced to create the other class to handle the operation
-	 * selection.
+
+	/**
+	 * Handles list selection on attributes. Further below their is a separate
+	 * class, getOperationSelection which does the exact same thing as this
+	 * method but on the other list. Since their were two lists, one for the
+	 * attributes, and one for operations I found that their was no good way to
+	 * tell apart ListSelectionEvents from two separate lists. I thus was forced
+	 * to create the other class to handle the operation selection.
 	 */
-	public void valueChanged(ListSelectionEvent e){
+	public void valueChanged(ListSelectionEvent e) {
 
-		ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-
-		int firstIndex = e.getFirstIndex();
-		int lastIndex = e.getLastIndex();
-		boolean isAdjusting = e.getValueIsAdjusting(); 
-		//e.getSource().getClass().
+		ListSelectionModel lsm = (ListSelectionModel) e.getSource();
 
 		if (lsm.isSelectionEmpty()) {
-			//System.out.println(" <none>");
+			// System.out.println(" <none>");
 		} else {
 			// Find out which indexes are selected.
 			int minIndex = lsm.getMinSelectionIndex();
 			int maxIndex = lsm.getMaxSelectionIndex();
 
-
 			for (int i = minIndex; i <= maxIndex; i++) {
-				//if (lsm.isSelectedIndex(i) && last != i) {
+				// if (lsm.isSelectedIndex(i) && last != i) {
 				criteriaBuild = criteriaField.getText();
-				if(attributesArray[i].contains(" ")){
-					criteriaBuild = criteriaBuild +" \""+ attributesArray[i]+"\" ";
-				}else{
-					criteriaBuild = criteriaBuild +" "+ attributesArray[i]+" ";
+				if (attributesArray[i].contains(" ")) {
+					criteriaBuild = criteriaBuild + " \"" + attributesArray[i]
+							+ "\" ";
+				} else {
+					criteriaBuild = criteriaBuild + " " + attributesArray[i]
+							+ " ";
 				}
 				criteriaField.setText(criteriaBuild);
-				//System.out.println("Selected Index: "+i);
-				//}
+				// System.out.println("Selected Index: "+i);
+				// }
 				last = i;
 			}
 		}
@@ -244,47 +260,37 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 		criteriaField.setHorizontalAlignment(JTextField.LEFT);
 
 	}
-	
-	
-	/*
-	 * Class which handles the list selection for the operation List.
-	 * I had to create this class because I could not find a good way of
-	 * distinguishing between ListSelectionEvents coming from different 
-	 * lists that are registered to the same listener.
-	 */
-	class getOperationSelection implements ListSelectionListener{
 
-		public getOperationSelection(){
+	/**
+	 * Class which handles the list selection for the operation List. I had to
+	 * create this class because I could not find a good way of distinguishing
+	 * between ListSelectionEvents coming from different lists that are
+	 * registered to the same listener.
+	 */
+	class getOperationSelection implements ListSelectionListener {
+
+		public getOperationSelection() {
 
 		}
-		public void valueChanged(ListSelectionEvent e){
-			ListSelectionModel lsm = (ListSelectionModel)e.getSource();
-
-			//System.out.println("maddeeee it");
-
-
-			int firstIndex = e.getFirstIndex();
-			int lastIndex = e.getLastIndex();
-			boolean isAdjusting = e.getValueIsAdjusting(); 
-			//e.getSource().getClass().
+		public void valueChanged(ListSelectionEvent e) {
+			ListSelectionModel lsm = (ListSelectionModel) e.getSource();
 
 			if (lsm.isSelectionEmpty()) {
-				//System.out.println(" <none>");
+				// System.out.println(" <none>");
 			} else {
 				// Find out which indexes are selected.
 				int minIndex = lsm.getMinSelectionIndex();
 				int maxIndex = lsm.getMaxSelectionIndex();
 
-
 				for (int i = minIndex; i <= maxIndex; i++) {
 
 					// if (lsm.isSelectedIndex(i) && last != i) {
 					criteriaBuild = criteriaField.getText();
-					criteriaBuild = criteriaBuild +" "+ opArray[i]+" ";
+					criteriaBuild = criteriaBuild + " " + opArray[i] + " ";
 					criteriaField.setText(criteriaBuild);
-					//System.out.println("Selected Index: "+i);
+					// System.out.println("Selected Index: "+i);
 
-					//}
+					// }
 					last = i;
 				}
 			}
@@ -295,59 +301,53 @@ public class CriteriaBuilderDialog extends JPanel implements ActionListener, Lis
 
 		}
 	}
-	
-	
-	
-	public String[] getAllAttributes() {
-		// Create the list by combining node and edge attributes into a single
-		// list
 
-		getAttributesList(attributeList, Cytoscape.getNodeAttributes(), "");
-		getAttributesList(attributeList, Cytoscape.getEdgeAttributes(), "");
-		
-		String[] str = (String[])attributeList.toArray(new String[attributeList.size()]);
+	/**
+	 * @return
+	 */
+	public String[] getAllAttributes() {
+
+		getAttributesList(attributeList, Cytoscape.getNodeAttributes(), "__");
+
+		String[] str = (String[]) attributeList
+				.toArray(new String[attributeList.size()]);
 		attributeList.clear();
 		return str;
 
 	}
 
-	
+	/**
+	 * @param attributeList
+	 * @param attributes
+	 * @param prefix
+	 */
 	public void getAttributesList(ArrayList<String> attributeList,
 			CyAttributes attributes, String prefix) {
 		String[] names = attributes.getAttributeNames();
 		ArrayList<String> numericAttributes = new ArrayList<String>();
-		//ArrayList<String> stringAttributes = new ArrayList<String>();
+		// ArrayList<String> stringAttributes = new ArrayList<String>();
 		ArrayList<String> booleanAttributes = new ArrayList<String>();
-		ArrayList<String> internalAttributes = new ArrayList<String>();
 		for (int i = 0; i < names.length; i++) {
-			if (attributes.getType(names[i]) == CyAttributes.TYPE_FLOATING || attributes.getType(names[i]) == CyAttributes.TYPE_INTEGER){
-				if(names[i].contains(" ")){	names[i].replace(" " ,"-"); }	
-				if(names[i].contains(":")){
-					internalAttributes.add(names[i]);
-				}else{
-					numericAttributes.add(names[i]);
-				}
-			}	
-			if(attributes.getType(names[i]) == CyAttributes.TYPE_BOOLEAN){
-				if(names[i].contains(" ")){	names[i].replace(" " ,"-"); }	
-				if(names[i].contains(":")){
-					internalAttributes.add(names[i]);
-				}else{
-				   booleanAttributes.add(names[i]);
-				}
+			if (!attributes.getUserVisible(names[i])
+					|| names[i].startsWith(prefix)) {
+				continue;
+			}
+			if (attributes.getType(names[i]) == CyAttributes.TYPE_FLOATING
+					|| attributes.getType(names[i]) == CyAttributes.TYPE_INTEGER) {
+				numericAttributes.add(names[i]);
+			} else if (attributes.getType(names[i]) == CyAttributes.TYPE_BOOLEAN) {
+				booleanAttributes.add(names[i]);
 			}
 		}
-		//attributeList.add("--Numeric Attributes--");
-		for(int j=0; j<numericAttributes.size(); j++){
+		// attributeList.add("--Numeric Attributes--");
+		for (int j = 0; j < numericAttributes.size(); j++) {
 			attributeList.add(numericAttributes.get(j));
 		}
-		//attributeList.add("--Boolean Attributes--");
-		for(int k=0; k<booleanAttributes.size(); k++){
+		// attributeList.add("--Boolean Attributes--");
+		for (int k = 0; k < booleanAttributes.size(); k++) {
 			attributeList.add(booleanAttributes.get(k));
 		}
-		for(int i=0; i<internalAttributes.size(); i++){
-			//attributeList.add(internalAttributes.get(i));
-		}
+
 	}
-	
+
 }
