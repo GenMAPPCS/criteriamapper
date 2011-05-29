@@ -126,8 +126,8 @@ public class AttributeManager {
 	 * @param outcome
 	 */
 	public void setColorAttribute(String label, String nodeID, Boolean outcome) {
-		nodeAttributes.setAttribute(nodeID, label, outcome);
 		nodeAttributes.setUserVisible(label, false);
+		nodeAttributes.setAttribute(nodeID, label, outcome);
 		nodeAttributes = Cytoscape.getNodeAttributes();
 	}
 
@@ -156,6 +156,8 @@ public class AttributeManager {
 			compositeName = compositeName + ":" + labels[k];
 		}
 		
+		// set attr to hidden
+		nodeAttributes.setUserVisible(compositeName, false);
 
 		for (int i = 0; i < nodesList.size(); i++) {
 			Node node = nodesList.get(i);
@@ -186,8 +188,6 @@ public class AttributeManager {
 				nodeAttributes = Cytoscape.getNodeAttributes();
 			}
 		}
-		// set attr to hidden
-		nodeAttributes.setUserVisible(compositeName, false);
 	}
 
 	public void removeCompositeAttribute(String compositeName) {
