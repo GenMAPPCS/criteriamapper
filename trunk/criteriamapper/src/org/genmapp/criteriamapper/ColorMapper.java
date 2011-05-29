@@ -183,7 +183,6 @@ public class ColorMapper {
 		Cytoscape.setCurrentNetwork(net.getIdentifier());
 		networkView = Cytoscape.getNetworkView(net.getIdentifier());
 		Cytoscape.setCurrentNetworkView(networkView.getIdentifier());
-		Cytoscape.getCurrentNetworkView().fitContent();
 
 		VisualMappingManager vmm = Cytoscape.getVisualMappingManager();
 		CalculatorCatalog catalog = vmm.getCalculatorCatalog();
