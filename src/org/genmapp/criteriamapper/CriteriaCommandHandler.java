@@ -37,7 +37,8 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 	public final static String NAMESPACE = "criteriamapper";
 	public final static String PROPERTY_SETS = "org.genmapp.criteriasets_1.0";
 	public final static String PROPERTY_SET_PREFIX = "org.genmapp.criteriaset.";
-//	public final static String NET_ATTR_APPLIED_SET = "org.genmapp.criteriaset";
+	// public final static String NET_ATTR_APPLIED_SET =
+	// "org.genmapp.criteriaset";
 
 	// Commands and associated args
 	public static final String OPEN_CRITERIA_MAPPER = "open dialog";
@@ -178,7 +179,7 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			String mapTo;
 			List<String> labels;
 			List<String> expressions;
-			List<Color> colors;
+			String[] colorsA = new String[0];
 			boolean createFlag;
 
 			Object sn = getArg(command, ARG_SETNAME, args);
@@ -241,23 +242,13 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 				throw new CyCommandException("unknown type for expressions");
 
 			Object cl = getArg(command, ARG_COLOR_LIST, args);
-			if (cl instanceof List) {
-				if (((List<Object>) cl).get(0) instanceof Color)
-					colors = (List<Color>) cl;
-				else
-					throw new CyCommandException(
-							"color list not of type Color?");
-			} else if (cl instanceof String) {
-				colors = new ArrayList<Color>();
+			if (cl instanceof String) {
 				// remove brackets, if they are there
 				if (((String) cl).startsWith("[")
 						&& ((String) cl).endsWith("]"))
 					cl = ((String) cl).substring(1, ((String) cl).length() - 1);
-				// parse at comma delimiters
-				String[] list = ((String) cl).split(",");
-				for (String colorString : list) {
-					colors.add(Color.decode(colorString.trim()));
-				}
+				// parse at comma and/or space delimiters
+				colorsA = ((String) cl).split("[\\s,]+");
 			} else
 				throw new CyCommandException("unknown type for color list");
 
@@ -265,40 +256,38 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			 * Proceed to create/apply criteria set
 			 */
 
-//			 //First, check if it already exists
-//			CyAttributes na = Cytoscape.getNetworkAttributes();
-//			List<String> setList = na.getListAttribute(network.getIdentifier(),
-//					CriteriaCommandHandler.PROPERTY_SETS);
-//			if (null == setList) {
-//				setList = new ArrayList<String>();
-//			}
-//			if (!setName.equals("")) {
-//				if (!setList.contains(setName)) {
-//					// then, add set name
-//					setList.add(setName);
-//					
-//					// and construct criteria list
-//					ArrayList<String> critList = new ArrayList<String>();
-//					critList.add(mapTo);
-//					for (int k = 0; k < labels.size(); k++) {
-//						critList.add(expressions.get(k) + ":" + labels.get(k) + ":"
-//								+ CriteriaTablePanel.colorToString(colors.get(k)));
-//					}
-//					System.out.println("CREATE SETTINGS: " + critList);
-//					na.setListAttribute(network.getIdentifier(),
-//							CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName,
-//							critList);
-//				}
-				// position set name in front to indicate latest mapping
-				// choice
-//				java.util.Collections
-//						.swap(setList, 0, setList.indexOf(setName));
-
-//				na.setAttribute(network.getIdentifier(),
-//						CriteriaCommandHandler.NET_ATTR_APPLIED_SET, setName);
-				
-//			}
-
+			// //First, check if it already exists
+			// CyAttributes na = Cytoscape.getNetworkAttributes();
+			// List<String> setList =
+			// na.getListAttribute(network.getIdentifier(),
+			// CriteriaCommandHandler.PROPERTY_SETS);
+			// if (null == setList) {
+			// setList = new ArrayList<String>();
+			// }
+			// if (!setName.equals("")) {
+			// if (!setList.contains(setName)) {
+			// // then, add set name
+			// setList.add(setName);
+			//					
+			// // and construct criteria list
+			// ArrayList<String> critList = new ArrayList<String>();
+			// critList.add(mapTo);
+			// for (int k = 0; k < labels.size(); k++) {
+			// critList.add(expressions.get(k) + ":" + labels.get(k) + ":"
+			// + CriteriaTablePanel.colorToString(colors.get(k)));
+			// }
+			// System.out.println("CREATE SETTINGS: " + critList);
+			// na.setListAttribute(network.getIdentifier(),
+			// CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName,
+			// critList);
+			// }
+			// position set name in front to indicate latest mapping
+			// choice
+			// java.util.Collections
+			// .swap(setList, 0, setList.indexOf(setName));
+			// na.setAttribute(network.getIdentifier(),
+			// CriteriaCommandHandler.NET_ATTR_APPLIED_SET, setName);
+			// }
 			// Now, calculate and apply
 			String compositeLabel = "";
 			if (setName.equals(""))
@@ -321,14 +310,13 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 					if (i == 0) {
 						compositeLabel = label;
 					} else {
-						if (!label.equals("") && label != null) {
-							compositeLabel = compositeLabel + ":" + label;
-						}
+						compositeLabel = setName + ":composite";
+						// if (!label.equals("") && label != null) {
+						// compositeLabel = compositeLabel + ":" + label;
+						// }
 					}
 					// evaluates expression and sets node attribute
 					calculate.evaluateLeftToRight(label);
-
-					colors.add(colors.get(i));
 				}
 			}
 
@@ -338,16 +326,11 @@ public class CriteriaCommandHandler extends AbstractCommandHandler {
 			}
 
 			try {
-				attManager.setCompositeAttribute(labelsA);
+				attManager.setCompositeAttribute(compositeLabel, labelsA, colorsA);
 			} catch (Exception e) {
 				System.out.println("COMPOSITE FAILED!! " + e.getMessage());
 			}
 
-			Color[] colorsA = new Color[labels.size()];
-			for (int g = 0; g < labels.size(); g++) {
-				colorsA[g] = colors.get(g);
-			}
-			
 			if (labels.size() == 1) {
 				mapper.createDiscreteMapping(network, setName, labelsA[0],
 						colorsA[0], mapTo);

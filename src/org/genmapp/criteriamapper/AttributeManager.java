@@ -24,13 +24,10 @@ package org.genmapp.criteriamapper;
 
 import giny.model.Node;
 
+import java.awt.Color;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Properties;
-import java.util.Set;
 
-import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
 import cytoscape.CytoscapeInit;
 import cytoscape.data.CyAttributes;
@@ -98,7 +95,7 @@ public class AttributeManager {
 	 * values separated by the colons are the criteria, label, and color
 	 * respectively. Any number of values, or colon separated strings can be
 	 * associated with a setName or 'Criteria Set Name' attribute.
-	 *
+	 * 
 	 * @param setName
 	 * @param mapTo
 	 * @param criteriaLabelColor
@@ -131,40 +128,41 @@ public class AttributeManager {
 		nodeAttributes = Cytoscape.getNodeAttributes();
 	}
 
-
 	/**
 	 * This method is responsible for assessing the hierarchy of criteria. It
-	 * creates a composite node attribute and assigns an integer corresponding
-	 * the to criteria (i.e., row number) that both true and highest ranking. If
-	 * a node fails all criteria, then the value is set to -1.
-	 *
+	 * creates a composite node attribute and assigns the color (e.g.,
+	 * "#ff0000") corresponding to the criteria (i.e., row number) that both
+	 * true and highest ranking. If a node fails all criteria, then the value is
+	 * set to "null".
+	 * 
 	 * @param labels
 	 * @throws Exception
 	 */
-	public void setCompositeAttribute(String[] labels) throws Exception {
+	public void setCompositeAttribute(String compositeLabel, String[] labels,
+			String[] colors) throws Exception {
 		if (labels.length <= 1) {
 			// only a single criteria; skip composition
 			return;
 		}
 
 		List<Node> nodesList = Cytoscape.getCyNodesList();
-		String compositeName = labels[0];
-		for (int k = 1; k < labels.length; k++) {
-			if (labels[k].equals("")) {
-				continue;
-			}
-			compositeName = compositeName + ":" + labels[k];
-		}
-		
+		String compositeName = compositeLabel;
+		// for (int k = 1; k < labels.length; k++) {
+		// if (labels[k].equals("")) {
+		// continue;
+		// }
+		// compositeName = compositeName + ":" + labels[k];
+		// }
+
 		// set attr to hidden
-		nodeAttributes.setUserVisible(compositeName, false);
+		nodeAttributes.setUserVisible(compositeName, true);
 
 		for (int i = 0; i < nodesList.size(); i++) {
 			Node node = nodesList.get(i);
 			String nodeID = node.getIdentifier();
 
 			// initialize value to all false (-1)
-			nodeAttributes.setAttribute(nodeID, compositeName, -1);
+			nodeAttributes.setAttribute(nodeID, compositeName, "null");
 
 			// loop through each label in order
 			for (int j = 0; j < labels.length; j++) {
@@ -180,7 +178,8 @@ public class AttributeManager {
 				// if true, then mark label row position and skip to next node.
 				if (nodeAttributes.getBooleanAttribute(nodeID, labels[j])) {
 
-					nodeAttributes.setAttribute(nodeID, compositeName, j);
+					nodeAttributes.setAttribute(nodeID, compositeName,
+							colors[j]);
 					break; // next node
 
 				}

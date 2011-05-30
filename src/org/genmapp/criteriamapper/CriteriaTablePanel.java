@@ -62,8 +62,10 @@ import javax.swing.table.TableColumn;
 import cytoscape.CyNetwork;
 import cytoscape.Cytoscape;
 
-public class CriteriaTablePanel implements ActionListener,
-		ListSelectionListener {
+public class CriteriaTablePanel
+		implements
+			ActionListener,
+			ListSelectionListener {
 
 	// external classes
 	private AttributeManager attManager;
@@ -93,8 +95,8 @@ public class CriteriaTablePanel implements ActionListener,
 	private String[] labelsA = new String[0];
 	private ArrayList<String> labels = new ArrayList<String>();
 	private String compositeLabel = "";
-	
-	private Color[] colorsA = new Color[0];
+
+	private String[] colorsA = new String[0];
 
 	public CriteriaTablePanel() {
 		dataModel = new BooleanTableModel();
@@ -209,7 +211,7 @@ public class CriteriaTablePanel implements ActionListener,
 
 		// JCheckBox showBox = new JCheckBox();
 		// showCol.setCellEditor(new DefaultCellEditor(showBox));
-		// showBox.setToolTipText("Click to show/hide criteria as visual style");
+		//showBox.setToolTipText("Click to show/hide criteria as visual style");
 
 		DefaultTableCellRenderer labelRenderer = new DefaultTableCellRenderer();
 		labelRenderer.setToolTipText("Double-click to edit");
@@ -472,8 +474,6 @@ public class CriteriaTablePanel implements ActionListener,
 		return String.valueOf(buf);
 	}
 
-
-
 	/**
 	 * Parses attributes for all nodes independent of networks. Sets variables
 	 * used in downstream network visual mapping.
@@ -481,8 +481,8 @@ public class CriteriaTablePanel implements ActionListener,
 	public void calcNodeAttributes() {
 
 		this.labels = new ArrayList<String>();
-		ArrayList<Color> colors = new ArrayList<Color>();
-	
+		ArrayList<String> colors = new ArrayList<String>();
+
 		if (setName.equals("")) {
 			JOptionPane.showMessageDialog(cbDialog, "Must have a set name.");
 			return;
@@ -504,9 +504,10 @@ public class CriteriaTablePanel implements ActionListener,
 				if (i == 0) {
 					compositeLabel = label;
 				} else {
-					if (!label.equals("") && label != null) {
-						compositeLabel = compositeLabel + ":" + label;
-					}
+					compositeLabel = setName + ":composite";
+					// if (!label.equals("") && label != null) {
+					// compositeLabel = compositeLabel + ":" + label;
+					// }
 				}
 				// evaluates expression and sets node attribute
 				calculate.evaluateLeftToRight(label);
@@ -519,7 +520,7 @@ public class CriteriaTablePanel implements ActionListener,
 					labels.add(label);
 				}
 
-				Color c = Color.decode(getCell(i, COLOR_COL) + "");
+				String c = getCell(i, COLOR_COL) + "";
 				colors.add(c);
 			}
 		}
@@ -529,19 +530,19 @@ public class CriteriaTablePanel implements ActionListener,
 			labelsA[h] = labels.get(h);
 		}
 
-		try {
-			attManager.setCompositeAttribute(labelsA);
-		} catch (Exception e) {
-			System.out.println("COMPOSITE FAILED!! " + e.getMessage());
-		}
-
-		this.colorsA = new Color[labels.size()];
+		this.colorsA = new String[labels.size()];
 		for (int g = 0; g < labels.size(); g++) {
 			colorsA[g] = colors.get(g);
 		}
 
+		try {
+			attManager.setCompositeAttribute(compositeLabel, labelsA, colorsA);
+		} catch (Exception e) {
+			System.out.println("COMPOSITE FAILED!! " + e.getMessage());
+		}
+
 	}
-	
+
 	public void applyCriteria() {
 		Set<CyNetwork> allNetworks = Cytoscape.getNetworkSet();
 		for (CyNetwork network : allNetworks) {
@@ -687,7 +688,7 @@ public class CriteriaTablePanel implements ActionListener,
 		int colCount = 3;
 		// boolean empty = true;
 
-		String[] columnNames = { "Label", "Expression", "Value" };
+		String[] columnNames = {"Label", "Expression", "Value"};
 		Object[][] data = new Object[rowCount][colCount];
 
 		public void addRow() {
@@ -832,8 +833,10 @@ class ColorRenderer extends JLabel implements TableCellRenderer {
 	}
 }
 
-class ColorEditor extends AbstractCellEditor implements TableCellEditor,
-		ActionListener {
+class ColorEditor extends AbstractCellEditor
+		implements
+			TableCellEditor,
+			ActionListener {
 	Color currentColor;
 	JButton button;
 	JColorChooser colorChooser;
@@ -893,8 +896,10 @@ class ColorEditor extends AbstractCellEditor implements TableCellEditor,
 
 }
 
-class CriteriaEditor extends AbstractCellEditor implements TableCellEditor,
-		ActionListener {
+class CriteriaEditor extends AbstractCellEditor
+		implements
+			TableCellEditor,
+			ActionListener {
 	JButton button;
 
 	String criteria;
