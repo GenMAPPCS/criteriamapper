@@ -69,7 +69,7 @@ public class ColorMapper {
 	 * are subsequently mapped.
 	 */
 	public VisualStyle createCompositeMapping(CyNetwork net, String vsName,
-			String compositeLabel, Color[] colors, String mapTo) {
+			String compositeLabel, String[] colors, String mapTo) {
 		boolean newStyle = false;
 		
 		if (!compositeLabel.contains(":")) {
@@ -100,14 +100,14 @@ public class ColorMapper {
 		DiscreteMapping disMapping = new DiscreteMapping(Color.class,
 				compositeLabel);
 
-		disMapping.putMapValue(new Integer(-1), Color.WHITE);
+		disMapping.putMapValue("null", Color.WHITE);
 
 		List<Integer> rowList = new ArrayList<Integer>();
 		boolean doCalc = false;
 
 		// collect colors intended for Node Color into disMapping
 		for (int i = 0; i < colors.length; i++) {
-			disMapping.putMapValue(new Integer(i), colors[i]);
+			disMapping.putMapValue(colors[i], Color.decode(colors[i]));
 			doCalc = true;
 		}
 
@@ -115,26 +115,26 @@ public class ColorMapper {
 
 		Calculator nodeColorCalculator = null;
 
-		if (rowList.size() > 0) {
-			Map<String, List<Color>> nodeMap = new HashMap<String, List<Color>>();
-			String[] labels = compositeLabel.split(":");
-			for (Integer j : rowList) {
-				List<Node> nodeList = network.nodesList();
-				for (Node node : nodeList) {
-					String id = node.getIdentifier();
-					boolean b = AttributeManager.getColorAttribute(id,
-							labels[j]);
-					Color c = colors[j];
-					if (!b)
-						c = Color.white; // TODO: set to default node color
-					List<Color> cl = nodeMap.get(id);
-					if (null == cl)
-						cl = new ArrayList<Color>();
-					cl.add(c);
-					nodeMap.put(id, cl);
-				}
-			}
-		}
+//		if (rowList.size() > 0) {
+//			Map<String, List<Color>> nodeMap = new HashMap<String, List<Color>>();
+//			String[] labels = compositeLabel.split(":");
+//			for (Integer j : rowList) {
+//				List<Node> nodeList = network.nodesList();
+//				for (Node node : nodeList) {
+//					String id = node.getIdentifier();
+//					boolean b = AttributeManager.getColorAttribute(id,
+//							labels[j]);
+//					Color c = colors[j];
+//					if (!b)
+//						c = Color.white; // TODO: set to default node color
+//					List<Color> cl = nodeMap.get(id);
+//					if (null == cl)
+//						cl = new ArrayList<Color>();
+//					cl.add(c);
+//					nodeMap.put(id, cl);
+//				}
+//			}
+//		}
 
 		if (doCalc) {
 			nodeColorCalculator = new BasicCalculator(vs.getName()
@@ -177,7 +177,7 @@ public class ColorMapper {
 	 * evaluated criteria and the color it should be mapped to.
 	 */
 	public VisualStyle createDiscreteMapping(CyNetwork net, String vsName,
-			String label, Color currentColor, String mapTo) {
+			String label, String currentColor, String mapTo) {
 		
 		// must set current view to retrieve visual style via vmm
 		Cytoscape.setCurrentNetwork(net.getIdentifier());
@@ -201,7 +201,7 @@ public class ColorMapper {
 
 		DiscreteMapping disMapping = new DiscreteMapping(Color.class, label);
 
-		disMapping.putMapValue(Boolean.TRUE, currentColor);
+		disMapping.putMapValue(Boolean.TRUE, Color.decode(currentColor));
 		disMapping.putMapValue(Boolean.FALSE, Color.WHITE);
 
 		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
@@ -236,7 +236,7 @@ public class ColorMapper {
 	 * the label of an evaluated criteria and the color it should be mapped to.
 	 */
 	public VisualStyle createDiscreteBorderMapping(CyNetwork net,
-			String vsName, String label, Color currentColor) {
+			String vsName, String label, String currentColor) {
 
 		networkView = Cytoscape.getNetworkView(net.getIdentifier());
 
@@ -260,7 +260,7 @@ public class ColorMapper {
 
 		DiscreteMapping disMapping = new DiscreteMapping(Color.class, label);
 
-		disMapping.putMapValue(Boolean.TRUE, currentColor);
+		disMapping.putMapValue(Boolean.TRUE, Color.decode(currentColor));
 		disMapping.putMapValue(Boolean.FALSE, Color.WHITE);
 
 		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
