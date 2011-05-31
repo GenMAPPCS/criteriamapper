@@ -201,8 +201,8 @@ public class ColorMapper {
 
 		DiscreteMapping disMapping = new DiscreteMapping(Color.class, label);
 
-		disMapping.putMapValue(Boolean.TRUE, Color.decode(currentColor));
-		disMapping.putMapValue(Boolean.FALSE, Color.WHITE);
+		disMapping.putMapValue("true", Color.decode(currentColor));
+		disMapping.putMapValue("false", Color.WHITE);
 
 		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
 
@@ -260,8 +260,8 @@ public class ColorMapper {
 
 		DiscreteMapping disMapping = new DiscreteMapping(Color.class, label);
 
-		disMapping.putMapValue(Boolean.TRUE, Color.decode(currentColor));
-		disMapping.putMapValue(Boolean.FALSE, Color.WHITE);
+		disMapping.putMapValue("true", Color.decode(currentColor));
+		disMapping.putMapValue("false", Color.WHITE);
 
 		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
 
