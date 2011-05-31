@@ -395,33 +395,7 @@ public class CriteriaTablePanel
 
 	}
 
-	public Color[] getColorArray(int[] indices) {
-		Color[] temp = new Color[indices.length];
-		for (int i = 0; i < indices.length; i++) {
-			String colorString = getCell(indices[i], 2) + "";
-			temp[i] = Color.decode(colorString);
-		}
-		return temp;
-	}
 
-	public String[] getLabelArray(int[] indices) {
-		String[] temp = new String[indices.length];
-		for (int i = 0; i < indices.length; i++) {
-			temp[i] = getCell(indices[i], 1) + "";
-		}
-		return temp;
-	}
-
-	public String getCompositeLabel(String[] labels) {
-		String compositeLabel = labels[0];
-		for (int i = 1; i < labels.length; i++) {
-			if (labels[i] == null || labels[i].equals("")) {
-				return compositeLabel + "";
-			}
-			compositeLabel = compositeLabel + ":" + labels[i];
-		}
-		return compositeLabel + "";
-	}
 
 	/*
 	 * This method handles all of the list and table selection events. If you
@@ -438,7 +412,7 @@ public class CriteriaTablePanel
 
 		/*
 		 * Actually, nothing happens here. This was an old behavior no longer
-		 * desired. The composite of criteria are always evalutated, not
+		 * desired. The composite of criteria are always evaluated, not
 		 * individual criteria.
 		 */
 

@@ -124,7 +124,7 @@ public class AttributeManager {
 	 */
 	public void setColorAttribute(String label, String nodeID, Boolean outcome) {
 		nodeAttributes.setUserVisible(label, false);
-		nodeAttributes.setAttribute(nodeID, label, outcome);
+		nodeAttributes.setAttribute(nodeID, label, outcome.toString());
 		nodeAttributes = Cytoscape.getNodeAttributes();
 	}
 
@@ -176,7 +176,8 @@ public class AttributeManager {
 				}
 
 				// if true, then mark label row position and skip to next node.
-				if (nodeAttributes.getBooleanAttribute(nodeID, labels[j])) {
+				if (Boolean.valueOf(nodeAttributes.getStringAttribute(nodeID,
+						labels[j]))) {
 
 					nodeAttributes.setAttribute(nodeID, compositeName,
 							colors[j]);
@@ -207,7 +208,7 @@ public class AttributeManager {
 
 	public static boolean getColorAttribute(String nodeID, String label) {
 		if (nodeAttributes.hasAttribute(nodeID, label)) {
-			return nodeAttributes.getBooleanAttribute(nodeID, label);
+			return Boolean.valueOf(nodeAttributes.getStringAttribute(nodeID, label));
 		}
 		return false;
 	}
