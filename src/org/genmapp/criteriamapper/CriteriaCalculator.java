@@ -67,7 +67,7 @@ public class CriteriaCalculator {
 			switch (i) {
 
 				case StreamTokenizer.TT_NUMBER : // Found a number, push value
-													// to stack
+					// to stack
 
 					// System.out.println(st.nval);
 					tokenList.add(new Token(Token.NUMBER, st.nval));
@@ -424,105 +424,78 @@ public class CriteriaCalculator {
 		CyNode cnode = (CyNode) node;
 		String nodeID = cnode.getIdentifier();
 
-		// System.out.println("second Node Value"+ nodeValues.get(secondValue));
-
 		if (firstToken.type == Token.NUMBER) {
 			dvalue1 = firstToken.numberValue;
 
-		} else {
+		} else if (firstToken.type == Token.NUMATTRIBUTE
+				&& attributeTypeMap.get(firstToken.attributeName) == 2) {
+			// value = getValue(node, firstValue);
+			if (nodeAttributes.hasAttribute(nodeID, firstToken.attributeName)) {
+				dvalue1 = nodeAttributes.getDoubleAttribute(nodeID,
+						firstToken.attributeName);
+			} else {return false;}
+		} else if (firstToken.type == Token.NUMATTRIBUTE
+				&& attributeTypeMap.get(firstToken.attributeName) == 3) {
 
-			if (firstToken.type == Token.NUMATTRIBUTE
-					&& attributeTypeMap.get(firstToken.attributeName) == 2) {
-
-				// value = getValue(node, firstValue);
-				if (nodeAttributes.hasAttribute(nodeID,
-						firstToken.attributeName)) {
-					dvalue1 = nodeAttributes.getDoubleAttribute(nodeID,
-							firstToken.attributeName);
-
-					// System.out.println("dvalue1: "+dvalue1);
-				}
-			} else {
-				if (firstToken.type == Token.NUMATTRIBUTE
-						&& attributeTypeMap.get(firstToken.attributeName) == 3) {
-
-					if (nodeAttributes.hasAttribute(nodeID,
-							firstToken.attributeName)) {
-						dvalue1 = nodeAttributes.getIntegerAttribute(nodeID,
-								firstToken.attributeName);
-						// String stemp = temp + "";
-						// nodeValueMap.put(attribute, stemp);
-						// System.out.println("ivalue1: "+dvalue1);
-					}
+			if (nodeAttributes.hasAttribute(nodeID, firstToken.attributeName)) {
+				dvalue1 = nodeAttributes.getIntegerAttribute(nodeID,
+						firstToken.attributeName);
+			} else {return false;}
+		} else if (firstToken.type == Token.NUMATTRIBUTE
+				&& attributeTypeMap.get(firstToken.attributeName) == 1) {
+			if (tokenList.get(position + 1).type == Token.EQ) {
+				if (secondToken.type == Token.TRUE) {
+					// System.out.println("ayo");
+					return true;
 				} else {
-					if (firstToken.type == Token.NUMATTRIBUTE
-							&& attributeTypeMap.get(firstToken.attributeName) == 1) {
-						if (tokenList.get(position + 1).type == Token.EQ) {
-							if (secondToken.type == Token.TRUE) {
-								// System.out.println("ayo");
-								return true;
-							} else {
-								if (secondToken.type == Token.FALSE) {
-									return false;
-								}
-							}
-						}
+					if (secondToken.type == Token.FALSE) {
+						return false;
 					}
 				}
 			}
-		}
+		} else { return false;}
 
 		if (secondToken.type == Token.NUMBER) {
 
 			dvalue2 = secondToken.numberValue;
 
 			// System.out.println("digit1: "+dvalue1);
-		} else {
+		} else if (secondToken.type == Token.NUMATTRIBUTE
+				&& attributeTypeMap.get(secondToken.attributeName) == 2) {
 
-			if (secondToken.type == Token.NUMATTRIBUTE
-					&& attributeTypeMap.get(secondToken.attributeName) == 2) {
+			// value = getValue(node, firstValue);
+			if (nodeAttributes.hasAttribute(nodeID, secondToken.attributeName)) {
+				dvalue2 = nodeAttributes.getDoubleAttribute(nodeID,
+						secondToken.attributeName);
+				// String stemp = temp + "";
+				// nodeValueMap.put(attribute, stemp);
+				// System.out.println("dvalue1: "+dvalue1);
+			} else {return false;}
+		} else if (secondToken.type == Token.NUMATTRIBUTE
+				&& attributeTypeMap.get(secondToken.attributeName) == 3) {
 
-				// value = getValue(node, firstValue);
-				if (nodeAttributes.hasAttribute(nodeID,
-						secondToken.attributeName)) {
-					dvalue2 = nodeAttributes.getDoubleAttribute(nodeID,
-							secondToken.attributeName);
-					// String stemp = temp + "";
-					// nodeValueMap.put(attribute, stemp);
-					// System.out.println("dvalue1: "+dvalue1);
-				}
-			} else {
-				if (secondToken.type == Token.NUMATTRIBUTE
-						&& attributeTypeMap.get(secondToken.attributeName) == 3) {
-
-					if (nodeAttributes.hasAttribute(nodeID,
-							secondToken.attributeName)) {
-						dvalue2 = nodeAttributes.getIntegerAttribute(nodeID,
-								secondToken.attributeName);
-						// String stemp = temp + "";
-						// nodeValueMap.put(attribute, stemp);
-						// System.out.println("ivalue1: "+ivalue1);
-					}
+			if (nodeAttributes.hasAttribute(nodeID, secondToken.attributeName)) {
+				dvalue2 = nodeAttributes.getIntegerAttribute(nodeID,
+						secondToken.attributeName);
+				// String stemp = temp + "";
+				// nodeValueMap.put(attribute, stemp);
+				// System.out.println("ivalue1: "+ivalue1);
+			} else {return false;}
+		} else if (secondToken.type == Token.NUMATTRIBUTE
+				&& attributeTypeMap.get(secondToken.attributeName) == 1) {
+			if (tokenList.get(position + 1).type == Token.EQ) {
+				if (firstToken.type == Token.TRUE) {
+					// System.out.println("ayo");
+					return true;
 				} else {
-					if (secondToken.type == Token.NUMATTRIBUTE
-							&& attributeTypeMap.get(secondToken.attributeName) == 1) {
-						if (tokenList.get(position + 1).type == Token.EQ) {
-							if (firstToken.type == Token.TRUE) {
-								// System.out.println("ayo");
-								return true;
-							} else {
-								if (firstToken.type == Token.FALSE) {
-									return false;
-								}
-							}
-						}
+					if (firstToken.type == Token.FALSE) {
+						return false;
 					}
 				}
 			}
-		}
+		}  else {return false;}
 
 		Token opToken = tokenList.get(position + 1);
-		// System.out.println(dvalue1+"   "+dvalue2);
 
 		if (opToken.type == Token.LT) {
 			return (dvalue1 < dvalue2);
@@ -547,7 +520,6 @@ public class CriteriaCalculator {
 
 		return false;
 	}
-
 	// System.out.println("comparisonOutcome: "+comparisonOutcome);
 
 	public void createAttributeTypeHash() {

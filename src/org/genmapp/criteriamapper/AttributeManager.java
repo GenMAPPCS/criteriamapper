@@ -123,7 +123,7 @@ public class AttributeManager {
 	 * @param outcome
 	 */
 	public void setColorAttribute(String label, String nodeID, Boolean outcome) {
-		nodeAttributes.setUserVisible(label, false);
+		nodeAttributes.setUserVisible(label, true);
 		nodeAttributes.setAttribute(nodeID, label, outcome.toString());
 		nodeAttributes = Cytoscape.getNodeAttributes();
 	}
