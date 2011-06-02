@@ -72,7 +72,7 @@ public class ColorMapper {
 			String compositeLabel, String[] colors, String mapTo) {
 		boolean newStyle = false;
 		
-		if (!compositeLabel.contains(":")) {
+		if (!compositeLabel.contains(":composite")) {
 			return createDiscreteMapping(net, vsName, compositeLabel,
 					colors[0], mapTo);
 		}

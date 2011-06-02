@@ -241,13 +241,8 @@ public class CriteriaBuilderDialog extends JPanel
 			for (int i = minIndex; i <= maxIndex; i++) {
 				// if (lsm.isSelectedIndex(i) && last != i) {
 				criteriaBuild = criteriaField.getText();
-				if (attributesArray[i].contains(" ")) {
-					criteriaBuild = criteriaBuild + " \"" + attributesArray[i]
-							+ "\" ";
-				} else {
-					criteriaBuild = criteriaBuild + " " + attributesArray[i]
-							+ " ";
-				}
+				criteriaBuild = criteriaBuild + " \"" + attributesArray[i]
+						+ "\" ";
 				criteriaField.setText(criteriaBuild);
 				// System.out.println("Selected Index: "+i);
 				// }
