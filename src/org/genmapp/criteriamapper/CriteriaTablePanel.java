@@ -549,7 +549,6 @@ public class CriteriaTablePanel
 		if (col == COLOR_COL) {
 			// java.awt.Color[r=0,g=0,b=255]
 			Color c = Color.decode(value);
-			System.out.println("colors: " + value + ":" + c.toString());
 			dataModel.setValueAt(c, row, col);
 			// System.out.println("set values");
 			return;

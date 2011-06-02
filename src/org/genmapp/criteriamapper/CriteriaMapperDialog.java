@@ -368,8 +368,8 @@ public class CriteriaMapperDialog extends JDialog
 		String[] criteriaLabels = new String[ctPanel.getDataLength()];
 
 		for (int k = 0; k < criteriaLabels.length; k++) {
-			String temp = ctPanel.getCell(k, ctPanel.EXP_COL) + ":"
-					+ ctPanel.getCell(k, ctPanel.LABEL_COL) + ":"
+			String temp = ctPanel.getCell(k, ctPanel.EXP_COL) + "::"
+					+ ctPanel.getCell(k, ctPanel.LABEL_COL) + "::"
 					+ ctPanel.getCell(k, ctPanel.COLOR_COL);
 			System.out.println("SAVE SETTINGS: " + sn + "  " + temp);
 			if (!temp.equals(null))
@@ -403,7 +403,7 @@ public class CriteriaMapperDialog extends JDialog
 
 		for (int i = 1; i < criteria.length; i++) {
 
-			String[] temp = criteria[i].split(":");
+			String[] temp = criteria[i].split("::");
 			if (temp.length != 3) {
 				break;
 			}
