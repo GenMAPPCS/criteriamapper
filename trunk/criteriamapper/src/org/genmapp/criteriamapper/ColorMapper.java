@@ -93,14 +93,14 @@ public class ColorMapper {
 		String newVsName = baseName[0] + "__" + vsName;
 		vs = catalog.getVisualStyle(newVsName);
 		if (null == vs) {
-			vs = new VisualStyle(vsOld, newVsName);
+			vs = new VisualStyle(newVsName);
 			catalog.addVisualStyle(vs);
 		}
 
 		DiscreteMapping disMapping = new DiscreteMapping(Color.class,
 				compositeLabel);
 
-		disMapping.putMapValue("null", Color.WHITE);
+		disMapping.putMapValue("null", Color.LIGHT_GRAY);
 
 		List<Integer> rowList = new ArrayList<Integer>();
 		boolean doCalc = false;
@@ -111,7 +111,7 @@ public class ColorMapper {
 			doCalc = true;
 		}
 
-		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
+		NodeAppearanceCalculator nodeAppCalc = vsOld.getNodeAppearanceCalculator();
 
 		Calculator nodeColorCalculator = null;
 
@@ -140,11 +140,11 @@ public class ColorMapper {
 			nodeColorCalculator = new BasicCalculator(vs.getName()
 					+ "-Node Color-Discrete Mapper", disMapping,
 					VisualPropertyType.NODE_FILL_COLOR);
-		}
-
-		if (nodeColorCalculator != null) {
+			nodeColorCalculator.setName(vs.getName()
+					+ "-Node Color-Discrete Mapper2");
 			nodeAppCalc.setCalculator(nodeColorCalculator);
 		}
+
 		vs.setNodeAppearanceCalculator(nodeAppCalc);
 
 		// Set the visual style
@@ -165,7 +165,7 @@ public class ColorMapper {
 		for (Node node : nodeList) {
 
 			NodeView nodeView = networkView.getNodeView(node);
-			Paint p = Color.WHITE;
+			Paint p = Color.LIGHT_GRAY;
 			nodeView.setUnselectedPaint(p);
 
 		}
@@ -195,16 +195,16 @@ public class ColorMapper {
 		String newVsName = baseName[0] + "__" + vsName;
 		vs = catalog.getVisualStyle(newVsName);
 		if (null == vs) {
-			vs = new VisualStyle(vsOld, newVsName);
+			vs = new VisualStyle(newVsName);
 			catalog.addVisualStyle(vs);
 		}
 
 		DiscreteMapping disMapping = new DiscreteMapping(Color.class, label);
 
 		disMapping.putMapValue("true", Color.decode(currentColor));
-		disMapping.putMapValue("false", Color.WHITE);
+		disMapping.putMapValue("false", Color.LIGHT_GRAY);
 
-		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
+		NodeAppearanceCalculator nodeAppCalc = vsOld.getNodeAppearanceCalculator();
 
 		Calculator nodeColorCalculator = null;
 
@@ -261,7 +261,7 @@ public class ColorMapper {
 		DiscreteMapping disMapping = new DiscreteMapping(Color.class, label);
 
 		disMapping.putMapValue("true", Color.decode(currentColor));
-		disMapping.putMapValue("false", Color.WHITE);
+		disMapping.putMapValue("false", Color.LIGHT_GRAY);
 
 		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
 
@@ -271,7 +271,7 @@ public class ColorMapper {
 
 		nodeAppCalc.setCalculator(nodeColorCalculator);
 
-		vs.setNodeAppearanceCalculator(nodeAppCalc);
+		//vs.setNodeAppearanceCalculator(nodeAppCalc);
 
 		// Set the visual style
 		vmm.setVisualStyle(vs);
