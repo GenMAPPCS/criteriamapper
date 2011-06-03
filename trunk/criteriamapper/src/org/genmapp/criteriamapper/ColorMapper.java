@@ -40,6 +40,7 @@ import cytoscape.view.CyNetworkView;
 import cytoscape.visual.CalculatorCatalog;
 import cytoscape.visual.NodeAppearanceCalculator;
 import cytoscape.visual.VisualMappingManager;
+import cytoscape.visual.VisualPropertyDependency;
 import cytoscape.visual.VisualPropertyType;
 import cytoscape.visual.VisualStyle;
 import cytoscape.visual.calculators.BasicCalculator;
@@ -146,6 +147,9 @@ public class ColorMapper {
 		}
 
 		vs.setNodeAppearanceCalculator(nodeAppCalc);
+		vs.getDependency()
+		.set(VisualPropertyDependency.Definition.NODE_SIZE_LOCKED,
+				false);
 
 		// Set the visual style
 		vmm.setVisualStyle(vs);
@@ -220,6 +224,9 @@ public class ColorMapper {
 		nodeAppCalc.setCalculator(nodeColorCalculator);
 
 		vs.setNodeAppearanceCalculator(nodeAppCalc);
+		vs.getDependency()
+		.set(VisualPropertyDependency.Definition.NODE_SIZE_LOCKED,
+				false);
 
 		// Set the visual style
 		vmm.setVisualStyle(vs);
@@ -271,7 +278,10 @@ public class ColorMapper {
 
 		nodeAppCalc.setCalculator(nodeColorCalculator);
 
-		//vs.setNodeAppearanceCalculator(nodeAppCalc);
+		vs.setNodeAppearanceCalculator(nodeAppCalc);
+		vs.getDependency()
+		.set(VisualPropertyDependency.Definition.NODE_SIZE_LOCKED,
+				false);
 
 		// Set the visual style
 		vmm.setVisualStyle(vs);
