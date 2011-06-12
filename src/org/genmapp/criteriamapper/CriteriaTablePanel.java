@@ -591,8 +591,8 @@ public class CriteriaTablePanel
 
 	public void populateList(String criteria, String label, Color currentColor) {
 		dataModel.addRow();
-		System.out.println("  Row Count: " + dataModel.rowCount + " Criteria: "
-				+ criteria + " Label: " + label);
+//		System.out.println("  Row Count: " + dataModel.rowCount + " Criteria: "
+//				+ criteria + " Label: " + label);
 
 		dataModel.setValueAt(label, dataModel.rowCount - 1, LABEL_COL);
 		dataModel.setValueAt(criteria, dataModel.rowCount - 1, EXP_COL);
