@@ -99,7 +99,8 @@ public class ColorMapper {
 		DiscreteMapping disMapping = new DiscreteMapping(Color.class,
 				compositeLabel);
 
-		disMapping.putMapValue("null", Color.LIGHT_GRAY);
+		disMapping.putMapValue("false", Color.LIGHT_GRAY);
+		disMapping.putMapValue("null", Color.WHITE);
 
 		List<Integer> rowList = new ArrayList<Integer>();
 		boolean doCalc = false;
@@ -207,6 +208,7 @@ public class ColorMapper {
 
 		disMapping.putMapValue("true", Color.decode(currentColor));
 		disMapping.putMapValue("false", Color.LIGHT_GRAY);
+		disMapping.putMapValue("null", Color.WHITE);
 
 		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
 
@@ -270,6 +272,7 @@ public class ColorMapper {
 
 		disMapping.putMapValue("true", Color.decode(currentColor));
 		disMapping.putMapValue("false", Color.LIGHT_GRAY);
+		disMapping.putMapValue("null", Color.WHITE);
 
 		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
 
