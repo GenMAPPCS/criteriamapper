@@ -72,7 +72,7 @@ public class ColorMapper {
 	public VisualStyle createCompositeMapping(CyNetwork net, String vsName,
 			String compositeLabel, String[] colors, String mapTo) {
 		boolean newStyle = false;
-		
+
 		if (!compositeLabel.contains(":composite")) {
 			return createDiscreteMapping(net, vsName, compositeLabel,
 					colors[0], mapTo);
@@ -93,10 +93,8 @@ public class ColorMapper {
 		String[] baseName = vsOld.getName().split("__");
 		String newVsName = baseName[0] + "__" + vsName;
 		vs = catalog.getVisualStyle(newVsName);
-		if (null == vs) {
-			vs = new VisualStyle(newVsName);
-			catalog.addVisualStyle(vs);
-		}
+		if (null == vs)
+			vs = new VisualStyle(vsOld, newVsName);
 
 		DiscreteMapping disMapping = new DiscreteMapping(Color.class,
 				compositeLabel);
@@ -112,30 +110,31 @@ public class ColorMapper {
 			doCalc = true;
 		}
 
-		NodeAppearanceCalculator nodeAppCalc = vsOld.getNodeAppearanceCalculator();
+		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
 
 		Calculator nodeColorCalculator = null;
 
-//		if (rowList.size() > 0) {
-//			Map<String, List<Color>> nodeMap = new HashMap<String, List<Color>>();
-//			String[] labels = compositeLabel.split(":");
-//			for (Integer j : rowList) {
-//				List<Node> nodeList = network.nodesList();
-//				for (Node node : nodeList) {
-//					String id = node.getIdentifier();
-//					boolean b = AttributeManager.getColorAttribute(id,
-//							labels[j]);
-//					Color c = colors[j];
-//					if (!b)
-//						c = Color.white; // TODO: set to default node color
-//					List<Color> cl = nodeMap.get(id);
-//					if (null == cl)
-//						cl = new ArrayList<Color>();
-//					cl.add(c);
-//					nodeMap.put(id, cl);
-//				}
-//			}
-//		}
+		// if (rowList.size() > 0) {
+		// Map<String, List<Color>> nodeMap = new HashMap<String,
+		// List<Color>>();
+		// String[] labels = compositeLabel.split(":");
+		// for (Integer j : rowList) {
+		// List<Node> nodeList = network.nodesList();
+		// for (Node node : nodeList) {
+		// String id = node.getIdentifier();
+		// boolean b = AttributeManager.getColorAttribute(id,
+		// labels[j]);
+		// Color c = colors[j];
+		// if (!b)
+		// c = Color.white; // TODO: set to default node color
+		// List<Color> cl = nodeMap.get(id);
+		// if (null == cl)
+		// cl = new ArrayList<Color>();
+		// cl.add(c);
+		// nodeMap.put(id, cl);
+		// }
+		// }
+		// }
 
 		if (doCalc) {
 			nodeColorCalculator = new BasicCalculator(vs.getName()
@@ -147,9 +146,12 @@ public class ColorMapper {
 		}
 
 		vs.setNodeAppearanceCalculator(nodeAppCalc);
-		vs.getDependency()
-		.set(VisualPropertyDependency.Definition.NODE_SIZE_LOCKED,
-				false);
+		vs.getDependency().set(
+				VisualPropertyDependency.Definition.NODE_SIZE_LOCKED, false);
+
+		VisualStyle vsNew = catalog.getVisualStyle(newVsName);
+		if (null == vsNew)
+			catalog.addVisualStyle(vs);
 
 		// Set the visual style
 		vmm.setVisualStyle(vs);
@@ -182,7 +184,7 @@ public class ColorMapper {
 	 */
 	public VisualStyle createDiscreteMapping(CyNetwork net, String vsName,
 			String label, String currentColor, String mapTo) {
-		
+
 		// must set current view to retrieve visual style via vmm
 		Cytoscape.setCurrentNetwork(net.getIdentifier());
 		networkView = Cytoscape.getNetworkView(net.getIdentifier());
@@ -198,17 +200,15 @@ public class ColorMapper {
 		String[] baseName = vsOld.getName().split("__");
 		String newVsName = baseName[0] + "__" + vsName;
 		vs = catalog.getVisualStyle(newVsName);
-		if (null == vs) {
-			vs = new VisualStyle(newVsName);
-			catalog.addVisualStyle(vs);
-		}
+		if (null == vs)
+			vs = new VisualStyle(vsOld, newVsName);
 
 		DiscreteMapping disMapping = new DiscreteMapping(Color.class, label);
 
 		disMapping.putMapValue("true", Color.decode(currentColor));
 		disMapping.putMapValue("false", Color.LIGHT_GRAY);
 
-		NodeAppearanceCalculator nodeAppCalc = vsOld.getNodeAppearanceCalculator();
+		NodeAppearanceCalculator nodeAppCalc = vs.getNodeAppearanceCalculator();
 
 		Calculator nodeColorCalculator = null;
 
@@ -224,9 +224,12 @@ public class ColorMapper {
 		nodeAppCalc.setCalculator(nodeColorCalculator);
 
 		vs.setNodeAppearanceCalculator(nodeAppCalc);
-		vs.getDependency()
-		.set(VisualPropertyDependency.Definition.NODE_SIZE_LOCKED,
-				false);
+		vs.getDependency().set(
+				VisualPropertyDependency.Definition.NODE_SIZE_LOCKED, false);
+
+		VisualStyle vsNew = catalog.getVisualStyle(newVsName);
+		if (null == vsNew)
+			catalog.addVisualStyle(vs);
 
 		// Set the visual style
 		vmm.setVisualStyle(vs);
@@ -260,10 +263,8 @@ public class ColorMapper {
 		String[] baseName = vsOld.getName().split("__");
 		String newVsName = baseName[0] + "__" + vsName;
 		vs = catalog.getVisualStyle(newVsName);
-		if (null == vs) {
+		if (null == vs)
 			vs = new VisualStyle(vsOld, newVsName);
-			catalog.addVisualStyle(vs);
-		}
 
 		DiscreteMapping disMapping = new DiscreteMapping(Color.class, label);
 
@@ -279,9 +280,12 @@ public class ColorMapper {
 		nodeAppCalc.setCalculator(nodeColorCalculator);
 
 		vs.setNodeAppearanceCalculator(nodeAppCalc);
-		vs.getDependency()
-		.set(VisualPropertyDependency.Definition.NODE_SIZE_LOCKED,
-				false);
+		vs.getDependency().set(
+				VisualPropertyDependency.Definition.NODE_SIZE_LOCKED, false);
+
+		VisualStyle vsNew = catalog.getVisualStyle(newVsName);
+		if (null == vsNew)
+			catalog.addVisualStyle(vs);
 
 		// Set the visual style
 		vmm.setVisualStyle(vs);
