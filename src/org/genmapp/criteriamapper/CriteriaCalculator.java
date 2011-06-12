@@ -289,11 +289,11 @@ public class CriteriaCalculator {
 			CyNode node = (CyNode) nodeList.get(j);
 			Node gnode = nodeList.get(j);
 			String nodeID = node.getIdentifier();
-			Stack<Boolean> finalValue = new Stack<Boolean>();
+			Stack<String> finalValue = new Stack<String>();
 
 			int size = tokenList.size();
 			if (size < 2) { // incomplete expression
-				finalValue.push(false);
+				finalValue.push("null");
 				return;
 			}
 			for (int i = 0; i < size; i++) {
@@ -304,11 +304,12 @@ public class CriteriaCalculator {
 				int type1 = tokenList.get(i + 1).type;
 				int type2 = tokenList.get(i + 2).type;
 				// System.out.println(attributes.get(i)+ "evaluateOnce");
+				// EQ FORM: ... [x] > y ...
 				if ((i + 2) < size
 						&& (type1 == Token.LT || type1 == Token.GT
 								|| type1 == Token.LTEQ || type1 == Token.GTEQ || type1 == Token.EQ)) {
 
-					boolean comparisonOutcome = false;
+					String comparisonOutcome = "null";
 
 					// if(!(attributes.get(i).equals("") ||
 					// attributes.get(i+2).equals(""))){
@@ -322,7 +323,7 @@ public class CriteriaCalculator {
 					finalValue.push(comparisonOutcome);
 					i = i + 2;
 				} else {
-
+					// EQ FORM: ... [y] AND z ...
 					if ((i + 2) < size
 							&& (type1 == Token.AND || type1 == Token.OR || type1 == Token.NOT)) {
 						// logicalString = logicalString + attributes.get(i) +
@@ -333,37 +334,38 @@ public class CriteriaCalculator {
 						i++;
 					} else {
 						if ((type0 == Token.AND || type0 == Token.OR || type0 == Token.NOT)) {
-
+							// EQ FORM: ... y [AND] z OR ...
 							if (i + 3 < size
 									&& (type2 == Token.AND || type2 == Token.OR || type2 == Token.NOT)) {
-								boolean temp = finalValue.pop();
-								boolean temp2 = tokenList.get(i + 1).booleanValue;
-								boolean outcome = doBooleanOperation(tokenList
+								String temp = finalValue.pop();
+								String temp2 = tokenList.get(i + 1).booleanValue;
+								String outcome = doBooleanOperation(tokenList
 										.get(i), temp, temp2);
 								finalValue.push(outcome);
 								i++;
 							} else {
-
+								// EQ FORM: ... [AND] z ...
 								if (i + 2 == size) {
 									// logicalString = logicalString +
 									// attributes.get(i+1);
-									boolean temp = finalValue.pop();
-									boolean outcome = doBooleanOperation(
+									String temp = finalValue.pop();
+									String outcome = doBooleanOperation(
 											tokenList.get(i), temp, tokenList
 													.get(i + 1).booleanValue);
 									finalValue.push(outcome);
 									i++;
 								} else {
+									// EQ FORM: ... [AND] z > a ...
 									if (i + 3 < size
 											&& (type2 == Token.LT
 													|| type2 == Token.GT
 													|| type2 == Token.LTEQ
 													|| type2 == Token.GTEQ || type2 == Token.EQ)) {
-										boolean temp = doNumericalOperation(
+										String temp = doNumericalOperation(
 												i + 1, tokenList.get(i + 1),
 												tokenList.get(i + 3), node);
-										boolean temp2 = finalValue.pop();
-										boolean outcome = doBooleanOperation(
+										String temp2 = finalValue.pop();
+										String outcome = doBooleanOperation(
 												tokenList.get(i), temp, temp2);
 										finalValue.push(outcome);
 										i = i + 3;
@@ -378,43 +380,75 @@ public class CriteriaCalculator {
 			// System.out.print(node.getIdentifier() +" : "+ logicalString );
 			// network.setSelectedNodeState(node, false);
 			if (!finalValue.isEmpty()) {
-				boolean outcome = finalValue.pop();
+				String outcome = finalValue.pop();
 				attManager.setColorAttribute(label, node.getIdentifier(),
 						outcome);
 			}
 		}
 	}
 
-	public boolean doBooleanOperation(Token token, boolean firstValue,
-			boolean secondValue) {
-		if (token.type == Token.AND) {
-			if (firstValue && secondValue) {
-				return true;
-			} else {
-				return false;
-			}
+	/**
+	 * This is boolean operation for strings! Allows for "null" case. Returns
+	 * "true", "false" or "null".
+	 * 
+	 * @param token
+	 * @param firstValue
+	 *            "true", "false" or "null"
+	 * @param secondValue
+	 *            "true", "false" or "null"
+	 * @return
+	 */
+	public String doBooleanOperation(Token token, String first, String second) {
+		// if either is null, then return null
+		if (first.equals("null")) {
+			return "null";
 		} else {
-			if (token.type == Token.OR) {
-				if (firstValue || secondValue) {
-					return true;
-				} else {
-					return false;
-				}
-
+			if (second.equals("null")) {
+				return "null";
 			} else {
-				if (token.type == Token.NOT) {
-					if (firstValue && !secondValue) {
-						return true;
+				// else evaluate strings like booleans
+				boolean firstValue = Boolean.valueOf(first);
+				boolean secondValue = Boolean.valueOf(second);
+
+				if (token.type == Token.AND) {
+					if (firstValue && secondValue) {
+						return "true";
 					} else {
-						return false;
+						return "false";
+					}
+
+				} else {
+					if (token.type == Token.OR) {
+						if (firstValue || secondValue) {
+							return "true";
+						} else {
+							return "false";
+						}
+
+					} else {
+						if (token.type == Token.NOT) {
+							if (firstValue && !secondValue) {
+								return "true";
+							} else {
+								return "false";
+							}
+						}
 					}
 				}
 			}
 		}
-		return false;
+		return "null";
 	}
-
-	public boolean doNumericalOperation(int position, Token firstToken,
+	
+	
+	/**
+	 * @param position
+	 * @param firstToken
+	 * @param secondToken
+	 * @param node
+	 * @return
+	 */
+	public String doNumericalOperation(int position, Token firstToken,
 			Token secondToken, Node node) {
 		boolean comparisonOutcome = false;
 
@@ -433,27 +467,33 @@ public class CriteriaCalculator {
 			if (nodeAttributes.hasAttribute(nodeID, firstToken.attributeName)) {
 				dvalue1 = nodeAttributes.getDoubleAttribute(nodeID,
 						firstToken.attributeName);
-			} else {return false;}
+			} else {
+				return "null";
+			}
 		} else if (firstToken.type == Token.NUMATTRIBUTE
 				&& attributeTypeMap.get(firstToken.attributeName) == 3) {
 
 			if (nodeAttributes.hasAttribute(nodeID, firstToken.attributeName)) {
 				dvalue1 = nodeAttributes.getIntegerAttribute(nodeID,
 						firstToken.attributeName);
-			} else {return false;}
+			} else {
+				return "null";
+			}
 		} else if (firstToken.type == Token.NUMATTRIBUTE
 				&& attributeTypeMap.get(firstToken.attributeName) == 1) {
 			if (tokenList.get(position + 1).type == Token.EQ) {
 				if (secondToken.type == Token.TRUE) {
 					// System.out.println("ayo");
-					return true;
+					return "true";
 				} else {
 					if (secondToken.type == Token.FALSE) {
-						return false;
+						return "false";
 					}
 				}
 			}
-		} else { return false;}
+		} else {
+			return "null";
+		}
 
 		if (secondToken.type == Token.NUMBER) {
 
@@ -470,7 +510,9 @@ public class CriteriaCalculator {
 				// String stemp = temp + "";
 				// nodeValueMap.put(attribute, stemp);
 				// System.out.println("dvalue1: "+dvalue1);
-			} else {return false;}
+			} else {
+				return "null";
+			}
 		} else if (secondToken.type == Token.NUMATTRIBUTE
 				&& attributeTypeMap.get(secondToken.attributeName) == 3) {
 
@@ -480,45 +522,64 @@ public class CriteriaCalculator {
 				// String stemp = temp + "";
 				// nodeValueMap.put(attribute, stemp);
 				// System.out.println("ivalue1: "+ivalue1);
-			} else {return false;}
+			} else {
+				return "null";
+			}
 		} else if (secondToken.type == Token.NUMATTRIBUTE
 				&& attributeTypeMap.get(secondToken.attributeName) == 1) {
 			if (tokenList.get(position + 1).type == Token.EQ) {
 				if (firstToken.type == Token.TRUE) {
 					// System.out.println("ayo");
-					return true;
+					return "true";
 				} else {
 					if (firstToken.type == Token.FALSE) {
-						return false;
+						return "false";
 					}
 				}
 			}
-		}  else {return false;}
+		} else {
+			return "null";
+		}
 
 		Token opToken = tokenList.get(position + 1);
 
 		if (opToken.type == Token.LT) {
-			return (dvalue1 < dvalue2);
+			if (dvalue1 < dvalue2)
+				return "true";
+			else
+				return "false";
 
 		}
 
 		if (opToken.type == Token.GT) {
-			return (dvalue1 > dvalue2);
+			if (dvalue1 > dvalue2)
+				return "true";
+			else
+				return "false";
 		}
 
 		if (opToken.type == Token.LTEQ) {
-			return (dvalue1 <= dvalue2);
+			if (dvalue1 <= dvalue2)
+				return "true";
+			else
+				return "false";
 		}
 
 		if (opToken.type == Token.GTEQ) {
-			return (dvalue1 >= dvalue2);
+			if (dvalue1 >= dvalue2)
+				return "true";
+			else
+				return "false";
 		}
 
 		if (opToken.type == Token.EQ) {
-			return (dvalue1 == dvalue2);
+			if (dvalue1 == dvalue2)
+				return "true";
+			else
+				return "false";
 		}
 
-		return false;
+		return "null";
 	}
 	// System.out.println("comparisonOutcome: "+comparisonOutcome);
 
@@ -603,7 +664,7 @@ class Token {
 
 	public double numberValue; // in case it is a number...
 	public String attributeName; // in case it is a symbol
-	public boolean booleanValue;
+	public String booleanValue;
 
 	public int getType() {
 		return type;

@@ -122,9 +122,9 @@ public class AttributeManager {
 	 * @param nodeID
 	 * @param outcome
 	 */
-	public void setColorAttribute(String label, String nodeID, Boolean outcome) {
-		nodeAttributes.setUserVisible(label, true);
-		nodeAttributes.setAttribute(nodeID, label, outcome.toString());
+	public void setColorAttribute(String label, String nodeID, String outcome) {
+		nodeAttributes.setUserVisible(label, false);
+		nodeAttributes.setAttribute(nodeID, label, outcome);
 		nodeAttributes = Cytoscape.getNodeAttributes();
 	}
 
@@ -144,38 +144,42 @@ public class AttributeManager {
 			// only a single criteria; skip composition
 			return;
 		}
+		// update reference to node attributes
+		nodeAttributes = Cytoscape.getNodeAttributes();
 
 		List<Node> nodesList = Cytoscape.getCyNodesList();
 		String compositeName = compositeLabel;
-		// for (int k = 1; k < labels.length; k++) {
-		// if (labels[k].equals("")) {
-		// continue;
-		// }
-		// compositeName = compositeName + ":" + labels[k];
-		// }
 
 		// set attr to hidden
-		nodeAttributes.setUserVisible(compositeName, true);
+		nodeAttributes.setUserVisible(compositeName, false);
 
 		for (int i = 0; i < nodesList.size(); i++) {
 			Node node = nodesList.get(i);
 			String nodeID = node.getIdentifier();
 
-			// initialize value to all false (-1)
+			// initialize default value to null
 			nodeAttributes.setAttribute(nodeID, compositeName, "null");
 
-			// loop through each label in order
+			/*
+			 * Loop through each label from top to bottom, giving priority based
+			 * on position and value of "true".
+			 */
 			for (int j = 0; j < labels.length; j++) {
 				if (labels[j].equals("")) {
 					continue;
 				}
 				if (!(nodeAttributes.hasAttribute(nodeID, labels[j]))) {
-					throw new Exception("ITERATION: " + j
-							+ " Node Attribute for node " + nodeID + " at "
-							+ labels[j] + " has not been calculated");
+					continue;
+				}
+				if (nodeAttributes.getStringAttribute(nodeID, labels[j])
+						.equals("null")) {
+					continue;
 				}
 
-				// if true, then mark label row position and skip to next node.
+				/*
+				 * By this point the value is either "true" or "false". If true,
+				 * then mark label row position and skip to next node!
+				 */
 				if (Boolean.valueOf(nodeAttributes.getStringAttribute(nodeID,
 						labels[j]))) {
 
@@ -183,9 +187,16 @@ public class AttributeManager {
 							colors[j]);
 					break; // next node
 
+				} else {
+					/*
+					 * If top position is false, then mark it; otherwise leave
+					 * it to null default
+					 */
+					if (j == 0)
+						nodeAttributes.setAttribute(nodeID, compositeName,
+								"false");
 				}
-				// update reference to node attributes
-				nodeAttributes = Cytoscape.getNodeAttributes();
+
 			}
 		}
 	}
@@ -208,7 +219,8 @@ public class AttributeManager {
 
 	public static boolean getColorAttribute(String nodeID, String label) {
 		if (nodeAttributes.hasAttribute(nodeID, label)) {
-			return Boolean.valueOf(nodeAttributes.getStringAttribute(nodeID, label));
+			return Boolean.valueOf(nodeAttributes.getStringAttribute(nodeID,
+					label));
 		}
 		return false;
 	}
