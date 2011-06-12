@@ -407,8 +407,8 @@ public class CriteriaMapperDialog extends JDialog
 			if (temp.length != 3) {
 				break;
 			}
-			System.out.println("LOAD SETTINGS: " + setName + " " + temp[0]
-					+ " :" + temp[1] + " :" + temp[2]);
+			// System.out.println("LOAD SETTINGS: " + setName + " " + temp[0]
+			// + " :" + temp[1] + " :" + temp[2]);
 			ctPanel.populateList(temp[0], temp[1], Color.decode(temp[2]));
 
 		}
@@ -432,7 +432,7 @@ public class CriteriaMapperDialog extends JDialog
 
 	public void propertyChange(PropertyChangeEvent e) {
 		if (e.getPropertyName().equals("ATTRIBUTES_CHANGED")) {
-			//TODO: update attr list
+			// TODO: update attr list
 		}
 	}
 
