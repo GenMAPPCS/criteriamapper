@@ -11,7 +11,7 @@
   	<property name="src.dir" value="src"/>
 
 	<!--  The directory containing library jar files -->	
-	<property name="release.dir" value="/Applications/Cytoscape_v2.8.1"/>
+	<property name="release.dir" value="/Applications/Cytoscape_v2.8.2"/>
 	
   	<!-- Temporary build directories -->
 
@@ -46,8 +46,11 @@
     		<mkdir dir="${build.dir}"/>
 			<mkdir dir="${build.classes}"/>
 
-  		<!-- <mkdir dir="${dist.dir}"/> -->
-		<!-- <mkdir dir="${doc.dir}"/> -->
+  		<!-- copy over images -->
+		<copy todir="${build.classes}/org/genmapp/criteriamapper/images">
+			<fileset dir="${basedir}/images" />
+		</copy>
+  		
   	</target>
 
 	<!--  Target to clean out all directories -->
@@ -84,12 +87,6 @@
         </unjar>
 		-->
    		
-        <!-- copy over images 
-   		<mkdir dir="${build.classes}/org/genmapp/criteriamapper/img"/>
- 		<copy todir="${build.classes}/org/genmapp/criteriamapper/img">
- 			<fileset dir="${src.dir}/img" />
- 			</copy> -->
-
       <jar destfile="${build.dir}/${plugin.name}.jar">
         <fileset dir="${build.classes}"/>
         </jar>

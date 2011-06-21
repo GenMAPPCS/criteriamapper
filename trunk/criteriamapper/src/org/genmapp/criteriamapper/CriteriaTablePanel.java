@@ -37,6 +37,7 @@ import java.util.Set;
 import javax.swing.AbstractCellEditor;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JColorChooser;
 import javax.swing.JDialog;
@@ -248,32 +249,28 @@ public class CriteriaTablePanel
 
 		// Add the scroll pane to this panel.
 
-		// java.net.URL upArrowURL = CriteriaTablePanel.class
-		// .getResource("img/upArrow2.gif");
-		// java.net.URL downArrowURL = CriteriaTablePanel.class
-		// .getResource("img/downArrow2.gif");
-		// ImageIcon upIcon = new ImageIcon();
-		// ImageIcon downIcon = new ImageIcon();
-		// if (upArrowURL != null) {
-		// upIcon = new ImageIcon(upArrowURL);
-		// }
-		// if (downArrowURL != null) {
-		// downIcon = new ImageIcon(downArrowURL);
-		// }
-
-		JButton upArrow = new JButton("Move Row Up");
+		JButton upArrow = new JButton();
+		upArrow.setIcon(new ImageIcon(getClass()
+				.getResource("images/up.png")));
+		upArrow.setToolTipText("Move criteria up");
 		upArrow.setActionCommand("moveUp");
 		upArrow.addActionListener(this);
 
-		JButton downArrow = new JButton("Move Row Down");
+		JButton downArrow = new JButton();
+		downArrow.setIcon(new ImageIcon(getClass().getResource("images/down.png")));
+		downArrow.setToolTipText("Move criteria down");
 		downArrow.setActionCommand("moveDown");
 		downArrow.addActionListener(this);
 
-		JButton newRow = new JButton("New Row");
+		JButton newRow = new JButton();
+		newRow.setIcon(new ImageIcon(getClass().getResource("images/add.png")));
+		newRow.setToolTipText("Add new criteria");
 		newRow.setActionCommand("newCriteria");
 		newRow.addActionListener(this);
 
-		JButton deleteRow = new JButton("Delete Row");
+		JButton deleteRow = new JButton();
+		deleteRow.setIcon(new ImageIcon(getClass().getResource("images/subtract.png")));
+		deleteRow.setToolTipText("Delete criteria");
 		deleteRow.setActionCommand("deleteCriteria");
 		deleteRow.addActionListener(this);
 
@@ -394,8 +391,6 @@ public class CriteriaTablePanel
 		}
 
 	}
-
-
 
 	/*
 	 * This method handles all of the list and table selection events. If you
@@ -591,8 +586,9 @@ public class CriteriaTablePanel
 
 	public void populateList(String criteria, String label, Color currentColor) {
 		dataModel.addRow();
-//		System.out.println("  Row Count: " + dataModel.rowCount + " Criteria: "
-//				+ criteria + " Label: " + label);
+		// System.out.println("  Row Count: " + dataModel.rowCount +
+		// " Criteria: "
+		// + criteria + " Label: " + label);
 
 		dataModel.setValueAt(label, dataModel.rowCount - 1, LABEL_COL);
 		dataModel.setValueAt(criteria, dataModel.rowCount - 1, EXP_COL);
