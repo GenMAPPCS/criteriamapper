@@ -98,27 +98,11 @@ public class CriteriaBuilderDialog extends JPanel
 		titleBorder.setTitlePosition(TitledBorder.TOP);
 		bigPanel.setBorder(titleBorder);
 
-		// make label panel
-		JPanel labelPanel = new JPanel();
-		BoxLayout labelBox = new BoxLayout(labelPanel, BoxLayout.X_AXIS);
-		labelPanel.setLayout(labelBox);
-
-		JPanel attPanel = new JPanel(new BorderLayout(0, 2));
-		JLabel attLabel = new JLabel("      Attributes");
-		attPanel.add(attLabel, BorderLayout.LINE_START);
-		JPanel opPanel = new JPanel(new BorderLayout(0, 2));
-		JLabel opLabel = new JLabel("Operations           ");
-
-		opPanel.add(opLabel, BorderLayout.LINE_END);
-
-		labelPanel.add(attPanel);
-		labelPanel.add(opPanel);
-
-		JPanel listPanel = new JPanel();
-		BoxLayout listBox = new BoxLayout(listPanel, BoxLayout.X_AXIS);
-		listPanel.setLayout(listBox);
-
-		JPanel attListPanel = new JPanel(new BorderLayout(0, 2));
+		// make attr panel
+		JPanel attListPanel = new JPanel();
+		BoxLayout attrListBox = new BoxLayout(attListPanel, BoxLayout.Y_AXIS);
+		attListPanel.setLayout(attrListBox);
+		
 		attributesArray = getAllAttributes();
 		attList = new JList();
 		attList.setModel(new javax.swing.AbstractListModel() {
@@ -141,16 +125,24 @@ public class CriteriaBuilderDialog extends JPanel
 		attList.setSelectionModel(listSelectModel);
 
 		JScrollPane attpane = new JScrollPane();
-		attpane
-				.setToolTipText("Click on attribute names to copy them into the expression above");
 		attpane.setViewportView(attList);
-		attpane.setMinimumSize(new Dimension(125, 100));
-		attpane.setPreferredSize(new Dimension(125, 100));
-		attpane.setMaximumSize(new Dimension(125, Cytoscape.getDesktop()
-				.getHeight()));
-		attListPanel.add(attpane, BorderLayout.LINE_START);
+//		attpane.setMinimumSize(new Dimension(125, 100));
+//		attpane.setPreferredSize(new Dimension(150, 100));
+//		attpane.setMaximumSize(new Dimension(Cytoscape.getDesktop().getWidth(), Cytoscape.getDesktop()
+//				.getHeight()));
+		
+		JLabel attrLabel = new JLabel("Attributes");
+		attrLabel
+		.setToolTipText("Click on attribute names to copy them into the expression above");
+		
+		attListPanel.add(attrLabel);
+		attListPanel.add(attpane);
 
-		JPanel opListPanel = new JPanel(new BorderLayout(0, 2));
+		// make op panel
+		JPanel opListPanel = new JPanel();
+		BoxLayout opListBox = new BoxLayout(opListPanel, BoxLayout.Y_AXIS);
+		opListPanel.setLayout(opListBox);
+		
 		opList = new JList(opArray);
 		ListSelectionModel listSelectionModel = opList.getSelectionModel();
 		getOperationSelection opSelection = new getOperationSelection();
@@ -158,25 +150,29 @@ public class CriteriaBuilderDialog extends JPanel
 		opList.setSelectionModel(listSelectionModel);
 
 		JScrollPane oppane = new JScrollPane();
-		oppane
-				.setToolTipText("Click on operations to copy them into the expression above");
+
 		oppane.setViewportView(opList);
-		oppane.setMinimumSize(new Dimension(125, 100));
-		oppane.setPreferredSize(new Dimension(125, 100));
-		oppane.setMaximumSize(new Dimension(125, Cytoscape.getDesktop()
-				.getHeight()));
-		opListPanel.add(oppane, BorderLayout.LINE_START);
+//		oppane.setMinimumSize(new Dimension(85, 100));
+//		oppane.setPreferredSize(new Dimension(85, 100));
+//		oppane.setMaximumSize(new Dimension(85, Cytoscape.getDesktop()
+//				.getHeight()));
+		
+		JLabel opLabel = new JLabel("Operators");
+		opLabel
+		.setToolTipText("Click on operators to copy them into the expression above");
+		
+		opListPanel.add(opLabel);
+		opListPanel.add(oppane);
 
-		JPanel buttonBox = new JPanel();
-
+		// put attr and op together
+		JPanel listPanel = new JPanel();
+		BoxLayout listBox = new BoxLayout(listPanel, BoxLayout.X_AXIS);
+		listPanel.setLayout(listBox);
 		listPanel.add(attListPanel);
 		listPanel.add(opListPanel);
-
-		bigPanel.add(labelPanel);
+		
+		// put it all together
 		bigPanel.add(listPanel);
-		bigPanel.add(buttonBox);
-		bigPanel.setMaximumSize(new Dimension(300, Cytoscape.getDesktop()
-				.getHeight()));
 
 		return bigPanel;
 	}
@@ -200,7 +196,7 @@ public class CriteriaBuilderDialog extends JPanel
 		fieldPanel.setBorder(titleBorder);
 
 		JTextArea jt = new JTextArea(
-				"Use this field to construct expressions using Attributes and Operations below.");
+				"Use this field to construct expressions using available Attributes and Operators.");
 		jt.setFont(new Font("Arial", Font.PLAIN, 10));
 		jt.setBackground(this.getBackground());
 		fieldPanel.add(jt);
