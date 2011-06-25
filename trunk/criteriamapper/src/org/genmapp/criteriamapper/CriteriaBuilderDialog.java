@@ -241,8 +241,14 @@ public class CriteriaBuilderDialog extends JPanel
 			for (int i = minIndex; i <= maxIndex; i++) {
 				// if (lsm.isSelectedIndex(i) && last != i) {
 				criteriaBuild = criteriaField.getText();
-				criteriaBuild = criteriaBuild + " \"" + attributesArray[i]
-						+ "\" ";
+				criteriaBuild = criteriaBuild.substring(0, criteriaField
+						.getCaretPosition() )
+						+ " \""
+						+ attributesArray[i]
+						+ "\" "
+						+ criteriaBuild
+								.substring(criteriaField.getCaretPosition(),
+										criteriaBuild.length() );
 				criteriaField.setText(criteriaBuild);
 				// System.out.println("Selected Index: "+i);
 				// }
@@ -281,7 +287,14 @@ public class CriteriaBuilderDialog extends JPanel
 
 					// if (lsm.isSelectedIndex(i) && last != i) {
 					criteriaBuild = criteriaField.getText();
-					criteriaBuild = criteriaBuild + " " + opArray[i] + " ";
+					criteriaBuild = criteriaBuild.substring(0, criteriaField
+							.getCaretPosition() )
+							+ " "
+							+ opArray[i]
+							+ " "
+							+ criteriaBuild.substring(criteriaField
+									.getCaretPosition(),
+									criteriaBuild.length() );;
 					criteriaField.setText(criteriaBuild);
 					// System.out.println("Selected Index: "+i);
 

@@ -91,10 +91,10 @@ public class AttributeManager {
 	}
 
 	/**
-	 * The values attribute refers to a list of colon separated Strings. The
-	 * values separated by the colons are the criteria, label, and color
-	 * respectively. Any number of values, or colon separated strings can be
-	 * associated with a setName or 'Criteria Set Name' attribute.
+	 * The values attribute refers to a list of double-colon separated Strings.
+	 * The values separated by double-colons are criteria, label, and color,
+	 * respectively. Any number of values, or double-colon separated strings,
+	 * can be associated with a setName or 'Criteria Set Name' attribute.
 	 * 
 	 * @param setName
 	 * @param mapTo
@@ -115,6 +115,15 @@ public class AttributeManager {
 		CytoscapeInit.getProperties().setProperty(
 				CriteriaCommandHandler.PROPERTY_SET_PREFIX + setName, str);
 
+		/*
+		 * Clear all setname nodeAttributes to clean up old, deleted and renamed
+		 * criteria. This method is followed by a fresh call to
+		 * calcNodeAttributes() to restore a new set.
+		 */
+		for (String attrname : nodeAttributes.getAttributeNames()){
+			if (attrname.startsWith(setName+"_"))
+				nodeAttributes.deleteAttribute(attrname);
+		}
 	}
 
 	/**
@@ -123,7 +132,8 @@ public class AttributeManager {
 	 * @param outcome
 	 */
 	public void setColorAttribute(String label, String nodeID, String outcome) {
-		nodeAttributes.setUserVisible(label, false);
+		nodeAttributes.setUserEditable(label, false);
+		nodeAttributes.setUserVisible(label, true);
 		nodeAttributes.setAttribute(nodeID, label, outcome);
 		nodeAttributes = Cytoscape.getNodeAttributes();
 	}
@@ -151,7 +161,8 @@ public class AttributeManager {
 		String compositeName = compositeLabel;
 
 		// set attr to hidden
-		nodeAttributes.setUserVisible(compositeName, false);
+		nodeAttributes.setUserVisible(compositeName, true);
+		nodeAttributes.setUserEditable(compositeName, false);
 
 		for (int i = 0; i < nodesList.size(); i++) {
 			Node node = nodesList.get(i);
