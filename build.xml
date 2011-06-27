@@ -87,6 +87,8 @@
         </unjar>
 		-->
    		
+        <copy file="plugin.props" todir="${build.classes}/org/genmapp/criteriamapper/"/>
+   		
       <jar destfile="${build.dir}/${plugin.name}.jar">
         <fileset dir="${build.classes}"/>
         </jar>
