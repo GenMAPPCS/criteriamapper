@@ -103,8 +103,9 @@ public class CriteriaMapperDialog extends JDialog
 	}
 
 	public void initialize() {
+		setTitle("CriteriaMapper");
+		
 		mainPanel = new JPanel();
-
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.PAGE_AXIS));
 
 		setPanel = getCriteriaSetPanel();
@@ -162,7 +163,7 @@ public class CriteriaMapperDialog extends JDialog
 		JLabel setLabel = new JLabel("Name");
 
 		nameBox = new JComboBox(nameBoxArray);
-		nameBox.setEditable((nameBoxArray.length == 1) ? true : false);
+		nameBox.setEditable(true); //(nameBoxArray.length == 1) ? true : false);
 		nameBox.setPreferredSize(new Dimension(240, 20));
 		nameBox.setActionCommand("nameBoxChanged");
 		nameBox.addActionListener(this);
@@ -307,18 +308,18 @@ public class CriteriaMapperDialog extends JDialog
 				return;
 			}
 			// prompt user to confirm deletion
-			setName = (String) nameBox.getSelectedItem();
+			String setNameToDel = (String) nameBox.getSelectedItem();
 			Object[] options = {"No", "Yes"};
 			int n = JOptionPane.showOptionDialog(this,
-					"Are you sure that you want to delete " + setName + "?",
+					"Are you sure that you want to delete " + setNameToDel + "?",
 					"", JOptionPane.YES_NO_CANCEL_OPTION,
 					JOptionPane.QUESTION_MESSAGE, null, options, options[1]);
 			if (n == 1) { // YES
-				attributeManager.removeSetFromProps(setName);
+				attributeManager.removeSetFromProps(setNameToDel);
 				deletedFlag = true; // to avoid autosave via nameBoxChanged
-				nameBox.removeItem(setName);
+				nameBox.removeItem(setNameToDel);
 				ctPanel.clearTable();
-				CriteriaCommandHandler.updateWorkspaces(setName);
+				CriteriaCommandHandler.updateWorkspaces(setNameToDel);
 			} else { // NO
 				// do nothing...
 			}
@@ -360,7 +361,7 @@ public class CriteriaMapperDialog extends JDialog
 	public void saveSettings(String sn) {
 
 		if (sn.equals("New...") || ctPanel.savedFlag) {
-			System.out.println("Skipped Save!");
+//			System.out.println("Skipped Save!");
 			return; // skip saving "New..." or already saved
 		}
 
